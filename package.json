@@ -1,0 +1,37 @@
+{
+  "name": "scorely-beta",
+  "version": "1.0.0",
+  "description": "AI-powered LinkedIn profile ranker for talent acquisition",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve .",
+    "dev": "npx serve . --listen 3000",
+    "build": "echo 'Static site - no build required'",
+    "deploy": "netlify deploy --prod --dir ."
+  },
+  "keywords": [
+    "linkedin",
+    "recruiting",
+    "ai",
+    "talent-acquisition",
+    "profile-ranking",
+    "hr-tech"
+  ],
+  "author": "Scorely Team",
+  "license": "PROPRIETARY",
+  "devDependencies": {
+    "serve": "^14.2.0",
+    "netlify-cli": "^17.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/your-username/scorely-beta.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/scorely-beta/issues"
+  },
+  "homepage": "https://your-username.github.io/scorely-beta/"
+}

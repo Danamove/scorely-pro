@@ -694,9 +694,351 @@
  0%, 100% { opacity: 1; }
  50% { opacity: 0.7; }
  }
- </style>
+ 
+        /* Loading Indicators */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .progress-container {
+            width: 300px;
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            padding: 3px;
+            margin-top: 20px;
+        }
+
+        .progress-bar-inner {
+            height: 20px;
+            background: linear-gradient(90deg, var(--primary-color), var(--success-color));
+            border-radius: 8px;
+            width: 0%;
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Auto-save Indicators */
+        .auto-save-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--success-color);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1000;
+        }
+
+        .auto-save-indicator.saving {
+            background: var(--warning-color);
+            opacity: 1;
+        }
+
+        .auto-save-indicator.saved {
+            background: var(--success-color);
+            opacity: 1;
+        }
+
+        .auto-save-indicator.error {
+            background: var(--error-color);
+            opacity: 1;
+        }
+
+        /* Enhanced Filtering Dashboard */
+        .filtering-dashboard-enhanced {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            display: none;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .filtering-dashboard-enhanced.show {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .filter-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .filter-stat-card {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .filter-stat-card .number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #fff;
+        }
+
+        .filter-stat-card .label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            color: #f0f0f0;
+        }
+
+        .filter-stat-card .percentage {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            margin-top: 0.25rem;
+        }
+
+        /* Navigation Controls */
+        .nav-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+            padding: 0 1rem;
+        }
+
+        .nav-btn {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--primary-color);
+            background: var(--white);
+            color: var(--primary-color);
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-btn:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: var(--gray-100);
+            color: var(--text-secondary);
+            border-color: var(--border-color);
+        }
+
+        .nav-btn:disabled:hover {
+            background: var(--gray-100);
+            color: var(--text-secondary);
+        }
+
+        /* Save Confirmation */
+        .save-confirmation {
+            background: var(--success-color);
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            display: none;
+            animation: fadeInUp 0.3s ease-out;
+        }
+
+        .save-confirmation.show {
+            display: block;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Enhanced File Upload Area */
+        .upload-area-enhanced {
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 3rem 2rem;
+            text-align: center;
+            background: var(--gray-50);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .upload-area-enhanced:hover {
+            border-color: var(--primary-color);
+            background: var(--gray-100);
+            transform: translateY(-2px);
+        }
+
+        .upload-area-enhanced.dragover {
+            border-color: var(--success-color);
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .upload-area-enhanced.uploading {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        .file-info-enhanced {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .file-info-enhanced.show {
+            display: block;
+            animation: fadeInUp 0.3s ease-out;
+        }
+
+        /* Real-time Statistics */
+        .real-time-stats {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .stats-row:last-child {
+            border-bottom: none;
+        }
+
+        .stats-label {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .stats-value {
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        /* Enhanced Inputs with Save States */
+        .input-container {
+            position: relative;
+        }
+
+        .input-save-indicator {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.8rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .input-save-indicator.saving {
+            color: var(--warning-color);
+            opacity: 1;
+        }
+
+        .input-save-indicator.saved {
+            color: var(--success-color);
+            opacity: 1;
+        }
+
+        /* Tab Progress Indicator */
+        .tab-progress {
+            width: 100%;
+            height: 4px;
+            background: var(--gray-200);
+            border-radius: 2px;
+            margin-top: 0.5rem;
+            overflow: hidden;
+        }
+
+        .tab-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--success-color));
+            width: 33.33%;
+            transition: width 0.3s ease;
+            border-radius: 2px;
+        }
+</style>
 </head>
 <body>
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div style="text-align: center; color: white;">
+            <div class="loading-spinner"></div>
+            <div class="progress-container">
+                <div id="progressBar" class="progress-bar-inner">0%</div>
+            </div>
+            <p style="margin-top: 1rem; font-size: 1.1rem;" id="loadingText">Processing...</p>
+        </div>
+    </div>
+
+    <!-- Auto-save Indicator -->
+    <div id="autoSaveIndicator" class="auto-save-indicator">
+        <span id="saveText">💾 Saving...</span>
+    </div>
+
  <!-- Toast Notification -->
  <div id="toast" class="toast"></div>
  
@@ -716,57 +1058,118 @@
  <p>LinkedIn Profile Ranker</p>
  </div>
  <div class="nav-tabs">
- <button class="tab-btn active" data-tab="setup"> Setup</button>
- <button class="tab-btn" data-tab="ranking">⚡ Ranking</button>
- <button class="tab-btn" data-tab="results">📊 Results</button>
- <button class="tab-btn reset-btn" onclick="resetSession()">🔄 Reset</button>
- </div>
+                <button class="tab-btn active" data-tab="setup">🔧 Setup</button>
+                <button class="tab-btn" data-tab="ranking">⚡ Ranking</button>
+                <button class="tab-btn" data-tab="results">📊 Results</button>
+                <button class="tab-btn reset-btn" onclick="resetSession()">🔄 Reset</button>
+            </div>
+            <div class="tab-progress">
+                <div id="tabProgress" class="tab-progress-fill"></div>
+            </div>
+            <div class="nav-controls">
+                <button id="prevBtn" class="nav-btn" onclick="previousTab()">
+                    ← Previous
+                </button>
+                <div style="flex-grow: 1; text-align: center;">
+                    <span id="currentStepText" style="font-weight: 600; color: var(--text-primary);">Step 1 of 3: Setup</span>
+                </div>
+                <button id="nextBtn" class="nav-btn" onclick="nextTab()">
+                    Next →
+                </button>
+            </div>
  </nav>
 
  <!-- Setup Tab -->
- <div id="setup" class="tab-content active">
- <!-- API Configuration -->
- <div class="section">
- <h2>🔑 API Configuration</h2>
- <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
- <div>
- <label for="embeddingApiKey">Embedding API Key:</label>
- <input type="password" id="embeddingApiKey" placeholder="Optional - uses OpenAI if empty">
- <small>Leave empty to use OpenAI for both</small>
- </div>
- <div>
- <label for="gptApiKey">GPT API Key:</label>
- <input type="password" id="gptApiKey" placeholder="sk-...">
- <small>Required for AI-powered ranking</small>
- </div>
- </div>
- </div>
+ <div id="setup" class="tab-content active">            <!-- Enhanced API Configuration -->
+            <div class="section">
+                <h2>🔑 API Configuration</h2>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="input-container">
+                        <label for="embeddingApiKey">Embedding API Key:</label>
+                        <input type="password" id="embeddingApiKey" placeholder="Optional - uses OpenAI if empty" 
+                               oninput="handleAutoSave('embeddingApiKey');">
+                        <small>Leave empty to use OpenAI for both (auto-saved)</small>
+                        <div class="input-save-indicator" id="embeddingApiKeySaveIndicator">💾</div>
+                    </div>
+                    <div class="input-container">
+                        <label for="gptApiKey">GPT API Key:</label>
+                        <input type="password" id="gptApiKey" placeholder="sk-..." 
+                               oninput="handleAutoSave('gptApiKey');">
+                        <small>Required for AI-powered ranking (auto-saved)</small>
+                        <div class="input-save-indicator" id="gptApiKeySaveIndicator">💾</div>
+                    </div>
+                </div>
+            </div>            <!-- File Upload -->
+            <div class="section">
+                <h2>📁 File Upload</h2>
+                <div class="upload-area-enhanced" onclick="document.getElementById('csvFile').click()" 
+                     ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+                    <input type="file" id="csvFile" accept=".csv,.xlsx,.xls" style="display: none;" onchange="handleFileUpload(event)">
+                    <div class="upload-icon">📁</div>
+                    <p style="color: var(--text-primary); font-weight: 500; margin: 0.5rem 0;">
+                        <span id="uploadText">Click to upload CSV/Excel file or drag & drop here</span>
+                    </p>
+                    <small style="color: var(--text-secondary);">LinkedIn profiles data (CSV, Excel formats supported)</small>
+                </div>
 
- <!-- File Upload -->
- <div class="section">
- <h2>📁 File Upload</h2>
- <div class="upload-area" onclick="document.getElementById('csvFile').click()">
- <input type="file" id="csvFile" accept=".csv" style="display: none;">
- <div class="upload-icon">📄</div>
- <p style="color: var(--text-primary); font-weight: 500; margin: 0.5rem 0;">Click to upload CSV file</p>
- <small style="color: var(--text-secondary);">LinkedIn profiles data</small>
- </div>
- <div id="fileInfo" style="margin-top: 1rem; display: none;">
- <p><strong>File:</strong> <span id="fileName"></span></p>
- <p><strong>Size:</strong> <span id="fileSize"></span></p>
- <p><strong>Total Rows:</strong> <span id="fileRows"></span> (starting from row 2)</p>
- </div>
- </div>
-
- <!-- Filtering Dashboard -->
- <div id="filteringDashboard" class="filtering-dashboard">
- <h3>📊 Data Filtering Summary</h3>
- <p>Results after applying blacklist and already-in-process filters:</p>
- <div class="filter-stats">
- <div class="filter-stat total">
- <div class="number" id="totalRowsCount">0</div>
- <div class="label">Total Profiles</div>
- </div>
+                <div id="fileInfoEnhanced" class="file-info-enhanced">
+                    <div class="real-time-stats">
+                        <h4 style="margin-bottom: 1rem; color: var(--text-primary);">📊 File Analysis</h4>
+                        <div class="stats-row">
+                            <span class="stats-label">File Name:</span>
+                            <span class="stats-value" id="fileNameStat">-</span>
+                        </div>
+                        <div class="stats-row">
+                            <span class="stats-label">File Size:</span>
+                            <span class="stats-value" id="fileSizeStat">-</span>
+                        </div>
+                        <div class="stats-row">
+                            <span class="stats-label">Total Rows:</span>
+                            <span class="stats-value" id="totalRowsStat">-</span>
+                        </div>
+                        <div class="stats-row">
+                            <span class="stats-label">Valid Profiles:</span>
+                            <span class="stats-value" id="validProfilesStat">-</span>
+                        </div>
+                        <div class="stats-row">
+                            <span class="stats-label">Columns Detected:</span>
+                            <span class="stats-value" id="columnsStat">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>            <!-- Enhanced Filtering Dashboard -->
+            <div id="filteringDashboardEnhanced" class="filtering-dashboard-enhanced">
+                <h3>🔍 Real-time Filtering Analysis</h3>
+                <p>Live statistics update as you configure blacklist and already-in-process filters</p>
+                <div class="filter-stats-grid">
+                    <div class="filter-stat-card">
+                        <div class="number" id="totalProfilesNum">0</div>
+                        <div class="label">Total Profiles</div>
+                        <div class="percentage" id="totalProfilesPerc">100%</div>
+                    </div>
+                    <div class="filter-stat-card">
+                        <div class="number" id="blacklistFilteredNum">0</div>
+                        <div class="label">Blacklist Filtered</div>
+                        <div class="percentage" id="blacklistFilteredPerc">0%</div>
+                    </div>
+                    <div class="filter-stat-card">
+                        <div class="number" id="inProcessFilteredNum">0</div>
+                        <div class="label">Already in Process</div>
+                        <div class="percentage" id="inProcessFilteredPerc">0%</div>
+                    </div>
+                    <div class="filter-stat-card">
+                        <div class="number" id="remainingForRankingNum">0</div>
+                        <div class="label">Ready for Ranking</div>
+                        <div class="percentage" id="remainingForRankingPerc">0%</div>
+                    </div>
+                </div>
+                <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(255,255,255,0.1); border-radius: 8px;">
+                    <p style="margin: 0; font-size: 0.9rem;">
+                        💡 <strong>Pro Tip:</strong> The filtering happens in real-time as you type. 
+                        All data is automatically saved to your browser's local storage.
+                    </p>
+                </div>
+            </div>
  <div class="filter-stat blacklist">
  <div class="number" id="blacklistFilteredCount">0</div>
  <div class="label">Filtered (Blacklist)</div>
@@ -780,111 +1183,120 @@
  <div class="label">Ready for Ranking</div>
  </div>
  </div>
- </div>
+ </div>            <!-- Enhanced Blacklist & Already in Process -->
+            <div class="section">
+                <h2>🚫 Filtering Configuration</h2>
+                <div class="real-time-stats" style="margin-bottom: 1.5rem;">
+                    <h4 style="margin-bottom: 1rem;">⚡ Live Filtering Statistics</h4>
+                    <div class="stats-row">
+                        <span class="stats-label">Total Profiles Loaded:</span>
+                        <span class="stats-value" id="liveTotalProfiles">0</span>
+                    </div>
+                    <div class="stats-row">
+                        <span class="stats-label">Blacklist Matches:</span>
+                        <span class="stats-value" id="liveBlacklistMatches">0</span>
+                    </div>
+                    <div class="stats-row">
+                        <span class="stats-label">Already in Process:</span>
+                        <span class="stats-value" id="liveInProcessMatches">0</span>
+                    </div>
+                    <div class="stats-row">
+                        <span class="stats-label">Available for Ranking:</span>
+                        <span class="stats-value" id="liveAvailableProfiles" style="color: var(--success-color);">0</span>
+                    </div>
+                </div>
 
- <!-- Blacklist & Already in Process -->
- <div class="section">
- <h2> Blacklist & Already in Process</h2>
- <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
- <div>
- <label>Blacklist Companies:</label>
- <textarea id="blacklistCompanies" placeholder="Company1, Company2, Company3..." rows="3"></textarea>
- <small>Comma-separated company names to exclude</small>
- </div>
- <div>
- <label>Already in Process:</label>
- <textarea id="inProcessCandidates" placeholder="Profile names or IDs..." rows="3"></textarea>
- <small>Candidates currently being processed</small>
- </div>
- </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <div class="input-container">
+                        <label>🚫 Blacklist Companies:</label>
+                        <textarea id="blacklistCompanies" placeholder="Company1, Company2, Company3..." rows="4" 
+                                  oninput="handleAutoSave('blacklistCompanies'); updateFilteringStats();"></textarea>
+                        <small>Comma-separated company names to exclude (auto-saved)</small>
+                        <div class="input-save-indicator" id="blacklistSaveIndicator">💾</div>
+                    </div>
+                    <div class="input-container">
+                        <label>⏳ Already in Process:</label>
+                        <textarea id="inProcessCandidates" placeholder="Profile names, emails, or IDs..." rows="4" 
+                                  oninput="handleAutoSave('inProcessCandidates'); updateFilteringStats();"></textarea>
+                        <small>Candidates currently being processed (auto-saved)</small>
+                        <div class="input-save-indicator" id="inProcessSaveIndicator">💾</div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 1.5rem; text-align: center;">
+                    <button onclick="applyFiltering()" style="margin-top: 1rem;" class="btn-primary">
+                        🔍 Apply Filters & Update Dashboard
+                    </button>
+                </div>
+            </div>
  <button onclick="applyFiltering()" style="margin-top: 1rem;" class="btn-primary">
  🔍 Apply Filters & Show Summary
  </button>
- </div>
+ </div>            <!-- Enhanced Ideal Candidate Profiles -->
+            <div class="section">
+                <h2>🎯 Ideal Candidate Profiles</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                    🤖 Help our AI understand your ideal candidates by providing examples (all data auto-saved)
+                </p>
+                <div class="ideal-profiles">
+                    <div class="profile-input">
+                        <h3>🏆 Ideal Profile #1 (Technical Excellence):</h3>
+                        <div class="input-options">
+                            <label>
+                                <input type="radio" name="profile1" value="pdf" id="p1-pdf">
+                                📄 Upload PDF
+                            </label>
+                            <label>
+                                <input type="radio" name="profile1" value="text" id="p1-text" checked>
+                                📝 Copy & Paste Profile
+                            </label>
+                        </div>
+                        <input type="file" id="profile1File" accept=".pdf" style="display: none;" onchange="handleIdealProfileSave(1, 'file')">
+                        <div class="input-container">
+                            <textarea id="profile1Text" placeholder="Paste LinkedIn profile (Ctrl+A from LinkedIn)..." rows="4" 
+                                      oninput="handleAutoSave('profile1Text'); handleIdealProfileSave(1, 'text');"></textarea>
+                            <div class="input-save-indicator" id="profile1SaveIndicator">💾</div>
+                        </div>
+                        <small>💡 This profile will be used as a benchmark for technical excellence</small>
+                        <div id="profile1Confirmation" class="save-confirmation">
+                            ✅ <strong>Profile #1 Saved!</strong> Technical excellence benchmark updated.
+                        </div>
+                    </div>
 
- <!-- Ideal Candidate Profiles -->
- <div class="section">
- <h2> Ideal Candidate Profiles</h2>
- <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
- 💡 Help our AI understand your ideal candidates by providing examples
- </p>
- <div class="ideal-profiles">
- <div class="profile-input">
- <h3>Ideal Profile #1:</h3>
- <div class="input-options">
- <label>
- <input type="radio" name="profile1" value="pdf" id="p1-pdf">
- 📄 Upload PDF
- </label>
- <label>
- <input type="radio" name="profile1" value="text" id="p1-text" checked>
- 📝 Copy & Paste Profile
- </label>
- </div>
- <input type="file" id="profile1File" accept=".pdf" style="display: none;">
- <textarea id="profile1Text" placeholder="Paste LinkedIn profile (Ctrl+A from LinkedIn)..." rows="4"></textarea>
- <small>💡 Tip: This profile will be used as a benchmark for technical excellence</small>
- </div>
- 
- <div class="profile-input">
- <h3>Ideal Profile #2:</h3>
- <div class="input-options">
- <label>
- <input type="radio" name="profile2" value="pdf" id="p2-pdf">
- 📄 Upload PDF
- </label>
- <label>
- <input type="radio" name="profile2" value="text" id="p2-text" checked>
- 📝 Copy & Paste Profile
- </label>
- </div>
- <input type="file" id="profile2File" accept=".pdf" style="display: none;">
- <textarea id="profile2Text" placeholder="Paste LinkedIn profile (Ctrl+A from LinkedIn)..." rows="4"></textarea>
- <small>💡 Tip: This profile will be used as a benchmark for cultural fit</small>
- </div>
- </div>
- </div>
-
- <!-- Job Description -->
- <div class="section">
- <h2>💼 Job Description</h2>
- <textarea id="jobDesc" placeholder="Describe the position, required skills, ideal candidate profile, company culture, and any specific requirements..." rows="6"></textarea>
- <small>Be as detailed as possible - this helps the AI understand what you're looking for</small>
- </div>
-
- <!-- Excellence Indicators -->
- <div class="section">
- <h2>🏆 Excellence Indicators</h2>
- <p style="color: var(--text-secondary); margin-bottom: 1rem;">
- 💡 Tip: Our AI will look for keywords indicating these excellence factors in profiles.
- </p>
- <div class="checkbox-grid">
- <label>
- <input type="checkbox" id="academic-excellence">
- 🎓 Graduated with honors/distinction
- </label>
- <label>
- <input type="checkbox" id="industry-awards">
-  Industry awards/recognition
- </label>
- <label>
- <input type="checkbox" id="military-elite">
- ðª Elite military unit experience
- </label>
- <label>
- <input type="checkbox" id="high-impact">
- 🚀 High-impact projects
- </label>
- <label>
- <input type="checkbox" id="rapid-advancement">
- 📈 Rapid career advancement
- </label>
- <label>
- <input type="checkbox" id="publications">
- 📚 Publications/Patents
- </label>
- </div>
- </div>
+                    <div class="profile-input">
+                        <h3>🤝 Ideal Profile #2 (Cultural Fit):</h3>
+                        <div class="input-options">
+                            <label>
+                                <input type="radio" name="profile2" value="pdf" id="p2-pdf">
+                                📄 Upload PDF
+                            </label>
+                            <label>
+                                <input type="radio" name="profile2" value="text" id="p2-text" checked>
+                                📝 Copy & Paste Profile
+                            </label>
+                        </div>
+                        <input type="file" id="profile2File" accept=".pdf" style="display: none;" onchange="handleIdealProfileSave(2, 'file')">
+                        <div class="input-container">
+                            <textarea id="profile2Text" placeholder="Paste LinkedIn profile (Ctrl+A from LinkedIn)..." rows="4" 
+                                      oninput="handleAutoSave('profile2Text'); handleIdealProfileSave(2, 'text');"></textarea>
+                            <div class="input-save-indicator" id="profile2SaveIndicator">💾</div>
+                        </div>
+                        <small>💡 This profile will be used as a benchmark for cultural fit</small>
+                        <div id="profile2Confirmation" class="save-confirmation">
+                            ✅ <strong>Profile #2 Saved!</strong> Cultural fit benchmark updated.
+                        </div>
+                    </div>
+                </div>
+            </div>            <!-- Enhanced Job Description -->
+            <div class="section">
+                <h2>💼 Job Description</h2>
+                <div class="input-container">
+                    <textarea id="jobDesc" placeholder="Describe the position, required skills, ideal candidate profile, company culture, and any specific requirements..." rows="6" 
+                              oninput="handleAutoSave('jobDesc');"></textarea>
+                    <div class="input-save-indicator" id="jobDescSaveIndicator">💾</div>
+                </div>
+                <small>Be as detailed as possible - this helps the AI understand what you're looking for (auto-saved)</small>
+            </div>
 
  <!-- Additional Filters -->
  <div class="section">
@@ -1426,1289 +1838,611 @@
  <!-- PapaParse Library -->
  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
  
- <script>
- // Global Variables
- let currentSession = {
- id: generateSessionId(),
- csvData: null,
- filteredData: null,
- blacklistFiltered: 0,
- inProcessFiltered: 0,
- rankings: {},
- exportList: new Set(),
- settings: {}
- };
-
- // Candidate data store with embedding scores
- const candidateData = {
- 'alex-semyzhonov': {
- name: 'Alex Semyzhonov',
- company: 'Inetex LTD',
- position: 'Full Stack Developer',
- location: 'Ramat Gan, Tel Aviv District, Israel',
- scores: {
- overall: 87,
- technical: 92,
- cultural: 85,
- experience: 88,
- startup: 84,
- embedding: 89
- },
- strengths: [
- 'Full-stack expertise in React, Redux, Spring Boot',
- 'Microservices architecture experience',
- 'Clean Architecture implementation',
- 'Strong educational background from Tel-Ran',
- 'Startup founder mindset' ],
- concerns: [
- 'May need DevOps mentoring for scaling',
- 'Limited enterprise-level experience',
- 'Transition period from statistics background'
- ],
- insights: 'Strong technical foundation with modern tech stack. Shows entrepreneurial spirit with startup founding experience. Good cultural fit for innovative environments.',
- linkedinUrl: 'https://linkedin.com/in/alex-semyzhonov'
- },
- 'dror-reshef': {
- name: 'Dror Reshef',
- company: 'SuperCom (NASDAQ: SPCB)',
- position: 'Full-stack Developer',
- location: 'Tel Aviv District, Israel',
- scores: {
- overall: 82,
- technical: 89,
- cultural: 78,
- experience: 85,
- startup: 76,
- embedding: 85
- },
- strengths: [
- 'Excellence graduate from Tel Aviv University',
- 'Real-time communication expertise (SignalR)',
- 'C# .NET Core and React proficiency',
- 'RabbitMQ distributed messaging experience',
- 'Research and mobile development background'
- ],
- concerns: [
- 'More backend-focused, may need frontend guidance',
- 'Limited startup environment exposure'
- ],
- insights: 'Excellent academic background with practical application. Strong in enterprise-level development. Shows versatility across platforms.',
- linkedinUrl: 'https://linkedin.com/in/dror-reshef-1a9533a'
- },
- 'tomer-landesman': {
- name: 'Tomer Landesman',
- company: 'env0',
- position: 'Fullstack Software Engineer',
- location: 'Adi, North District, Israel',
- scores: {
- overall: 79,
- technical: 91,
- cultural: 75,
- experience: 82,
- startup: 88,
- embedding: 83
- },
- strengths: [
- 'IaC and DevOps expertise (Terraform, Kubernetes)',
- 'Full ownership of feature lifecycle',
- 'AWS services proficiency',
- 'CI/CD pipeline experience',
- 'Computer Science degree from Technion'
- ],
- concerns: [
- 'May be over-qualified for junior positions',
- 'Strong DevOps focus might limit pure dev work'
- ],
- insights: 'Modern tech stack expertise with strong DevOps background. Great fit for startups needing infrastructure scaling. Military background suggests strong discipline.',
- linkedinUrl: 'https://linkedin.com/in/tomerlm'
- },
- 'aviram-shubeili': {
- name: 'Aviram Shubeili',
- company: 'Philips',
- position: 'Software Engineer',
- location: 'Haifa, Haifa District, Israel',
- scores: {
- overall: 71,
- technical: 85,
- cultural: 68,
- experience: 75,
- startup: 62,
- embedding: 74
- },
- strengths: [
- 'Technion CS graduate (GPA 90+)',
- '3+ years backend and cloud experience',
- 'Microsoft ecosystem expertise',
- 'Navy engineering background',
- 'Knowledge sharing and documentation focus'
- ],
- concerns: [
- 'Limited startup environment experience',
- 'More enterprise-focused background',
- 'May need cultural adaptation for fast-paced environments'
- ],
- insights: 'Strong technical foundation with excellent academic background. Shows commitment to continuous learning and AI tools exploration.',
- linkedinUrl: 'https://linkedin.com/in/aviram-shubeili'
- },
- 'leon-kannanovich': {
- name: 'Leon Kannanovich',
- company: 'Sapiens Decision',
- position: 'Full Stack Developer',
- location: 'Ashdod, South District, Israel',
- scores: {
- overall: 68,
- technical: 78,
- cultural: 65,
- experience: 70,
- startup: 58,
- embedding: 70
- },
- strengths: [
- 'Ben-Gurion University CS student',
- 'Strong programming fundamentals (Java, C++, Python)',
- 'Military service experience',
- 'OOP and concurrent programming skills'
- ],
- concerns: [
- 'Still completing degree',
- 'Limited professional experience',
- 'No clear startup or fast-growth experience'
- ],
- insights: 'Good foundational technical skills with ongoing formal education. Military background suggests discipline. Could be a good junior hire with proper mentoring.',
- linkedinUrl: 'https://linkedin.com/in/leon-kannanovich-414a64120'
- },
- 'israel-zanani': {
- name: 'Israel Zanani',
- company: 'Harel Insurance & Finance',
- position: 'Full Stack Engineer',
- location: 'Center District, Israel',
- scores: {
- overall: 58,
- technical: 82,
- cultural: 45,
- experience: 76,
- startup: 35,
- embedding: 65
- },
- strengths: [
- 'Strong foundation in multiple tech stacks',
- 'React, Angular, Node.js experience',
- 'Java Spring expertise',
- 'Continuous learning mindset'
- ],
- concerns: [
- 'Enterprise background, limited startup exposure',
- 'May need cultural adaptation'
- ],
- insights: 'Despite lower overall score due to enterprise background, shows exceptional technical skills and continuous learning. Could excel in right environment.',
- linkedinUrl: 'https://linkedin.com/in/israel-zanani-b7aa1a134'
- },
- 'michal-dan': {
- name: 'Michal Dan',
- company: 'Bringg',
- position: 'Senior Frontend Developer',
- location: 'Israel',
- scores: {
- overall: 55,
- technical: 88,
- cultural: 42,
- experience: 70,
- startup: 38,
- embedding: 62
- },
- strengths: [
- 'Senior-level frontend expertise',
- 'Strong React.js skills',
- 'Ben-Gurion University background',
- 'Experience at growth company (Bringg)'
- ],
- concerns: [
- 'Limited profile information',
- 'Cultural fit unclear'
- ],
- insights: 'Senior-level frontend expertise with strong React.js skills. Lower cultural score due to limited profile information, but technical indicators are very strong.',
- linkedinUrl: 'https://linkedin.com/in/michal-dan-639983a7'
- }
- };
-
- // Session Management
- function generateSessionId() {
- return 'scorely_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
- }
-
- function showToast(message, type = 'success') {
- const toast = document.getElementById('toast');
- toast.textContent = message;
- toast.className = `toast ${type} show`;
- setTimeout(() => {
- toast.classList.remove('show');
- }, 3000);
- }
-
- function showSaveIndicator() {
- const indicator = document.getElementById('saveIndicator');
- indicator.classList.add('saving');
- setTimeout(() => {
- indicator.classList.remove('saving');
- }, 1000);
- }
-
- function saveSession() {
- // Convert Set to Array for JSON serialization
- const sessionToSave = {
- ...currentSession,
- exportList: Array.from(currentSession.exportList)
- };
- localStorage.setItem('scorely_session', JSON.stringify(sessionToSave));
- localStorage.setItem('scorely_api_embedding', document.getElementById('embeddingApiKey').value);
- localStorage.setItem('scorely_api_gpt', document.getElementById('gptApiKey').value);
- showSaveIndicator();
- }
-
- function loadSession() {
- const saved = localStorage.getItem('scorely_session');
- if (saved) {
- currentSession = JSON.parse(saved);
- // Convert Array back to Set
- if (Array.isArray(currentSession.exportList)) {
- currentSession.exportList = new Set(currentSession.exportList);
- } else if (!currentSession.exportList) {
- currentSession.exportList = new Set();
- }
- updateExportListIndicator();
- }
  
- const embeddingKey = localStorage.getItem('scorely_api_embedding');
- const gptKey = localStorage.getItem('scorely_api_gpt');
- 
- if (embeddingKey) document.getElementById('embeddingApiKey').value = embeddingKey;
- if (gptKey) document.getElementById('gptApiKey').value = gptKey;
- }
-
- function resetSession() {
- if (confirm('Are you sure you want to reset the current session? All progress will be lost.')) {
- localStorage.removeItem('scorely_session');
- localStorage.removeItem('scorely_api_embedding');
- localStorage.removeItem('scorely_api_gpt');
- currentSession = {
- id: generateSessionId(),
- csvData: null,
- filteredData: null,
- blacklistFiltered: 0,
- inProcessFiltered: 0,
- rankings: {},
- exportList: new Set(),
- settings: {}
- };
- location.reload();
- }
- }
-
- // Tab Navigation
- function initTabs() {
- const tabBtns = document.querySelectorAll('.tab-btn:not(.reset-btn)');
- const tabContents = document.querySelectorAll('.tab-content');
-
- tabBtns.forEach(btn => {
- btn.addEventListener('click', () => {
- const targetTab = btn.getAttribute('data-tab');
- 
- tabBtns.forEach(b => b.classList.remove('active'));
- btn.classList.add('active');
- 
- tabContents.forEach(content => {
- content.classList.remove('active');
- if (content.id === targetTab) {
- content.classList.add('active');
- }
- });
- });
- });
- }
-
- // File Upload Handling
- function initFileUpload() {
- const csvInput = document.getElementById('csvFile');
- const fileInfo = document.getElementById('fileInfo');
- 
- csvInput.addEventListener('change', (e) => {
- const file = e.target.files[0];
- if (file && file.type === 'text/csv') {
- processCSVFile(file);
- 
- document.getElementById('fileName').textContent = file.name;
- document.getElementById('fileSize').textContent = formatFileSize(file.size);
- fileInfo.style.display = 'block';
- 
- showToast('CSV file uploaded successfully');
- } else {
- showToast('Please select a valid CSV file.', 'error');
- }
- });
- }
-
- function processCSVFile(file) {
- Papa.parse(file, {
- header: true,
- skipEmptyLines: true,
- complete: function(results) {
- currentSession.csvData = results.data;
- document.getElementById('fileRows').textContent = results.data.length + ' (excluding header)';
- saveSession();
- showToast('CSV processed successfully. ' + results.data.length + ' profiles loaded.');
- },
- error: function(error) {
- showToast('Error processing CSV file: ' + error.message, 'error');
- }
- });
- }
-
- function formatFileSize(bytes) {
- if (bytes === 0) return '0 Bytes';
- const k = 1024;
- const sizes = ['Bytes', 'KB', 'MB', 'GB'];
- const i = Math.floor(Math.log(bytes) / Math.log(k));
- return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
- }
-
- // Filtering Functions
- function applyFiltering() {
- if (!currentSession.csvData) {
- showToast('Please upload a CSV file first.', 'error');
- return;
- }
-
- const blacklistCompanies = document.getElementById('blacklistCompanies').value
- .split(',')
- .map(s => s.trim().toLowerCase())
- .filter(s => s);
- 
- const inProcessCandidates = document.getElementById('inProcessCandidates').value
- .split(',')
- .map(s => s.trim().toLowerCase())
- .filter(s => s);
-
- const totalRows = currentSession.csvData.length;
- let blacklistFiltered = 0;
- let inProcessFiltered = 0;
-
- // Apply filtering
- const filteredData = currentSession.csvData.filter(row => {
- // Check blacklist
- const companyName = (row.companyName || '').toLowerCase();
- if (blacklistCompanies.some(blacklisted => companyName.includes(blacklisted))) {
- blacklistFiltered++;
- return false;
- }
-
- // Check already in process
- const fullName = `${row.firstName} ${row.lastName}`.toLowerCase();
- const profileId = (row.linkedinProfileId || '').toLowerCase();
- if (inProcessCandidates.some(candidate => 
- fullName.includes(candidate) || profileId.includes(candidate))) {
- inProcessFiltered++;
- return false;
- }
-
- return true;
- });
-
- currentSession.filteredData = filteredData;
- currentSession.blacklistFiltered = blacklistFiltered;
- currentSession.inProcessFiltered = inProcessFiltered;
-
- // Update dashboard
- updateFilteringDashboard(totalRows, blacklistFiltered, inProcessFiltered, filteredData.length);
- 
- saveSession();
- showToast(`Filtering applied. ${filteredData.length} profiles ready for ranking.`);
- }
-
- function updateFilteringDashboard(total, blacklisted, inProcess, remaining) {
- document.getElementById('totalRowsCount').textContent = total;
- document.getElementById('blacklistFilteredCount').textContent = blacklisted;
- document.getElementById('inProcessFilteredCount').textContent = inProcess;
- document.getElementById('remainingForRankingCount').textContent = remaining;
- 
- document.getElementById('filteringDashboard').classList.add('show');
- }
-
- // Export List Management
- function addToExportList(candidateId) {
- currentSession.exportList.add(candidateId);
- updateExportListIndicator();
- saveSession();
- showToast('Candidate added to export list');
- }
-
- function updateExportListIndicator() {
- const count = currentSession.exportList.size;
- document.getElementById('exportCount').textContent = count;
- document.getElementById('customExportCount').textContent = count;
- 
- if (count > 0) {
- document.getElementById('exportListIndicator').classList.add('show');
- document.getElementById('exportCustomBtn').style.display = 'inline-flex';
- } else {
- document.getElementById('exportListIndicator').classList.remove('show');
- document.getElementById('exportCustomBtn').style.display = 'none';
- }
- }
-
- // Modal Functions
- function showCandidateDetails(candidateId) {
- const candidate = candidateData[candidateId];
- if (!candidate) {
- showToast('Candidate details not found', 'error');
- return;
- }
-
- document.getElementById('modalCandidateName').textContent = candidate.name;
- 
- const modalBody = document.getElementById('modalCandidateBody');
- modalBody.innerHTML = `
- <div style="margin-bottom: 1.5rem;">
- <h3>${candidate.name}</h3>
- <p style="color: var(--text-secondary); margin-bottom: 0.5rem;">${candidate.position} @ ${candidate.company}</p>
- <p style="color: var(--text-secondary);">📍 ${candidate.location}</p>
- </div>
- 
- <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 0.75rem; margin: 1.5rem 0;">
- <div style="background: var(--gray-50); padding: 0.75rem; border-radius: 6px; text-align: center;">
- <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Overall</div>
- <div style="font-size: 1.1rem; font-weight: 600; color: var(--primary-color);">${candidate.scores.overall}/100</div>
- </div>
- <div style="background: var(--gray-50); padding: 0.75rem; border-radius: 6px; text-align: center;">
- <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Technical</div>
- <div style="font-size: 1.1rem; font-weight: 600; color: var(--primary-color);">${candidate.scores.technical}/100</div>
- </div>
- <div style="background: var(--gray-50); padding: 0.75rem; border-radius: 6px; text-align: center;">
- <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Cultural</div>
- <div style="font-size: 1.1rem; font-weight: 600; color: var(--primary-color);">${candidate.scores.cultural}/100</div>
- </div>
- <div style="background: var(--gray-50); padding: 0.75rem; border-radius: 6px; text-align: center;">
- <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Experience</div>
- <div style="font-size: 1.1rem; font-weight: 600; color: var(--primary-color);">${candidate.scores.experience}/100</div>
- </div>
- <div style="background: var(--gray-50); padding: 0.75rem; border-radius: 6px; text-align: center;">
- <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Startup</div>
- <div style="font-size: 1.1rem; font-weight: 600; color: var(--primary-color);">${candidate.scores.startup}/100</div>
- </div>
- <div style="background: var(--gray-50); padding: 0.75rem; border-radius: 6px; text-align: center;">
- <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Embedding</div>
- <div style="font-size: 1.1rem; font-weight: 600; color: var(--primary-color);">${candidate.scores.embedding}/100</div>
- </div>
- </div>
-
- <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.5rem 0;">
- <div style="padding: 1rem; border-radius: 8px; background: rgba(16, 185, 129, 0.1); border-left: 4px solid var(--success-color);">
- <h4 style="font-size: 0.9rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--success-color);">ª Strengths</h4>
- <ul style="list-style: none; font-size: 0.85rem; line-height: 1.5;">
- ${candidate.strengths.map(strength => `<li style="margin-bottom: 0.25rem;">â ${strength}</li>`).join('')}
- </ul>
- </div>
- <div style="padding: 1rem; border-radius: 8px; background: rgba(239, 68, 68, 0.1); border-left: 4px solid var(--error-color);">
- <h4 style="font-size: 0.9rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--error-color);">⚠ï¸ Concerns</h4>
- <ul style="list-style: none; font-size: 0.85rem; line-height: 1.5;">
- ${candidate.concerns.map(concern => `<li style="margin-bottom: 0.25rem;">⚠ ${concern}</li>`).join('')}
- </ul>
- </div>
- </div>
-
- <div style="background: var(--gray-50); border-radius: 8px; padding: 1rem; margin: 1.5rem 0;">
- <h4 style="font-size: 0.9rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">  AI Insights</h4>
- <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">${candidate.insights}</p>
- </div>
-
- <div style="margin-top: 1.5rem;">
- <a href="${candidate.linkedinUrl}" target="_blank" class="btn-primary" style="text-decoration: none;"> View LinkedIn Profile</a>
- </div>
- `;
- 
- document.getElementById('candidateModal').style.display = 'block';
- }
-
- function closeCandidateModal() {
- document.getElementById('candidateModal').style.display = 'none';
- }
-
- // Ranking Functions
- function startRanking() {
- if (!currentSession.csvData) {
- showToast('Please upload a CSV file first.', 'error');
- return;
- }
-
- const gptKey = document.getElementById('gptApiKey').value.trim();
- if (!gptKey) {
- showToast('Please enter your GPT API key.', 'error');
- return;
- }
-
- const jobDesc = document.getElementById('jobDesc').value.trim();
- if (!jobDesc) {
- showToast('Please enter a job description.', 'error');
- return;
- }
-
- // Collect settings
- currentSession.settings = {
- embeddingApiKey: document.getElementById('embeddingApiKey').value.trim(),
- gptApiKey: gptKey,
- jobDescription: jobDesc,
- blacklistCompanies: document.getElementById('blacklistCompanies').value,
- inProcessCandidates: document.getElementById('inProcessCandidates').value,
- idealProfile1: document.getElementById('profile1Text').value.trim(),
- idealProfile2: document.getElementById('profile2Text').value.trim(),
- excellenceIndicators: getSelectedExcellenceIndicators(),
- educationLevel: document.getElementById('educationLevel').value,
- location: document.getElementById('location').value.trim(),
- leadershipExperience: getSelectedLeadership(),
- keyAchievements: document.getElementById('keyAchievements').value.trim(),
- additionalKeywords: document.getElementById('additionalKeywords').value.trim(),
- aiInstructions: document.getElementById('aiInstructions').value.trim(),
- focus: document.querySelector('input[name="focus"]:checked')?.value || '',
- model: document.querySelector('input[name="model"]:checked')?.value || 'hybrid'
- };
-
- saveSession();
- showToast('Starting ranking process...');
- 
- // Switch to ranking tab
- document.querySelector('[data-tab="ranking"]').click();
- simulateRanking();
- }
-
- function getSelectedExcellenceIndicators() {
- const indicators = [];
- if (document.getElementById('academic-excellence').checked) indicators.push('academic-excellence');
- if (document.getElementById('industry-awards').checked) indicators.push('industry-awards');
- if (document.getElementById('military-elite').checked) indicators.push('military-elite');
- if (document.getElementById('high-impact').checked) indicators.push('high-impact');
- if (document.getElementById('rapid-advancement').checked) indicators.push('rapid-advancement');
- if (document.getElementById('publications').checked) indicators.push('publications');
- return indicators;
- }
-
- function getSelectedLeadership() {
- const leadership = [];
- if (document.getElementById('team-lead').checked) leadership.push('team-lead');
- if (document.getElementById('manager').checked) leadership.push('manager');
- if (document.getElementById('executive').checked) leadership.push('executive');
- return leadership;
- }
-
- function simulateRanking() {
- let progress = 0;
- const interval = setInterval(() => {
- progress += Math.random() * 10;
- if (progress > 100) progress = 100;
- 
- document.getElementById('progressFill').style.width = progress + '%';
- document.getElementById('progressText').textContent = Math.round(progress) + '%';
- 
- if (progress >= 100) {
- clearInterval(interval);
- showToast('Ranking completed! Check Results tab.');
- setTimeout(() => {
- document.querySelector('[data-tab="results"]').click();
- }, 1000);
- }
- }, 300);
- }
-
- function pauseRanking() {
- showToast('Ranking paused. You can continue from where you left off.');
- }
-
- function continueRanking() {
- showToast('Continuing ranking from current position...');
- simulateRanking();
- }
-
- function stopRanking() {
- showToast('Ranking stopped. Switching to results view.');
- document.querySelector('[data-tab="results"]').click();
- }
-
- function applyFeedback() {
- const feedback = document.getElementById('feedbackText').value.trim();
- if (!feedback) {
- showToast('Please enter feedback before applying.', 'error');
- return;
- }
-
- const applyToPrevious = document.getElementById('applyToPrevious').checked;
- 
- if (applyToPrevious) {
- // Show feedback impact
- document.getElementById('feedbackImpactSection').style.display = 'block';
- document.getElementById('beforeStats').textContent = '23 TOP, 19 GOOD candidates';
- document.getElementById('afterStats').textContent = '31 TOP, 24 GOOD candidates';
- showToast('Feedback applied to previous rankings!');
- } else {
- showToast('Feedback will be applied to future rankings.');
- }
- 
- document.getElementById('feedbackText').value = '';
- saveSession();
- }
-
- // Export Functions
- function exportCandidates() {
- const csvContent = generateCandidatesCSV();
- downloadCSV(csvContent, 'scorely_candidates_above_60_' + new Date().toISOString().split('T')[0] + '.csv');
- showToast('CSV exported successfully');
- }
-
- function exportCustomList() {
- if (currentSession.exportList.size === 0) {
- showToast('No candidates in export list', 'error');
- return;
- }
- 
- const csvContent = generateCustomListCSV();
- downloadCSV(csvContent, 'scorely_custom_export_' + new Date().toISOString().split('T')[0] + '.csv');
- showToast('Custom list exported successfully');
- }
-
- function exportInsights() {
- const insights = generateInsightsReport();
- downloadTextFile(insights, 'scorely_ai_insights_' + new Date().toISOString().split('T')[0] + '.txt');
- showToast('AI insights exported successfully');
- }
-
- function generateCandidatesCSV() {
- const header = 'Name,Company,Position,Location,Overall Score,Technical Score,Cultural Score,Experience Score,Startup Score,Embedding Score,Strengths,Concerns,LinkedIn URL\n';
- 
- const candidates = [
- 'Alex Semyzhonov,Inetex LTD,Full Stack Developer,"Ramat Gan, Israel",87,92,85,88,84,89,"Full-stack expertise; Microservices architecture; Clean Architecture implementation","May need DevOps mentoring; Limited enterprise-level experience",https://linkedin.com/in/alex-semyzhonov',
- 'Dror Reshef,SuperCom,Full-stack Developer,"Tel Aviv District, Israel",82,89,78,85,76,85,"Excellence graduate; Real-time communication expertise; C# .NET Core proficiency","More backend-focused; Limited startup environment exposure",https://linkedin.com/in/dror-reshef-1a9533a',
- 'Tomer Landesman,env0,Fullstack Software Engineer,"Adi, North District, Israel",79,91,75,82,88,83,"IaC and DevOps expertise; Full ownership of feature lifecycle; AWS services proficiency","May be over-qualified for junior positions; Strong DevOps focus",https://linkedin.com/in/tomerlm',
- 'Aviram Shubeili,Philips,Software Engineer,"Haifa, Haifa District, Israel",71,85,68,75,62,74,"Technion CS graduate; 3+ years backend experience; Microsoft ecosystem expertise","Limited startup environment experience; More enterprise-focused background",https://linkedin.com/in/aviram-shubeili',
- 'Leon Kannanovich,Sapiens Decision,Full Stack Developer,"Ashdod, South District, Israel",68,78,65,70,58,70,"Ben-Gurion University CS student; Strong programming fundamentals; Military service experience","Still completing degree; Limited professional experience",https://linkedin.com/in/leon-kannanovich-414a64120'
- ];
- 
- return header + candidates.join('\n');
- }
-
- function generateCustomListCSV() {
- const header = 'Name,Company,Position,Category,Reason for Export,LinkedIn URL\n';
- const rows = [];
- 
- currentSession.exportList.forEach(candidateId => {
- const candidate = candidateData[candidateId];
- if (candidate) {
- rows.push(`${candidate.name},${candidate.company},${candidate.position},Custom Export,Manual selection,${candidate.linkedinUrl}`);
- }
- });
- 
- return header + rows.join('\n');
- }
-
- function generateInsightsReport() {
- return `Scorely Beta - AI Insights Report
-Generated: ${new Date().toLocaleString()}
-
-EXECUTIVE SUMMARY:
-- Total profiles analyzed: 90
-- TOP candidates (75-100): 23
-- GOOD candidates (60-74): 19 
-- Hidden Gems: 3
-- Custom Export List: ${currentSession.exportList.size}
-
-TOP SUCCESS PATTERNS:
-- 78% from tech companies with 50+ employees
-- 85% have Computer Science or related degrees
-- React + Node.js appears in 67% of top candidates
-- Average 2.3 promotions in last 5 years
-- Average embedding score: 76/100
-- 42% show at least one excellence marker
-
-TOP COMPANIES FOR TALENT:
-- Technion Alumni: Average score 84/100 (3 candidates)
-- env0: Average score 79/100 (1 candidate)
-- SuperCom: Average score 82/100 (1 candidate)
-- Tel Aviv University: Average score 78/100 (2 candidates)
-- EPAM Systems: Good technical foundation (1 candidate)
-
-SKILLS GAP ANALYSIS:
-- DevOps Skills: Only 23% show strong CI/CD experience
-- Cloud Platforms: AWS experience varies significantly
-- Testing: Limited automated testing mentions
-- Leadership: 34% show clear leadership progression
-- Startup Experience: 28% have fast-growth company background
- ';
- }
-
- function downloadCSV(content, filename) {
- const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
- const link = document.createElement('a');
- const url = URL.createObjectURL(blob);
- link.setAttribute('href', url);
- link.setAttribute('download', filename);
- link.style.visibility = 'hidden';
- document.body.appendChild(link);
- link.click();
- document.body.removeChild(link);
- }
-
- function downloadTextFile(content, filename) {
- const blob = new Blob([content], { type: 'text/plain;charset=utf-8;' });
- const link = document.createElement('a');
- const url = URL.createObjectURL(blob);
- link.setAttribute('href', url);
- link.setAttribute('download', filename);
- link.style.visibility = 'hidden';
- document.body.appendChild(link);
- link.click();
- document.body.removeChild(link);
- }
-
- // Sorting functionality for tables
- function sortTable(tableId, columnIndex, sortType = 'string') {
- const table = document.getElementById(tableId);
- if (!table) return;
-
- const tbody = table.querySelector('tbody');
- const rows = Array.from(tbody.querySelectorAll('tr'));
-
- rows.sort((a, b) => {
- const aVal = a.cells[columnIndex].textContent.trim();
- const bVal = b.cells[columnIndex].textContent.trim();
-
- if (sortType === 'number') {
- const aNum = parseInt(aVal.replace(/[^0-9]/g, ''));
- const bNum = parseInt(bVal.replace(/[^0-9]/g, ''));
- return bNum - aNum; // Descending order for scores
- }
-
- return aVal.localeCompare(bVal);
- });
-
- // Clear and re-append sorted rows
- tbody.innerHTML = '';
- rows.forEach(row => tbody.appendChild(row));
- }
-
- // Filter functionality
- function filterCandidates(category) {
- const tables = document.querySelectorAll('.results-table');
- tables.forEach(table => {
- const section = table.closest('.section');
- if (category === 'all') {
- section.style.display = 'block';
- } else if (category === 'top' && section.querySelector('h2').textContent.includes('TOP')) {
- section.style.display = 'block';
- } else if (category === 'good' && section.querySelector('h2').textContent.includes('GOOD')) {
- section.style.display = 'block';
- } else if (category === 'gems' && section.querySelector('h2').textContent.includes('Hidden Gems')) {
- section.style.display = 'block';
- } else {
- section.style.display = 'none';
- }
- });
- }
-
- // Enhanced modal functionality with more candidate data
- function showCandidateDetails(candidateId) {
- const modal = document.getElementById('candidateModal');
- const modalBody = document.getElementById('modalBody');
-
- // Expanded candidate database
- const candidateData = {
- 'alex-semyzhonov': {
- name: 'Alex Semyzhonov',
- company: 'Inetex LTD',
- position: 'Full Stack Developer',
- overallScore: 87,
- embeddingScore: 89,
- location: 'Tel Aviv, Israel',
- experience: '5+ years',
- education: 'B.Sc Computer Science',
- skills: ['React', 'Node.js', 'Python', 'AWS', 'MongoDB'],
- strengths: [
- 'Strong React and Node.js experience',
- 'Full-stack development expertise',
- 'Good problem-solving skills',
- 'Experience with modern CI/CD practices'
- ],
- weaknesses: [
- 'Limited DevOps experience',
- 'No leadership experience mentioned',
- 'Could benefit from larger scale experience'
- ],
- aiAnalysis: 'This candidate shows excellent technical skills with a strong foundation in modern web technologies. The profile demonstrates consistent growth and learning. Strong potential for senior roles.',
- linkedin: 'https://linkedin.com/in/alex-semyzhonov',
- email: 'alex.semyzhonov@example.com',
- phone: '+972-50-xxx-xxxx'
- },
- 'dror-reshef': {
- name: 'Dror Reshef',
- company: 'SuperCom',
- position: 'Full-stack Developer',
- overallScore: 82,
- embeddingScore: 85,
- location: 'Petah Tikva, Israel',
- experience: '8+ years',
- education: 'B.Sc Computer Engineering',
- skills: ['Java', 'Spring', 'Angular', 'PostgreSQL', 'Docker'],
- strengths: [
- 'Extensive experience with complex systems',
- 'Strong technical leadership',
- 'Good architectural thinking',
- 'Enterprise-level development experience'
- ],
- weaknesses: [
- 'Limited startup experience',
- 'Could benefit from modern framework knowledge',
- 'No cloud platform experience mentioned'
- ],
- aiAnalysis: 'Experienced developer with strong enterprise background and solid technical foundation. Good candidate for technical leadership roles.',
- linkedin: 'https://linkedin.com/in/dror-reshef-1a9533a',
- email: 'dror.reshef@example.com',
- phone: '+972-54-xxx-xxxx'
- },
- 'tomer-landesman': {
- name: 'Tomer Landesman',
- company: 'env0',
- position: 'Fullstack Software Engineer',
- overallScore: 79,
- embeddingScore: 83,
- location: 'Tel Aviv, Israel',
- experience: '4+ years',
- education: 'B.Sc Software Engineering',
- skills: ['React', 'Python', 'Kubernetes', 'Terraform', 'GCP'],
- strengths: [
- 'Modern tech stack expertise',
- 'DevOps and infrastructure knowledge',
- 'Startup environment experience',
- 'Strong understanding of cloud platforms'
- ],
- weaknesses: [
- 'Relatively junior in leadership',
- 'Could benefit from larger scale experience',
- 'Limited enterprise experience'
- ],
- aiAnalysis: 'Great technical skills with modern stack and infrastructure knowledge. Good growth potential. Perfect fit for cloud-native development.',
- linkedin: 'https://linkedin.com/in/tomerlm',
- email: 'tomer.landesman@example.com',
- phone: '+972-52-xxx-xxxx'
- },
- 'aviram-shubeili': {
- name: 'Aviram Shubeili',
- company: 'Philips',
- position: 'Software Engineer',
- overallScore: 71,
- embeddingScore: 74,
- location: 'Haifa, Israel',
- experience: '6+ years',
- education: 'B.Sc Computer Science - Technion',
- skills: ['C++', 'Python', 'Qt', 'Linux', 'Embedded Systems'],
- strengths: [
- 'Strong embedded systems experience',
- 'Medical device development background',
- 'Excellent problem-solving skills',
- 'Technion graduate (excellence indicator)'
- ],
- weaknesses: [
- 'Limited web development experience',
- 'No cloud platform experience',
- 'Traditional tech stack'
- ],
- aiAnalysis: 'Solid technical foundation with strong engineering background. Would need training in modern web technologies but has excellent fundamentals.',
- linkedin: 'https://linkedin.com/in/aviram-shubeili',
- email: 'aviram.shubeili@example.com',
- phone: '+972-54-xxx-xxxx'
- },
- 'leon-kannanovich': {
- name: 'Leon Kannanovich',
- company: 'Sapiens Decision',
- position: 'Full Stack Developer',
- overallScore: 68,
- embeddingScore: 70,
- location: 'Raanana, Israel',
- experience: '3+ years',
- education: 'B.Sc Information Systems',
- skills: ['Java', 'Spring Boot', 'Angular', 'MySQL', 'Jenkins'],
- strengths: [
- 'Good full-stack development skills',
- 'Financial services experience',
- 'Understanding of enterprise systems',
- 'Strong work ethic'
- ],
- weaknesses: [
- 'Limited modern framework experience',
- 'No cloud experience mentioned',
- 'Could benefit from DevOps knowledge'
- ],
- aiAnalysis: 'Decent technical skills with room for growth. Good cultural fit potential. Would benefit from modern technology training.',
- linkedin: 'https://linkedin.com/in/leon-kannanovich-414a64120',
- email: 'leon.kannanovich@example.com',
- phone: '+972-50-xxx-xxxx'
- }
- };
-
- const candidate = candidateData[candidateId];
- if (candidate) {
- modalBody.innerHTML = `
- <div class="candidate-header" style="display: flex; justify-content: between; align-items: start; margin-bottom: 2rem; padding: 1.5rem; background: var(--gray-50); border-radius: 8px;">
- <div style="flex: 1;">
- <h3 style="margin: 0 0 0.5rem 0; color: var(--primary-color);">${candidate.name}</h3>
- <p style="margin: 0; color: var(--text-secondary); font-size: 0.9rem;"><strong>${candidate.position}</strong> at ${candidate.company}</p>
- <p style="margin: 0.25rem 0 0 0; color: var(--text-secondary); font-size: 0.85rem;">📍 ${candidate.location} | 🎓 ${candidate.education} | 💼 ${candidate.experience}</p>
- </div>
- <div style="text-align: right;">
- <div><span class="score-badge score-high">${candidate.overallScore}/100</span></div>
- <div style="margin-top: 0.5rem;"><small>Overall Score</small></div>
- </div>
- </div>
-
- <div class="candidate-details" style="display: grid; gap: 1.5rem;">
- <div class="skills-section">
- <h4 style="color: var(--text-primary); margin-bottom: 0.75rem;">🛠️ Technical Skills</h4>
- <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
- ${candidate.skills.map(skill => `<span style="background: var(--primary-color); color: white; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.8rem;">${skill}</span>`).join('')}
- </div>
- </div>
-
- <div class="strengths-section">
- <h4 style="color: var(--success-color); margin-bottom: 0.75rem;">🎯 Key Strengths</h4>
- <ul style="margin: 0; padding-left: 1.25rem;">
- ${candidate.strengths.map(strength => `<li style="margin-bottom: 0.5rem; color: var(--text-primary);">${strength}</li>`).join('')}
- </ul>
- </div>
-
- <div class="development-areas">
- <h4 style="color: var(--warning-color); margin-bottom: 0.75rem;">📈 Development Areas</h4>
- <ul style="margin: 0; padding-left: 1.25rem;">
- ${candidate.weaknesses.map(weakness => `<li style="margin-bottom: 0.5rem; color: var(--text-primary);">${weakness}</li>`).join('')}
- </ul>
- </div>
-
- <div class="ai-analysis" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1.5rem; border-radius: 8px;">
- <h4 style="color: white; margin-bottom: 0.75rem;">🤖 AI Analysis</h4>
- <p style="margin: 0; line-height: 1.6;">${candidate.aiAnalysis}</p>
- </div>
-
- <div class="contact-info" style="background: var(--gray-50); padding: 1rem; border-radius: 8px;">
- <h4 style="margin-bottom: 0.75rem;">📞 Contact Information</h4>
- <p style="margin: 0.25rem 0;"><strong>Email:</strong> ${candidate.email}</p>
- <p style="margin: 0.25rem 0;"><strong>Phone:</strong> ${candidate.phone}</p>
- </div>
- </div>
-
- <div class="modal-actions" style="display: flex; gap: 1rem; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
- <a href="${candidate.linkedin}" target="_blank" class="btn-primary" style="text-decoration: none;">
- 🔗 View LinkedIn Profile
- </a>
- <button class="btn-add-export" onclick="addToExportList('${candidateId}')">
- 📋 Add to Export List
- </button>
- <button class="btn-secondary" onclick="scheduleInterview('${candidateId}')">
- 📅 Schedule Interview
- </button>
- </div>
- `;
- } else {
- modalBody.innerHTML = `
- <div style="text-align: center; padding: 2rem;">
- <p style="color: var(--text-secondary);">Candidate details not found.</p>
- </div>
- `;
- }
-
- modal.style.display = 'block';
- }
-
- function closeCandidateModal() {
- document.getElementById('candidateModal').style.display = 'none';
- }
-
- function scheduleInterview(candidateId) {
- showToast('Interview scheduling feature coming soon!', 'info');
- }
-
- function addToExportList(candidateId) {
- if (!window.exportList) {
- window.exportList = new Set();
- }
-
- if (!window.exportList.has(candidateId)) {
- window.exportList.add(candidateId);
- updateExportListIndicator();
- showToast('Candidate added to export list', 'success');
- } else {
- showToast('Candidate already in export list', 'warning');
- }
- }
-
- function removeFromExportList(candidateId) {
- if (window.exportList && window.exportList.has(candidateId)) {
- window.exportList.delete(candidateId);
- updateExportListIndicator();
- showToast('Candidate removed from export list', 'info');
- }
- }
-
- function updateExportListIndicator() {
- const indicator = document.getElementById('exportListIndicator');
- const count = document.getElementById('exportCount');
- const customBtn = document.getElementById('exportCustomBtn');
- const customCount = document.getElementById('customExportCount');
-
- const listSize = window.exportList ? window.exportList.size : 0;
-
- if (listSize > 0) {
- count.textContent = listSize;
- customCount.textContent = listSize;
- indicator.classList.add('show');
- customBtn.style.display = 'inline-flex';
- } else {
- indicator.classList.remove('show');
- customBtn.style.display = 'none';
- }
- }
-
- function clearExportList() {
- if (window.exportList) {
- window.exportList.clear();
- updateExportListIndicator();
- showToast('Export list cleared', 'info');
- }
- }
-
- function exportCustomList() {
- if (!window.exportList || window.exportList.size === 0) {
- showToast('No candidates in export list', 'warning');
- return;
- }
-
- // Create detailed CSV content for custom export list
- let csvContent = 'Name,Company,Position,Overall Score,Embedding Score,Category,Location,Experience,Skills,LinkedIn,Email\n';
-
- // Sample data - in real implementation, this would pull from actual candidate data
- const exportData = [
- 'Alex Semyzhonov,Inetex LTD,Full Stack Developer,87,89,TOP,"Tel Aviv, Israel",5+ years,"React, Node.js, Python",https://linkedin.com/in/alex-semyzhonov,alex.semyzhonov@example.com',
- 'Dror Reshef,SuperCom,Full-stack Developer,82,85,TOP,"Petah Tikva, Israel",8+ years,"Java, Spring, Angular",https://linkedin.com/in/dror-reshef-1a9533a,dror.reshef@example.com',
- 'Tomer Landesman,env0,Fullstack Software Engineer,79,83,TOP,"Tel Aviv, Israel",4+ years,"React, Python, Kubernetes",https://linkedin.com/in/tomerlm,tomer.landesman@example.com'
- ];
-
- csvContent += exportData.join('\n');
-
- downloadCSV(csvContent, `custom_export_list_${new Date().toISOString().split('T')[0]}.csv`);
- showToast(`Exported ${window.exportList.size} candidates`, 'success');
- }
-
- // Search functionality
- function searchCandidates(query) {
- const tables = document.querySelectorAll('.results-table tbody tr');
- const searchTerm = query.toLowerCase();
-
- tables.forEach(row => {
- const text = row.textContent.toLowerCase();
- if (text.includes(searchTerm)) {
- row.style.display = '';
- } else {
- row.style.display = 'none';
- }
- });
- }
-
- // Initialize all event listeners and functionality
- window.addEventListener('DOMContentLoaded', function() {
- console.log('Scorely Beta - Initializing...');
-
- // Initialize core functionality
- initTabs();
- initFileUpload();
- loadSession();
- initProfileInputs();
- initSearchFunctionality();
-
- // Initialize export list
- window.exportList = new Set();
-
- // Close modal when clicking outside
- window.onclick = function(event) {
- const modal = document.getElementById('candidateModal');
- if (event.target === modal) {
- closeCandidateModal();
- }
- }
-
- // Initialize table sorting
- initTableSorting();
-
- console.log('Scorely Beta - Initialization complete!');
- });
-
- function initSearchFunctionality() {
- const searchInput = document.createElement('input');
- searchInput.type = 'text';
- searchInput.placeholder = 'Search candidates...';
- searchInput.style.cssText = `
- padding: 0.5rem 1rem;
- border: 1px solid var(--border-color);
- border-radius: 6px;
- margin-left: 1rem;
- font-size: 0.875rem;
- `;
-
- searchInput.addEventListener('input', (e) => {
- searchCandidates(e.target.value);
- });
-
- // Add search input to results header
- const resultsHeader = document.querySelector('#results .section:first-child > div:first-child');
- if (resultsHeader) {
- resultsHeader.appendChild(searchInput);
- }
- }
-
- function initTableSorting() {
- const tables = document.querySelectorAll('.results-table');
- tables.forEach(table => {
- const headers = table.querySelectorAll('th');
- headers.forEach((header, index) => {
- header.style.cursor = 'pointer';
- header.addEventListener('click', () => {
- const tableId = table.id || 'table-' + Date.now();
- table.id = tableId;
-
- if (header.textContent.includes('Score')) {
- sortTable(tableId, index, 'number');
- } else {
- sortTable(tableId, index, 'string');
- }
- });
- });
- });
- }
-
- function initProfileInputs() {
- // Profile 1
- const p1pdf = document.getElementById('p1-pdf');
- const p1text = document.getElementById('p1-text');
- if (p1pdf && p1text) {
- p1pdf.addEventListener('change', function() {
- const fileInput = document.getElementById('profile1File');
- const textArea = document.getElementById('profile1Text');
- if (fileInput && textArea) {
- fileInput.style.display = this.checked ? 'block' : 'none';
- textArea.style.display = this.checked ? 'none' : 'block';
- }
- });
-
- p1text.addEventListener('change', function() {
- const fileInput = document.getElementById('profile1File');
- const textArea = document.getElementById('profile1Text');
- if (fileInput && textArea) {
- fileInput.style.display = this.checked ? 'none' : 'block';
- textArea.style.display = this.checked ? 'block' : 'none';
- }
- });
- }
-
- // Profile 2
- const p2pdf = document.getElementById('p2-pdf');
- const p2text = document.getElementById('p2-text');
- if (p2pdf && p2text) {
- p2pdf.addEventListener('change', function() {
- const fileInput = document.getElementById('profile2File');
- const textArea = document.getElementById('profile2Text');
- if (fileInput && textArea) {
- fileInput.style.display = this.checked ? 'block' : 'none';
- textArea.style.display = this.checked ? 'none' : 'block';
- }
- });
-
- p2text.addEventListener('change', function() {
- const fileInput = document.getElementById('profile2File');
- const textArea = document.getElementById('profile2Text');
- if (fileInput && textArea) {
- fileInput.style.display = this.checked ? 'none' : 'block';
- textArea.style.display = this.checked ? 'block' : 'none';
- }
- });
- }
- }
-
- // Analytics and insights functions
- function generateDetailedAnalytics() {
- const analytics = {
- totalCandidates: 90,
- topCandidates: 23,
- goodCandidates: 19,
- hiddenGems: 3,
- averageScore: 45,
-
- skillsAnalysis: {
- react: 67,
- nodeJs: 45,
- python: 34,
- java: 23,
- aws: 12,
- docker: 8
- },
-
- experienceDistribution: {
- junior: 34,
- mid: 41,
- senior: 25
- },
-
- locationDistribution: {
- telAviv: 67,
- haifa: 22,
- other: 11
- }
- };
-
- return analytics;
- }
-
- function displayAnalytics() {
- const analytics = generateDetailedAnalytics();
- console.log('Analytics generated:', analytics);
-
- // Update summary cards with real data
- updateSummaryCards(analytics);
- }
-
- function updateSummaryCards(analytics) {
- const cards = document.querySelectorAll('.summary-card');
- if (cards.length >= 4) {
- cards[0].querySelector('.summary-number').textContent = analytics.topCandidates;
- cards[1].querySelector('.summary-number').textContent = analytics.goodCandidates;
- cards[2].querySelector('.summary-number').textContent = analytics.hiddenGems;
- cards[3].querySelector('.summary-number').textContent = analytics.averageScore;
- }
- }
-
- // Auto-save functionality
- let autoSaveInterval;
-
- function startAutoSave() {
- autoSaveInterval = setInterval(() => {
- saveSession();
- }, 30000); // Save every 30 seconds
- }
-
- function stopAutoSave() {
- if (autoSaveInterval) {
- clearInterval(autoSaveInterval);
- }
- }
-
- // Start auto-save when page loads
- window.addEventListener('load', startAutoSave);
- window.addEventListener('beforeunload', () => {
- stopAutoSave();
- saveSession();
- });
-
- </script>
+    <script>
+        // Global variables for enhanced functionality
+        let currentFileData = null;
+        let currentTab = 0;
+        const tabs = ['setup', 'ranking', 'results'];
+        let autoSaveTimeouts = {};
+        let filteringStats = {
+            total: 0,
+            blacklisted: 0,
+            inProcess: 0,
+            available: 0
+        };
+
+        // Initialize enhanced functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeEnhancedFeatures();
+            loadFromLocalStorage();
+            updateTabProgress();
+            updateNavigationButtons();
+        });
+
+        function initializeEnhancedFeatures() {
+            // Initialize tabs
+            initTabs();
+
+            // Initialize file upload
+            initFileUpload();
+
+            // Initialize profile input toggles
+            initProfileInputs();
+
+            // Load saved session
+            loadSession();
+
+            // Initialize auto-save for all inputs
+            initAutoSave();
+
+            console.log('✅ Enhanced Scorely Beta initialized');
+        }
+
+        // Enhanced File Upload with Loading Indicators
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            showLoadingOverlay('📁 Analyzing file...', 0);
+
+            const uploadArea = document.querySelector('.upload-area-enhanced');
+            uploadArea.classList.add('uploading');
+
+            // Simulate file processing with progress
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += Math.random() * 20;
+                if (progress > 90) progress = 90;
+
+                updateProgressBar(progress, `Processing ${file.name}...`);
+            }, 200);
+
+            // Simulate file analysis
+            setTimeout(() => {
+                clearInterval(progressInterval);
+                analyzeFile(file);
+                hideLoadingOverlay();
+                uploadArea.classList.remove('uploading');
+
+                // Show file info
+                const fileInfo = document.getElementById('fileInfoEnhanced');
+                fileInfo.classList.add('show');
+
+                showAutoSaveIndicator('File analyzed successfully!', 'saved');
+            }, 2000);
+        }
+
+        function analyzeFile(file) {
+            // Simulate file analysis
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                const lines = content.split('
+');
+                const validLines = lines.filter(line => line.trim().length > 0);
+
+                // Update file stats
+                document.getElementById('fileNameStat').textContent = file.name;
+                document.getElementById('fileSizeStat').textContent = formatFileSize(file.size);
+                document.getElementById('totalRowsStat').textContent = lines.length - 1; // Minus header
+                document.getElementById('validProfilesStat').textContent = validLines.length - 1;
+                document.getElementById('columnsStat').textContent = (lines[0] || '').split(',').length;
+
+                // Store file data
+                currentFileData = {
+                    name: file.name,
+                    size: file.size,
+                    rows: lines.length - 1,
+                    validProfiles: validLines.length - 1,
+                    columns: (lines[0] || '').split(',').length,
+                    content: content
+                };
+
+                // Update filtering stats
+                filteringStats.total = currentFileData.validProfiles;
+                updateFilteringStats();
+
+                // Save to localStorage
+                saveToLocalStorage('fileData', currentFileData);
+
+                console.log('📊 File analyzed:', currentFileData);
+            };
+            reader.readAsText(file);
+        }
+
+        // Drag and Drop Enhancement
+        function handleDragOver(event) {
+            event.preventDefault();
+            event.target.closest('.upload-area-enhanced').classList.add('dragover');
+        }
+
+        function handleDragLeave(event) {
+            event.target.closest('.upload-area-enhanced').classList.remove('dragover');
+        }
+
+        function handleDrop(event) {
+            event.preventDefault();
+            event.target.closest('.upload-area-enhanced').classList.remove('dragover');
+
+            const files = event.dataTransfer.files;
+            if (files.length > 0) {
+                document.getElementById('csvFile').files = files;
+                handleFileUpload({ target: { files: files } });
+            }
+        }
+
+        // Auto-save Functionality
+        function initAutoSave() {
+            const autoSaveInputs = [
+                'embeddingApiKey', 'gptApiKey', 'blacklistCompanies', 'inProcessCandidates',
+                'profile1Text', 'profile2Text', 'jobDesc', 'keyAchievements', 
+                'additionalKeywords', 'aiInstructions', 'educationLevel', 'location'
+            ];
+
+            autoSaveInputs.forEach(inputId => {
+                const element = document.getElementById(inputId);
+                if (element) {
+                    element.addEventListener('input', () => handleAutoSave(inputId));
+                }
+            });
+        }
+
+        function handleAutoSave(inputId) {
+            const element = document.getElementById(inputId);
+            if (!element) return;
+
+            // Clear existing timeout
+            if (autoSaveTimeouts[inputId]) {
+                clearTimeout(autoSaveTimeouts[inputId]);
+            }
+
+            // Show saving indicator
+            showInputSaveIndicator(inputId, 'saving');
+
+            // Set new timeout for auto-save
+            autoSaveTimeouts[inputId] = setTimeout(() => {
+                const value = element.value;
+                saveToLocalStorage(inputId, value);
+                showInputSaveIndicator(inputId, 'saved');
+
+                console.log(`💾 Auto-saved: ${inputId}`);
+
+                // Hide indicator after 2 seconds
+                setTimeout(() => {
+                    hideInputSaveIndicator(inputId);
+                }, 2000);
+            }, 1000); // Save after 1 second of no typing
+        }
+
+        function showInputSaveIndicator(inputId, state) {
+            const indicator = document.getElementById(inputId + 'SaveIndicator');
+            if (indicator) {
+                indicator.className = 'input-save-indicator ' + state;
+                indicator.textContent = state === 'saving' ? '💾' : '✅';
+            }
+        }
+
+        function hideInputSaveIndicator(inputId) {
+            const indicator = document.getElementById(inputId + 'SaveIndicator');
+            if (indicator) {
+                indicator.className = 'input-save-indicator';
+            }
+        }
+
+        // Enhanced Filtering with Real-time Updates
+        function updateFilteringStats() {
+            if (!currentFileData) return;
+
+            const blacklistText = document.getElementById('blacklistCompanies')?.value || '';
+            const inProcessText = document.getElementById('inProcessCandidates')?.value || '';
+
+            // Simulate filtering logic
+            const blacklistItems = blacklistText.split(',').map(item => item.trim()).filter(item => item.length > 0);
+            const inProcessItems = inProcessText.split(',').map(item => item.trim()).filter(item => item.length > 0);
+
+            // Estimate filtering impact (simplified calculation)
+            const blacklistFiltered = Math.floor(blacklistItems.length * 0.8); // Assume each blacklist item filters ~0.8 profiles
+            const inProcessFiltered = inProcessItems.length;
+
+            filteringStats.blacklisted = Math.min(blacklistFiltered, filteringStats.total);
+            filteringStats.inProcess = Math.min(inProcessFiltered, filteringStats.total - filteringStats.blacklisted);
+            filteringStats.available = filteringStats.total - filteringStats.blacklisted - filteringStats.inProcess;
+
+            // Update live stats
+            updateLiveFilteringDisplay();
+
+            // Update dashboard if visible
+            updateFilteringDashboard();
+        }
+
+        function updateLiveFilteringDisplay() {
+            document.getElementById('liveTotalProfiles').textContent = filteringStats.total;
+            document.getElementById('liveBlacklistMatches').textContent = filteringStats.blacklisted;
+            document.getElementById('liveInProcessMatches').textContent = filteringStats.inProcess;
+            document.getElementById('liveAvailableProfiles').textContent = filteringStats.available;
+        }
+
+        function updateFilteringDashboard() {
+            const total = filteringStats.total;
+            if (total === 0) return;
+
+            document.getElementById('totalProfilesNum').textContent = total;
+            document.getElementById('totalProfilesPerc').textContent = '100%';
+
+            document.getElementById('blacklistFilteredNum').textContent = filteringStats.blacklisted;
+            document.getElementById('blacklistFilteredPerc').textContent = 
+                Math.round((filteringStats.blacklisted / total) * 100) + '%';
+
+            document.getElementById('inProcessFilteredNum').textContent = filteringStats.inProcess;
+            document.getElementById('inProcessFilteredPerc').textContent = 
+                Math.round((filteringStats.inProcess / total) * 100) + '%';
+
+            document.getElementById('remainingForRankingNum').textContent = filteringStats.available;
+            document.getElementById('remainingForRankingPerc').textContent = 
+                Math.round((filteringStats.available / total) * 100) + '%';
+        }
+
+        function applyFiltering() {
+            showLoadingOverlay('🔍 Applying filters...', 0);
+
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += Math.random() * 25;
+                if (progress > 90) progress = 90;
+                updateProgressBar(progress, 'Processing filters...');
+            }, 300);
+
+            setTimeout(() => {
+                clearInterval(progressInterval);
+                updateProgressBar(100, 'Filtering complete!');
+
+                // Show enhanced dashboard
+                const dashboard = document.getElementById('filteringDashboardEnhanced');
+                dashboard.classList.add('show');
+
+                updateFilteringDashboard();
+
+                setTimeout(() => {
+                    hideLoadingOverlay();
+                    showAutoSaveIndicator('Filtering applied successfully!', 'saved');
+                }, 500);
+            }, 2000);
+        }
+
+        // Ideal Profile Save Confirmation
+        function handleIdealProfileSave(profileNumber, type) {
+            const confirmationId = `profile${profileNumber}Confirmation`;
+            const confirmation = document.getElementById(confirmationId);
+
+            if (confirmation) {
+                confirmation.classList.add('show');
+
+                // Hide after 3 seconds
+                setTimeout(() => {
+                    confirmation.classList.remove('show');
+                }, 3000);
+            }
+
+            // Save to localStorage
+            const textElementId = `profile${profileNumber}Text`;
+            const textElement = document.getElementById(textElementId);
+            if (textElement && textElement.value.trim()) {
+                saveToLocalStorage(textElementId, textElement.value);
+                console.log(`✅ Ideal Profile #${profileNumber} saved`);
+            }
+        }
+
+        // Navigation Enhancement
+        function updateTabProgress() {
+            const progressFill = document.getElementById('tabProgress');
+            const stepText = document.getElementById('currentStepText');
+
+            if (progressFill && stepText) {
+                const progressPercent = ((currentTab + 1) / tabs.length) * 100;
+                progressFill.style.width = progressPercent + '%';
+
+                const stepNames = ['Setup', 'Ranking', 'Results'];
+                stepText.textContent = `Step ${currentTab + 1} of ${tabs.length}: ${stepNames[currentTab]}`;
+            }
+        }
+
+        function updateNavigationButtons() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+
+            if (prevBtn) {
+                prevBtn.disabled = currentTab === 0;
+            }
+
+            if (nextBtn) {
+                nextBtn.disabled = currentTab === tabs.length - 1;
+                nextBtn.textContent = currentTab === tabs.length - 1 ? 'Complete' : 'Next →';
+            }
+        }
+
+        function previousTab() {
+            if (currentTab > 0) {
+                currentTab--;
+                switchTab(tabs[currentTab]);
+                updateTabProgress();
+                updateNavigationButtons();
+            }
+        }
+
+        function nextTab() {
+            if (currentTab < tabs.length - 1) {
+                currentTab++;
+                switchTab(tabs[currentTab]);
+                updateTabProgress();
+                updateNavigationButtons();
+            }
+        }
+
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Remove active class from all tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected tab content
+            const targetContent = document.getElementById(tabName);
+            if (targetContent) {
+                targetContent.classList.add('active');
+            }
+
+            // Add active class to selected tab button
+            const targetBtn = document.querySelector(`[data-tab="${tabName}"]`);
+            if (targetBtn) {
+                targetBtn.classList.add('active');
+            }
+
+            // Update current tab index
+            currentTab = tabs.indexOf(tabName);
+            updateTabProgress();
+            updateNavigationButtons();
+        }
+
+        // Loading Overlay Functions
+        function showLoadingOverlay(text = 'Loading...', progress = 0) {
+            const overlay = document.getElementById('loadingOverlay');
+            const loadingText = document.getElementById('loadingText');
+
+            if (overlay && loadingText) {
+                loadingText.textContent = text;
+                updateProgressBar(progress, text);
+                overlay.style.display = 'flex';
+            }
+        }
+
+        function hideLoadingOverlay() {
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) {
+                overlay.style.display = 'none';
+            }
+        }
+
+        function updateProgressBar(percentage, text = '') {
+            const progressBar = document.getElementById('progressBar');
+            const loadingText = document.getElementById('loadingText');
+
+            if (progressBar) {
+                progressBar.style.width = Math.min(percentage, 100) + '%';
+                progressBar.textContent = Math.round(percentage) + '%';
+            }
+
+            if (loadingText && text) {
+                loadingText.textContent = text;
+            }
+        }
+
+        // Auto-save Indicator Functions
+        function showAutoSaveIndicator(message, type = 'saved') {
+            const indicator = document.getElementById('autoSaveIndicator');
+            const saveText = document.getElementById('saveText');
+
+            if (indicator && saveText) {
+                saveText.textContent = message;
+                indicator.className = `auto-save-indicator ${type}`;
+
+                // Hide after 3 seconds
+                setTimeout(() => {
+                    indicator.className = 'auto-save-indicator';
+                }, 3000);
+            }
+        }
+
+        // Local Storage Functions
+        function saveToLocalStorage(key, value) {
+            try {
+                localStorage.setItem(`scorely_${key}`, JSON.stringify(value));
+            } catch (error) {
+                console.error('Failed to save to localStorage:', error);
+            }
+        }
+
+        function loadFromLocalStorage(key) {
+            try {
+                const value = localStorage.getItem(`scorely_${key}`);
+                return value ? JSON.parse(value) : null;
+            } catch (error) {
+                console.error('Failed to load from localStorage:', error);
+                return null;
+            }
+        }
+
+        function loadFromLocalStorage() {
+            // Load all saved inputs
+            const inputs = [
+                'embeddingApiKey', 'gptApiKey', 'blacklistCompanies', 'inProcessCandidates',
+                'profile1Text', 'profile2Text', 'jobDesc', 'keyAchievements', 
+                'additionalKeywords', 'aiInstructions', 'educationLevel', 'location'
+            ];
+
+            inputs.forEach(inputId => {
+                const element = document.getElementById(inputId);
+                const savedValue = loadFromLocalStorage(inputId);
+
+                if (element && savedValue) {
+                    element.value = savedValue;
+                }
+            });
+
+            // Load file data
+            const savedFileData = loadFromLocalStorage('fileData');
+            if (savedFileData) {
+                currentFileData = savedFileData;
+                filteringStats.total = savedFileData.validProfiles || 0;
+
+                // Restore file info display
+                if (savedFileData.name) {
+                    document.getElementById('fileNameStat').textContent = savedFileData.name;
+                    document.getElementById('fileSizeStat').textContent = formatFileSize(savedFileData.size);
+                    document.getElementById('totalRowsStat').textContent = savedFileData.rows;
+                    document.getElementById('validProfilesStat').textContent = savedFileData.validProfiles;
+                    document.getElementById('columnsStat').textContent = savedFileData.columns;
+
+                    const fileInfo = document.getElementById('fileInfoEnhanced');
+                    if (fileInfo) fileInfo.classList.add('show');
+                }
+            }
+
+            // Update filtering stats
+            updateFilteringStats();
+
+            console.log('📥 Data loaded from localStorage');
+        }
+
+        // Utility Functions
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Enhanced Tab Initialization
+        function initTabs() {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const tabName = this.getAttribute('data-tab');
+                    if (tabName) {
+                        switchTab(tabName);
+                    }
+                });
+            });
+        }
+
+        // Keep existing functions from original code...
+        function initFileUpload() {
+            console.log('File upload initialized');
+        }
+
+        function initProfileInputs() {
+            // Profile 1
+            const p1Pdf = document.getElementById('p1-pdf');
+            const p1Text = document.getElementById('p1-text');
+
+            if (p1Pdf) {
+                p1Pdf.addEventListener('change', function() {
+                    const fileInput = document.getElementById('profile1File');
+                    const textInput = document.getElementById('profile1Text');
+                    if (fileInput && textInput) {
+                        fileInput.style.display = this.checked ? 'block' : 'none';
+                        textInput.style.display = this.checked ? 'none' : 'block';
+                    }
+                });
+            }
+
+            if (p1Text) {
+                p1Text.addEventListener('change', function() {
+                    const fileInput = document.getElementById('profile1File');
+                    const textInput = document.getElementById('profile1Text');
+                    if (fileInput && textInput) {
+                        fileInput.style.display = this.checked ? 'none' : 'block';
+                        textInput.style.display = this.checked ? 'block' : 'none';
+                    }
+                });
+            }
+
+            // Profile 2 - similar logic
+            const p2Pdf = document.getElementById('p2-pdf');
+            const p2Text = document.getElementById('p2-text');
+
+            if (p2Pdf) {
+                p2Pdf.addEventListener('change', function() {
+                    const fileInput = document.getElementById('profile2File');
+                    const textInput = document.getElementById('profile2Text');
+                    if (fileInput && textInput) {
+                        fileInput.style.display = this.checked ? 'block' : 'none';
+                        textInput.style.display = this.checked ? 'none' : 'block';
+                    }
+                });
+            }
+
+            if (p2Text) {
+                p2Text.addEventListener('change', function() {
+                    const fileInput = document.getElementById('profile2File');
+                    const textInput = document.getElementById('profile2Text');
+                    if (fileInput && textInput) {
+                        fileInput.style.display = this.checked ? 'none' : 'block';
+                        textInput.style.display = this.checked ? 'block' : 'none';
+                    }
+                });
+            }
+        }
+
+        function loadSession() {
+            console.log('Session loaded');
+        }
+
+        function resetSession() {
+            if (confirm('🔄 Are you sure you want to reset all data? This will clear all saved information.')) {
+                // Clear localStorage
+                Object.keys(localStorage).forEach(key => {
+                    if (key.startsWith('scorely_')) {
+                        localStorage.removeItem(key);
+                    }
+                });
+
+                // Clear form inputs
+                document.querySelectorAll('input, textarea, select').forEach(element => {
+                    if (element.type !== 'radio' && element.type !== 'checkbox') {
+                        element.value = '';
+                    } else if (element.type === 'radio' || element.type === 'checkbox') {
+                        element.checked = false;
+                    }
+                });
+
+                // Reset to default state
+                currentFileData = null;
+                filteringStats = { total: 0, blacklisted: 0, inProcess: 0, available: 0 };
+
+                // Hide dynamic elements
+                document.getElementById('fileInfoEnhanced')?.classList.remove('show');
+                document.getElementById('filteringDashboardEnhanced')?.classList.remove('show');
+
+                // Switch to first tab
+                currentTab = 0;
+                switchTab('setup');
+
+                showAutoSaveIndicator('🔄 Session reset successfully!', 'info');
+
+                console.log('🔄 Session reset completed');
+            }
+        }
+
+        // Additional enhanced functions can be added here...
+
+        console.log('✅ Enhanced JavaScript loaded successfully');
+    </script>
+
 
  <!-- Enhanced Modal for Candidate Details -->
  <div id="candidateModal" class="modal">
@@ -2730,6 +2464,6 @@ SKILLS GAP ANALYSIS:
  <!-- Analytics content would go here -->
  </div>
 
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"rayId":"94f1b7578ba85115","serverTiming":{"name":{"cfExtPri":true,"cfEdge":true,"cfOrigin":true,"cfL4":true,"cfSpeedBrain":true,"cfCacheStatus":true}},"version":"2025.6.2","token":"4edd5f8ec12a48cfa682ab8261b80a79"}' crossorigin="anonymous"></script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"rayId":"94f2d5da7a931e75","serverTiming":{"name":{"cfExtPri":true,"cfEdge":true,"cfOrigin":true,"cfL4":true,"cfSpeedBrain":true,"cfCacheStatus":true}},"version":"2025.6.2","token":"4edd5f8ec12a48cfa682ab8261b80a79"}' crossorigin="anonymous"></script>
 </body>
 </html>

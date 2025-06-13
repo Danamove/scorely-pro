@@ -4,647 +4,174 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scorely Beta - LinkedIn Profile Ranker</title>
-<link rel="stylesheet" href="./css/style.css">
-<script src="./js/script.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="container">
         <!-- Navigation -->
-        <div class="nav-container">
-            <div class="nav-tabs">
-                <button class="nav-tab active" data-tab="setup">
-                    <i class="fas fa-cog"></i> Setup
-                </button>
-                <button class="nav-tab" data-tab="ranking">
-                    <i class="fas fa-chart-line"></i> Ranking
-                </button>
-                <button class="nav-tab" data-tab="results">
-                    <i class="fas fa-trophy"></i> Results
-                </button>
-                <button class="nav-tab reset-btn" onclick="resetSession()">
-                    <i class="fas fa-refresh"></i> Reset
-                </button>
+        <nav class="navbar">
+            <div class="nav-brand">
+                <h1>🎯 Scorely Beta</h1>
+                <p>LinkedIn Profile Ranker</p>
             </div>
-        </div>
+            <div class="nav-tabs">
+                <button class="tab-btn active" data-tab="setup">📋 Setup</button>
+                <button class="tab-btn" data-tab="ranking">⚡ Ranking</button>
+                <button class="tab-btn" data-tab="results">📊 Results</button>
+                <button class="tab-btn reset-btn">🔄 Reset</button>
+            </div>
+        </nav>
 
         <!-- Setup Tab -->
-        <div id="setup-tab" class="tab-content active">
+        <div id="setup" class="tab-content active">
             <div class="section">
-                <h2><i class="fas fa-upload"></i> File Upload</h2>
+                <h2>📁 File Upload</h2>
                 <div class="upload-area">
-                    <div class="upload-box">
-                        <i class="fas fa-cloud-upload-alt"></i>
-                        <p>Drop CSV file here or click to browse</p>
-                        <input type="file" id="csvFile" accept=".csv" style="display: none;">
-                        <button onclick="document.getElementById('csvFile').click()">Choose File</button>
+                    <input type="file" id="csvFile" accept=".csv" style="display: none;">
+                    <div class="upload-box" onclick="document.getElementById('csvFile').click()">
+                        <div class="upload-icon">📄</div>
+                        <p>Click to upload CSV file</p>
+                        <small>LinkedIn profiles data</small>
                     </div>
                 </div>
             </div>
 
-            <!-- Ideal Profiles Section -->
             <div class="section">
-                <h2><i class="fas fa-star"></i> Ideal Candidate Profiles (Optional)</h2>
-                <div class="ideal-profiles-container">
-                    <p class="help-text">
-                        <i class="fas fa-lightbulb"></i>
-                        Help our AI understand your ideal candidates by providing examples
-                    </p>
+                <h2>🚫 Blacklist & Filters</h2>
+                <div class="filter-grid">
+                    <div class="filter-item">
+                        <label>Blacklist Companies:</label>
+                        <textarea placeholder="Company1, Company2, Company3..."></textarea>
+                    </div>
+                    <div class="filter-item">
+                        <label>Already in Process:</label>
+                        <textarea placeholder="Profile IDs or names..."></textarea>
+                    </div>
+                </div>
+            </div>
 
-                    <div class="ideal-profile">
+            <div class="section">
+                <h2>👤 Ideal Candidate Profiles</h2>
+                <div class="ideal-profiles">
+                    <div class="profile-input">
                         <h3>Ideal Profile #1:</h3>
-                        <div class="profile-input-options">
-                            <label class="radio-option">
-                                <input type="radio" name="profile1-type" value="pdf">
-                                <span>Upload PDF</span>
-                            </label>
-                            <label class="radio-option">
-                                <input type="radio" name="profile1-type" value="paste" checked>
-                                <span>Copy & Paste Profile</span>
-                            </label>
+                        <div class="input-options">
+                            <input type="radio" name="profile1" value="pdf" id="p1-pdf">
+                            <label for="p1-pdf">📄 Upload PDF</label>
+                            <input type="radio" name="profile1" value="text" id="p1-text" checked>
+                            <label for="p1-text">📝 Copy & Paste</label>
                         </div>
-
-                        <div class="pdf-upload" id="profile1-pdf" style="display: none;">
-                            <input type="file" id="profile1File" accept=".pdf">
-                            <label for="profile1File" class="file-label">
-                                <i class="fas fa-file-pdf"></i> Choose PDF
-                            </label>
-                        </div>
-
-                        <div class="paste-area" id="profile1-paste">
-                            <textarea placeholder="Paste Profile (Ctrl+A from LinkedIn)&#10;&#10;Example:&#10;John Doe - Senior Full Stack Developer&#10;Microsoft - 8 years experience&#10;Led team of 12 engineers, architected scalable systems..."></textarea>
-                        </div>
+                        <textarea placeholder="Paste LinkedIn profile (Ctrl+A from LinkedIn)..."></textarea>
                     </div>
-
-                    <div class="ideal-profile">
+                    
+                    <div class="profile-input">
                         <h3>Ideal Profile #2:</h3>
-                        <div class="profile-input-options">
-                            <label class="radio-option">
-                                <input type="radio" name="profile2-type" value="pdf">
-                                <span>Upload PDF</span>
-                            </label>
-                            <label class="radio-option">
-                                <input type="radio" name="profile2-type" value="paste" checked>
-                                <span>Copy & Paste Profile</span>
-                            </label>
+                        <div class="input-options">
+                            <input type="radio" name="profile2" value="pdf" id="p2-pdf">
+                            <label for="p2-pdf">📄 Upload PDF</label>
+                            <input type="radio" name="profile2" value="text" id="p2-text" checked>
+                            <label for="p2-text">📝 Copy & Paste</label>
                         </div>
-
-                        <div class="pdf-upload" id="profile2-pdf" style="display: none;">
-                            <input type="file" id="profile2File" accept=".pdf">
-                            <label for="profile2File" class="file-label">
-                                <i class="fas fa-file-pdf"></i> Choose PDF
-                            </label>
-                        </div>
-
-                        <div class="paste-area" id="profile2-paste">
-                            <textarea placeholder="Paste Profile (Ctrl+A from LinkedIn)&#10;&#10;Example:&#10;Sarah Chen - Product Manager&#10;Google - 6 years experience&#10;Launched 3 products from 0-to-1, excellent stakeholder management..."></textarea>
-                        </div>
-                    </div>
-
-                    <div class="tip-box">
-                        <i class="fas fa-info-circle"></i>
-                        <strong>Tip:</strong> These profiles will be used as benchmarks for scoring all candidates
+                        <textarea placeholder="Paste LinkedIn profile (Ctrl+A from LinkedIn)..."></textarea>
                     </div>
                 </div>
             </div>
 
-            <!-- Blacklist Management -->
             <div class="section">
-                <h2><i class="fas fa-ban"></i> Blacklist Management</h2>
-                <div class="blacklist-container">
-                    <div class="upload-method">
-                        <label class="radio-option">
-                            <input type="radio" name="blacklist-method" value="upload" checked>
-                            <span>Upload CSV File</span>
-                        </label>
-                        <label class="radio-option">
-                            <input type="radio" name="blacklist-method" value="manual">
-                            <span>Add Manually</span>
-                        </label>
-                    </div>
+                <h2>💼 Job Description</h2>
+                <textarea id="jobDesc" placeholder="Describe the position, required skills, and ideal candidate..."></textarea>
+            </div>
 
-                    <div class="upload-option" id="blacklist-upload">
-                        <input type="file" id="blacklistFile" accept=".csv">
-                        <label for="blacklistFile" class="file-label">
-                            <i class="fas fa-upload"></i> Choose Blacklist CSV
-                        </label>
-                    </div>
-
-                    <div class="manual-option" id="blacklist-manual" style="display: none;">
-                        <textarea placeholder="Enter company names (one per line):&#10;Company A&#10;Company B&#10;Company C"></textarea>
-                    </div>
+            <div class="section">
+                <h2>🏆 Excellence Indicators</h2>
+                <div class="checkbox-grid">
+                    <label><input type="checkbox"> 🎓 Graduated with honors/distinction</label>
+                    <label><input type="checkbox"> 🏅 Industry awards/recognition</label>
+                    <label><input type="checkbox"> 🪖 Elite military unit experience</label>
+                    <label><input type="checkbox"> 🚀 High-impact projects</label>
+                    <label><input type="checkbox"> 📈 Rapid career advancement</label>
+                    <label><input type="checkbox"> 📚 Publications/Patents</label>
                 </div>
             </div>
 
-            <!-- Already in Process -->
             <div class="section">
-                <h2><i class="fas fa-clock"></i> Already in Process</h2>
-                <div class="in-process-container">
-                    <div class="upload-method">
-                        <label class="radio-option">
-                            <input type="radio" name="process-method" value="upload" checked>
-                            <span>Upload CSV File</span>
-                        </label>
-                        <label class="radio-option">
-                            <input type="radio" name="process-method" value="manual">
-                            <span>Add Manually</span>
-                        </label>
-                    </div>
-
-                    <div class="upload-option" id="process-upload">
-                        <input type="file" id="processFile" accept=".csv">
-                        <label for="processFile" class="file-label">
-                            <i class="fas fa-upload"></i> Choose CSV File
-                        </label>
-                    </div>
-
-                    <div class="manual-option" id="process-manual" style="display: none;">
-                        <textarea placeholder="Enter candidate details:&#10;John Doe, Company&#10;Jane Smith, Company&#10;etc."></textarea>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Job Description -->
-            <div class="section">
-                <h2><i class="fas fa-briefcase"></i> Job Description</h2>
-                <div class="job-description-container">
-                    <div class="upload-method">
-                        <label class="radio-option">
-                            <input type="radio" name="job-method" value="text" checked>
-                            <span>Text Input</span>
-                        </label>
-                        <label class="radio-option">
-                            <input type="radio" name="job-method" value="pdf">
-                            <span>Upload PDF</span>
-                        </label>
-                    </div>
-
-                    <div class="text-option" id="job-text">
-                        <textarea placeholder="Enter job description...&#10;&#10;Position: Senior Full Stack Developer&#10;Requirements: 5+ years experience, React, Node.js...&#10;Responsibilities: Lead development team, architect solutions..."></textarea>
-                    </div>
-
-                    <div class="upload-option" id="job-pdf" style="display: none;">
-                        <input type="file" id="jobFile" accept=".pdf">
-                        <label for="jobFile" class="file-label">
-                            <i class="fas fa-file-pdf"></i> Choose PDF
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Excellence Indicators -->
-            <div class="section">
-                <h2><i class="fas fa-medal"></i> Excellence Indicators</h2>
-                <div class="excellence-container">
-                    <p class="help-text">
-                        <i class="fas fa-lightbulb"></i>
-                        <strong>Tip:</strong> Our AI will look for keywords indicating these excellence factors in profiles. 
-                        For example: 'graduated summa cum laude', 'promoted to lead in 6 months', 'recognized with award'.
-                    </p>
-
-                    <div class="excellence-categories">
-                        <div class="excellence-category">
-                            <h3>Academic Excellence</h3>
-                            <label class="checkbox-option">
-                                <input type="checkbox" value="honors">
-                                <span>Graduated with honors/distinction</span>
-                            </label>
-                            <label class="checkbox-option">
-                                <input type="checkbox" value="awards">
-                                <span>Industry awards/recognition</span>
-                            </label>
-                        </div>
-
-                        <div class="excellence-category">
-                            <h3>Military & Leadership</h3>
-                            <label class="checkbox-option">
-                                <input type="checkbox" value="military">
-                                <span>Elite military unit experience</span>
-                            </label>
-                            <label class="checkbox-option">
-                                <input type="checkbox" value="projects">
-                                <span>High-impact projects</span>
-                            </label>
-                            <label class="checkbox-option">
-                                <input type="checkbox" value="advancement">
-                                <span>Rapid career advancement</span>
-                            </label>
-                            <label class="checkbox-option">
-                                <input type="checkbox" value="publications">
-                                <span>Publications/Patents</span>
-                            </label>
-                        </div>
-
-                        <div class="excellence-category">
-                            <h3>Professional Achievement</h3>
-                            <label class="checkbox-option">
-                                <input type="checkbox" value="team-lead">
-                                <span>Team Lead</span>
-                            </label>
-                            <label class="checkbox-option">
-                                <input type="checkbox" value="manager">
-                                <span>Manager</span>
-                            </label>
-                            <label class="checkbox-option">
-                                <input type="checkbox" value="executive">
-                                <span>Executive (VP/C-level)</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Additional Filters -->
-            <div class="section">
-                <h2><i class="fas fa-filter"></i> Additional Filters</h2>
-                <div class="filters-grid">
-                    <div class="filter-group">
-                        <label>Education Level</label>
-                        <select>
-                            <option value="">Any</option>
-                            <option value="bachelor">Bachelor's</option>
-                            <option value="master">Master's</option>
-                            <option value="phd">PhD</option>
-                        </select>
-                    </div>
-
-                    <div class="filter-group">
-                        <label>Company Size</label>
-                        <select>
-                            <option value="">Any</option>
-                            <option value="small">Small (1-20)</option>
-                            <option value="medium">Medium (21-100)</option>
-                            <option value="large">Large (101-500)</option>
-                            <option value="enterprise">Enterprise (500+)</option>
-                        </select>
-                    </div>
-
-                    <div class="filter-group">
-                        <label>Experience Range</label>
-                        <input type="range" min="0" max="20" value="5" id="experienceRange">
-                        <span id="experienceValue">5+ years</span>
-                    </div>
-
-                    <div class="filter-group">
-                        <label>Location</label>
-                        <input type="text" placeholder="e.g., Tel Aviv, Israel">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Key Achievements -->
-            <div class="section">
-                <h2><i class="fas fa-trophy"></i> Key Achievements & Keywords</h2>
-                <div class="achievements-container">
-                    <div class="achievement-group">
-                        <label>Key Achievements (Keywords)</label>
-                        <textarea placeholder="Examples: grew team by 200%, increased revenue, reduced costs by 40%, launched product, led architecture redesign, implemented CI/CD, scaled...&#10;&#10;Comma-separated keywords to look for in profiles."></textarea>
-                        <small>Comma-separated keywords to look for in profiles.</small>
-                    </div>
-
-                    <div class="achievement-group">
-                        <label>Additional Keywords</label>
-                        <textarea placeholder="Any other important keywords..."></textarea>
-                        <small>Other specific terms to prioritize in candidate ranking</small>
-                    </div>
-                </div>
-            </div>
-
-            <!-- AI Enhancement -->
-            <div class="section">
-                <h2><i class="fas fa-robot"></i> AI Ranking Enhancement</h2>
-                <div class="ai-enhancement-container">
-                    <div class="ai-understanding">
-                        <div class="info-box">
-                            <i class="fas fa-brain"></i>
-                            <strong>AI Understanding:</strong> Our model will analyze profiles for indicators of excellence 
-                            like rapid promotions, significant achievements, and recognition, even if not 
-                            explicitly mentioned in keywords.
-                        </div>
-                    </div>
-
-                    <div class="ai-instructions">
-                        <label>Provide specific instructions to improve AI's ranking accuracy:</label>
-                        <textarea placeholder='Example: "Prioritize candidates who have worked with large-scale systems" or "Look for evidence of leadership in cross-functional teams"'></textarea>
-                    </div>
-
-                    <div class="focus-areas">
-                        <label>Focus Areas:</label>
-                        <div class="focus-grid">
-                            <label class="checkbox-option">
-                                <input type="checkbox" value="innovation">
-                                <span>Innovation focus</span>
-                            </label>
-                            <label class="checkbox-option">
-                                <input type="checkbox" value="initiative">
-                                <span>Initiative focus</span>
-                            </label>
-                            <label class="checkbox-option">
-                                <input type="checkbox" value="companies">
-                                <span>Top company focus</span>
-                            </label>
-                            <label class="checkbox-option">
-                                <input type="checkbox" value="growth">
-                                <span>Career growth focus</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- API Configuration -->
-            <div class="section">
-                <h2><i class="fas fa-key"></i> API Configuration</h2>
-                <div class="api-config">
-                    <div class="api-group">
-                        <label>OpenAI API Key</label>
-                        <input type="password" placeholder="Enter your OpenAI API key">
-                        <small>Used for GPT-4 analysis and embeddings</small>
-                    </div>
-
-                    <div class="api-group">
-                        <label>Embedding API Key (Optional)</label>
-                        <input type="password" placeholder="Optional - uses OpenAI if empty">
-                        <small>Leave empty to use OpenAI for both</small>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Model Selection -->
-            <div class="section">
-                <h2><i class="fas fa-cogs"></i> Model Selection</h2>
+                <h2>🔧 AI Model Configuration</h2>
                 <div class="model-selection">
-                    <label class="radio-option">
-                        <input type="radio" name="model" value="hybrid" checked>
-                        <span>Hybrid (Recommended)</span>
-                        <small>30% Embedding + 70% GPT-4</small>
-                    </label>
-                    <label class="radio-option">
-                        <input type="radio" name="model" value="embedding">
-                        <span>Embedding Only</span>
-                        <small>Fast, cost-effective</small>
-                    </label>
-                    <label class="radio-option">
-                        <input type="radio" name="model" value="gpt4">
-                        <span>GPT-4 Only</span>
-                        <small>Highest quality, slower</small>
-                    </label>
+                    <label><input type="radio" name="model" value="hybrid" checked> 🎯 Hybrid (30% Embedding + 70% GPT-4)</label>
+                    <label><input type="radio" name="model" value="embedding"> ⚡ Embedding Only (Fast)</label>
+                    <label><input type="radio" name="model" value="gpt4"> 🧠 GPT-4 Only (Highest Quality)</label>
                 </div>
             </div>
 
-            <div class="action-buttons">
-                <button class="primary-btn" onclick="startRanking()">
-                    <i class="fas fa-play"></i> Start Ranking
-                </button>
+            <div class="section">
+                <button class="btn-primary" onclick="startRanking()">🚀 Start Ranking</button>
             </div>
         </div>
 
         <!-- Ranking Tab -->
-        <div id="ranking-tab" class="tab-content">
-            <div class="ranking-header">
-                <h2><i class="fas fa-chart-line"></i> Ranking Progress</h2>
-                <div class="ranking-stats">
-                    <div class="stat-item">
-                        <span class="stat-label">Total Profiles:</span>
-                        <span class="stat-value">846 (excluding header)</span>
+        <div id="ranking" class="tab-content">
+            <div class="ranking-progress">
+                <h2>⚡ AI Ranking in Progress</h2>
+                <div class="progress-info">
+                    <div class="batch-info">
+                        <p>Processing Batch: <span id="currentBatch">1</span> of <span id="totalBatches">17</span></p>
+                        <p>Rows: <span id="currentRange">2-51</span> (50 profiles)</p>
                     </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Previously Ranked:</span>
-                        <span class="stat-value">0</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Remaining:</span>
-                        <span class="stat-value">846</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="batch-configuration">
-                <h3>Batch Configuration</h3>
-                <div class="batch-controls">
-                    <div class="batch-range">
-                        <label>From Row:</label>
-                        <input type="number" value="2" min="2" max="847">
-                        <label>To Row:</label>
-                        <input type="number" value="51" min="2" max="847">
-                        <span class="batch-info">(50 profiles)</span>
-                    </div>
-                    <div class="batch-size">
-                        <label>Batch Size:</label>
-                        <select>
-                            <option value="20">20</option>
-                            <option value="50" selected>50</option>
-                            <option value="100">100</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <div class="progress-section">
-                <div class="progress-container">
-                    <h3>Session Progress</h3>
                     <div class="progress-bar">
-                        <div class="progress-fill" style="width: 0%"></div>
+                        <div class="progress-fill" style="width: 35%"></div>
                     </div>
-                    <div class="progress-text">0/846 profiles (0%)</div>
+                    <p>Progress: 175/500 profiles (35%)</p>
+                </div>
+                
+                <div class="ranking-controls">
+                    <button class="btn-secondary">⏸️ Pause Ranking</button>
+                    <button class="btn-primary">▶️ Continue from Row 176</button>
                 </div>
 
-                <div class="progress-container">
-                    <h3>Current Batch</h3>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 0%"></div>
-                    </div>
-                    <div class="progress-text">0/50 profiles (0%)</div>
+                <div class="feedback-section">
+                    <h3>📝 Provide Feedback</h3>
+                    <textarea placeholder="Adjust ranking criteria based on current results..."></textarea>
+                    <button class="btn-secondary">💡 Apply Feedback</button>
                 </div>
-
-                <div class="eta-container">
-                    <div class="eta-item">
-                        <span>ETA:</span>
-                        <span>~12 minutes</span>
-                    </div>
-                    <div class="eta-item">
-                        <span>Cost:</span>
-                        <span>~$2.50</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="ranking-controls">
-                <button class="primary-btn" onclick="continueBatch()">
-                    <i class="fas fa-play"></i> Continue Ranking
-                </button>
-                <button class="secondary-btn" onclick="stopRanking()">
-                    <i class="fas fa-stop"></i> Stop Ranking
-                </button>
-            </div>
-
-            <div class="feedback-section">
-                <h3>Provide Feedback</h3>
-                <textarea placeholder="The technical scores seem too high for junior developers. Focus more on practical experience vs theoretical knowledge."></textarea>
-                <div class="feedback-impact">
-                    <h4>Feedback Impact:</h4>
-                    <ul>
-                        <li>Technical Weight: 85% → 70%</li>
-                        <li>Experience Weight: 60% → 80%</li>
-                    </ul>
-                </div>
-                <div class="feedback-options">
-                    <label class="checkbox-option">
-                        <input type="checkbox">
-                        <span>Apply to previous rankings</span>
-                    </label>
-                    <label class="checkbox-option">
-                        <input type="checkbox" checked>
-                        <span>Apply to future rankings</span>
-                    </label>
-                </div>
-                <button class="secondary-btn">Submit Feedback</button>
             </div>
         </div>
 
         <!-- Results Tab -->
-        <div id="results-tab" class="tab-content">
+        <div id="results" class="tab-content">
             <div class="results-header">
-                <h2><i class="fas fa-trophy"></i> Ranking Results</h2>
-                <div class="results-summary">
-                    <div class="summary-card top">
-                        <h3>23</h3>
-                        <p>TOP Candidates</p>
-                        <span>(75-100)</span>
-                    </div>
-                    <div class="summary-card good">
-                        <h3>19</h3>
-                        <p>GOOD Candidates</p>
-                        <span>(60-74)</span>
-                    </div>
-                    <div class="summary-card average">
-                        <h3>804</h3>
-                        <p>AVERAGE Candidates</p>
-                        <span>(&lt;60)</span>
-                    </div>
+                <h2>📊 Ranking Results</h2>
+                <div class="export-section">
+                    <button class="btn-primary">📥 Export CSV (Score ≥60)</button>
+                    <button class="btn-secondary">📄 Export AI Insights</button>
                 </div>
             </div>
 
-            <!-- Export Options -->
-            <div class="export-section">
-                <div class="export-option">
-                    <div class="export-card">
-                        <h3><i class="fas fa-download"></i> Export Qualified Candidates</h3>
-                        <p>Export CSV (Score ≥60)</p>
-                        <ul>
-                            <li>✓ Include all original columns</li>
-                            <li>✓ Add scoring breakdown</li>
-                            <li>✓ Add strengths & concerns</li>
-                            <li>✓ Add AI insights</li>
-                        </ul>
-                        <div class="export-info">
-                            42 candidates will be exported (23 TOP + 19 GOOD candidates)
-                        </div>
-                        <button class="primary-btn">
-                            <i class="fas fa-download"></i> Download CSV
-                        </button>
-                    </div>
+            <div class="results-summary">
+                <div class="summary-card">
+                    <h3>🏆 TOP Candidates</h3>
+                    <div class="summary-number">23</div>
+                    <p>75-100 score</p>
                 </div>
-
-                <div class="export-option">
-                    <div class="export-card">
-                        <h3><i class="fas fa-brain"></i> Export AI Analysis Report</h3>
-                        <p>Smart AI Insights</p>
-                        <ul>
-                            <li>✓ Common Success Patterns</li>
-                            <li>✓ Top Companies Analysis</li>
-                            <li>✓ Recommended Searches</li>
-                            <li>✓ Career Trajectory Trends</li>
-                            <li>✓ Skills Gap Analysis</li>
-                            <li>✓ Action Items List</li>
-                        </ul>
-                        <div class="format-options">
-                            <label>Format:</label>
-                            <select>
-                                <option value="pdf">PDF</option>
-                                <option value="json">JSON</option>
-                            </select>
-                        </div>
-                        <button class="primary-btn">
-                            <i class="fas fa-file-export"></i> Export Report
-                        </button>
-                    </div>
+                <div class="summary-card">
+                    <h3>✅ GOOD Candidates</h3>
+                    <div class="summary-number">19</div>
+                    <p>60-74 score</p>
+                </div>
+                <div class="summary-card">
+                    <h3>💎 Hidden Gems</h3>
+                    <div class="summary-number">3</div>
+                    <p>Special cases</p>
                 </div>
             </div>
 
-            <!-- TOP Candidates -->
-            <div class="candidates-section">
-                <h3 class="section-title top">
-                    <i class="fas fa-crown"></i> TOP Candidates (75-100)
-                </h3>
-                <div class="candidates-grid">
-                    <!-- Sample TOP candidate cards will be generated here -->
-                </div>
-            </div>
-
-            <!-- GOOD Candidates -->
-            <div class="candidates-section">
-                <h3 class="section-title good">
-                    <i class="fas fa-thumbs-up"></i> GOOD Candidates (60-74)
-                </h3>
-                <div class="candidates-grid">
-                    <!-- Sample GOOD candidate cards will be generated here -->
-                </div>
-            </div>
-
-            <!-- Hidden Gems -->
-            <div class="candidates-section">
-                <h3 class="section-title hidden-gem">
-                    <i class="fas fa-gem"></i> Hidden Gems
-                </h3>
-                <div class="candidates-grid">
-                    <!-- Hidden gem cards will be generated here -->
-                </div>
-            </div>
-
-            <!-- AI Insights -->
-            <div class="ai-insights-section">
-                <h3><i class="fas fa-lightbulb"></i> Smart AI Engine Insights</h3>
-                <div class="insights-grid">
-                    <div class="insight-card">
-                        <h4>Common Success Patterns</h4>
-                        <ul>
-                            <li>83% of top candidates have led teams of 5+ people</li>
-                            <li>76% have experience with microservices architecture</li>
-                            <li>67% have worked at both startups and large companies</li>
-                        </ul>
-                    </div>
-
-                    <div class="insight-card">
-                        <h4>Top Companies for Talent</h4>
-                        <ul>
-                            <li>Google (18 high-scoring candidates)</li>
-                            <li>Microsoft (15 high-scoring candidates)</li>
-                            <li>Amazon (12 high-scoring candidates)</li>
-                        </ul>
-                    </div>
-
-                    <div class="insight-card">
-                        <h4>Recommended Searches</h4>
-                        <ul>
-                            <li>"Senior R&D VPs from Google"</li>
-                            <li>"Machine Learning leads from Series B startups"</li>
-                            <li>"DevOps experts with Kubernetes experience"</li>
-                        </ul>
-                    </div>
-
-                    <div class="insight-card">
-                        <h4>Action Items</h4>
-                        <ul>
-                            <li>Focus outreach on candidates from Google and Microsoft</li>
-                            <li>Prioritize candidates with microservices experience</li>
-                            <li>Look for additional DevOps talent in Tel Aviv area</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
+            <!-- Candidate Cards will be inserted here by JavaScript -->
+            <div id="candidateCards"></div>
         </div>
     </div>
 
     <script src="js/script.js"></script>
 </body>
 </html>
+

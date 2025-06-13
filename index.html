@@ -4,174 +4,1185 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scorely Beta - LinkedIn Profile Ranker</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-shadow {
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .top-candidate {
+            border-left: 5px solid #10b981;
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+        }
+        .good-candidate {
+            border-left: 5px solid #3b82f6;
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+        }
+        .hidden-gem {
+            border-left: 5px solid #8b5cf6;
+            background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);
+        }
+        .progress-bar {
+            background: #e5e7eb;
+            border-radius: 10px;
+            height: 8px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            background: linear-gradient(90deg, #10b981, #059669);
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+        .upload-area {
+            border: 2px dashed #d1d5db;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+        .upload-area:hover {
+            border-color: #6366f1;
+            background-color: #f8fafc;
+        }
+        .tab-active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .excellence-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+        .model-option {
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1rem;
+            transition: all 0.3s ease;
+        }
+        .model-option:hover {
+            border-color: #6366f1;
+            background-color: #f8fafc;
+        }
+        .model-option.selected {
+            border-color: #6366f1;
+            background-color: #eef2ff;
+        }
+        .score-bar {
+            height: 6px;
+            border-radius: 3px;
+            background: #e5e7eb;
+            overflow: hidden;
+        }
+        .score-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+        .insights-panel {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+        }
+    </style>
 </head>
-<body>
-    <div class="container">
-        <!-- Navigation -->
-        <nav class="navbar">
-            <div class="nav-brand">
-                <h1>🎯 Scorely Beta</h1>
-                <p>LinkedIn Profile Ranker</p>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="gradient-bg text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-3">
+                    <div class="text-3xl">🎯</div>
+                    <div>
+                        <h1 class="text-2xl font-bold">Scorely Beta</h1>
+                        <p class="text-blue-100 text-sm">AI-Powered LinkedIn Profile Ranker</p>
+                    </div>
+                </div>
+                <div class="flex space-x-2">
+                    <button id="tab-setup" class="tab-btn px-6 py-2 rounded-lg font-medium transition-all tab-active">
+                        <i class="fas fa-cog mr-2"></i>Setup
+                    </button>
+                    <button id="tab-ranking" class="tab-btn px-6 py-2 rounded-lg font-medium transition-all hover:bg-white hover:bg-opacity-20">
+                        <i class="fas fa-bolt mr-2"></i>Ranking
+                    </button>
+                    <button id="tab-results" class="tab-btn px-6 py-2 rounded-lg font-medium transition-all hover:bg-white hover:bg-opacity-20">
+                        <i class="fas fa-chart-bar mr-2"></i>Results
+                    </button>
+                    <button id="reset-btn" class="px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg font-medium transition-all">
+                        <i class="fas fa-redo mr-2"></i>Reset
+                    </button>
+                </div>
             </div>
-            <div class="nav-tabs">
-                <button class="tab-btn active" data-tab="setup">📋 Setup</button>
-                <button class="tab-btn" data-tab="ranking">⚡ Ranking</button>
-                <button class="tab-btn" data-tab="results">📊 Results</button>
-                <button class="tab-btn reset-btn">🔄 Reset</button>
-            </div>
-        </nav>
+        </div>
+    </nav>
 
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <!-- Setup Tab -->
-        <div id="setup" class="tab-content active">
-            <div class="section">
-                <h2>📁 File Upload</h2>
-                <div class="upload-area">
-                    <input type="file" id="csvFile" accept=".csv" style="display: none;">
-                    <div class="upload-box" onclick="document.getElementById('csvFile').click()">
-                        <div class="upload-icon">📄</div>
-                        <p>Click to upload CSV file</p>
-                        <small>LinkedIn profiles data</small>
+        <div id="setup-content" class="tab-content">
+            <!-- API Configuration -->
+            <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">
+                    <i class="fas fa-key text-blue-500 mr-2"></i>API Configuration
+                </h2>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">OpenAI API Key</label>
+                        <input type="password" id="openai-key" placeholder="sk-..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <p class="text-xs text-gray-500 mt-1">Required for GPT-4 analysis</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Embedding API Key</label>
+                        <input type="password" id="embedding-key" placeholder="Optional - uses OpenAI if empty" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <p class="text-xs text-gray-500 mt-1">Leave empty to use OpenAI for both</p>
                     </div>
                 </div>
             </div>
 
-            <div class="section">
-                <h2>🚫 Blacklist & Filters</h2>
-                <div class="filter-grid">
-                    <div class="filter-item">
-                        <label>Blacklist Companies:</label>
-                        <textarea placeholder="Company1, Company2, Company3..."></textarea>
-                    </div>
-                    <div class="filter-item">
-                        <label>Already in Process:</label>
-                        <textarea placeholder="Profile IDs or names..."></textarea>
-                    </div>
+            <!-- File Upload -->
+            <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">
+                    <i class="fas fa-upload text-green-500 mr-2"></i>File Upload
+                </h2>
+                <div class="upload-area p-8 text-center cursor-pointer" onclick="document.getElementById('csv-file').click()">
+                    <input type="file" id="csv-file" accept=".csv" class="hidden">
+                    <div class="text-4xl mb-4">📄</div>
+                    <h3 class="text-lg font-semibold text-gray-700 mb-2">Upload LinkedIn Profiles CSV</h3>
+                    <p class="text-gray-500">Click to browse or drag and drop your CSV file</p>
+                    <div id="file-info" class="mt-4 text-sm text-blue-600 hidden"></div>
                 </div>
             </div>
 
-            <div class="section">
-                <h2>👤 Ideal Candidate Profiles</h2>
-                <div class="ideal-profiles">
-                    <div class="profile-input">
-                        <h3>Ideal Profile #1:</h3>
-                        <div class="input-options">
-                            <input type="radio" name="profile1" value="pdf" id="p1-pdf">
-                            <label for="p1-pdf">📄 Upload PDF</label>
-                            <input type="radio" name="profile1" value="text" id="p1-text" checked>
-                            <label for="p1-text">📝 Copy & Paste</label>
+            <!-- Blacklist & Filters -->
+            <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">
+                    <i class="fas fa-filter text-red-500 mr-2"></i>Blacklist & Filters
+                </h2>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Blacklist Companies</label>
+                        <textarea id="blacklist" rows="4" placeholder="Enter company names separated by commas..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                        <div class="mt-2">
+                            <input type="file" id="blacklist-file" accept=".csv,.txt" class="hidden">
+                            <button onclick="document.getElementById('blacklist-file').click()" class="text-sm text-blue-600 hover:text-blue-800">
+                                <i class="fas fa-upload mr-1"></i>Upload from file
+                            </button>
                         </div>
-                        <textarea placeholder="Paste LinkedIn profile (Ctrl+A from LinkedIn)..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Already in Process</label>
+                        <textarea id="in-process" rows="4" placeholder="Enter candidate names or IDs..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                        <div class="mt-2">
+                            <input type="file" id="process-file" accept=".csv,.txt" class="hidden">
+                            <button onclick="document.getElementById('process-file').click()" class="text-sm text-blue-600 hover:text-blue-800">
+                                <i class="fas fa-upload mr-1"></i>Upload from file
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ideal Candidate Profiles -->
+            <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">
+                    <i class="fas fa-star text-yellow-500 mr-2"></i>Ideal Candidate Profiles (Optional)
+                </h2>
+                <p class="text-gray-600 mb-6">Help our AI understand your ideal candidates by providing examples</p>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="border border-gray-200 rounded-lg p-4">
+                        <h3 class="font-semibold text-gray-700 mb-3">Ideal Profile #1</h3>
+                        <div class="flex space-x-4 mb-3">
+                            <label class="flex items-center">
+                                <input type="radio" name="profile1-type" value="pdf" class="mr-2">
+                                <i class="fas fa-file-pdf text-red-500 mr-1"></i>Upload PDF
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="profile1-type" value="text" checked class="mr-2">
+                                <i class="fas fa-clipboard text-blue-500 mr-1"></i>Copy & Paste
+                            </label>
+                        </div>
+                        <input type="file" id="profile1-pdf" accept=".pdf" class="hidden">
+                        <button id="profile1-pdf-btn" onclick="document.getElementById('profile1-pdf').click()" class="w-full mb-3 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 hidden">
+                            <i class="fas fa-upload mr-2"></i>Choose PDF File
+                        </button>
+                        <textarea id="profile1-text" rows="6" placeholder="Paste LinkedIn profile (Ctrl+A from LinkedIn)..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
                     </div>
                     
-                    <div class="profile-input">
-                        <h3>Ideal Profile #2:</h3>
-                        <div class="input-options">
-                            <input type="radio" name="profile2" value="pdf" id="p2-pdf">
-                            <label for="p2-pdf">📄 Upload PDF</label>
-                            <input type="radio" name="profile2" value="text" id="p2-text" checked>
-                            <label for="p2-text">📝 Copy & Paste</label>
+                    <div class="border border-gray-200 rounded-lg p-4">
+                        <h3 class="font-semibold text-gray-700 mb-3">Ideal Profile #2</h3>
+                        <div class="flex space-x-4 mb-3">
+                            <label class="flex items-center">
+                                <input type="radio" name="profile2-type" value="pdf" class="mr-2">
+                                <i class="fas fa-file-pdf text-red-500 mr-1"></i>Upload PDF
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="profile2-type" value="text" checked class="mr-2">
+                                <i class="fas fa-clipboard text-blue-500 mr-1"></i>Copy & Paste
+                            </label>
                         </div>
-                        <textarea placeholder="Paste LinkedIn profile (Ctrl+A from LinkedIn)..."></textarea>
+                        <input type="file" id="profile2-pdf" accept=".pdf" class="hidden">
+                        <button id="profile2-pdf-btn" onclick="document.getElementById('profile2-pdf').click()" class="w-full mb-3 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 hidden">
+                            <i class="fas fa-upload mr-2"></i>Choose PDF File
+                        </button>
+                        <textarea id="profile2-text" rows="6" placeholder="Paste LinkedIn profile (Ctrl+A from LinkedIn)..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                    </div>
+                </div>
+                <div class="mt-4 p-3 bg-blue-50 rounded-lg">
+                    <p class="text-sm text-blue-700">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        <strong>Tip:</strong> These profiles will be used as benchmarks for scoring all candidates
+                    </p>
+                </div>
+            </div>
+
+            <!-- Job Description -->
+            <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">
+                    <i class="fas fa-briefcase text-purple-500 mr-2"></i>Job Description
+                </h2>
+                <textarea id="job-description" rows="6" placeholder="Describe the position, required skills, company culture, and ideal candidate profile..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                <div class="mt-3 flex items-center space-x-4">
+                    <input type="file" id="job-pdf" accept=".pdf" class="hidden">
+                    <button onclick="document.getElementById('job-pdf').click()" class="text-sm text-blue-600 hover:text-blue-800">
+                        <i class="fas fa-upload mr-1"></i>Upload PDF instead
+                    </button>
+                </div>
+            </div>
+
+            <!-- Excellence Indicators -->
+            <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">
+                    <i class="fas fa-trophy text-yellow-500 mr-2"></i>Excellence Indicators
+                </h2>
+                <p class="text-gray-600 mb-4">Select factors that indicate exceptional candidates</p>
+                <div class="excellence-grid">
+                    <div class="space-y-3">
+                        <h3 class="font-semibold text-gray-700">Academic Excellence</h3>
+                        <label class="flex items-center space-x-3">
+                            <input type="checkbox" class="excellence-checkbox" value="honors">
+                            <span>🎓 Graduated with honors/distinction</span>
+                        </label>
+                        <label class="flex items-center space-x-3">
+                            <input type="checkbox" class="excellence-checkbox" value="awards">
+                            <span>🏆 Industry awards/recognition</span>
+                        </label>
+                    </div>
+                    <div class="space-y-3">
+                        <h3 class="font-semibold text-gray-700">Military & Leadership</h3>
+                        <label class="flex items-center space-x-3">
+                            <input type="checkbox" class="excellence-checkbox" value="military">
+                            <span>🪖 Elite military unit experience</span>
+                        </label>
+                        <label class="flex items-center space-x-3">
+                            <input type="checkbox" class="excellence-checkbox" value="projects">
+                            <span>🚀 High-impact projects</span>
+                        </label>
+                        <label class="flex items-center space-x-3">
+                            <input type="checkbox" class="excellence-checkbox" value="advancement">
+                            <span>📈 Rapid career advancement</span>
+                        </label>
+                        <label class="flex items-center space-x-3">
+                            <input type="checkbox" class="excellence-checkbox" value="publications">
+                            <span>📚 Publications/Patents</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="mt-4 p-3 bg-green-50 rounded-lg">
+                    <p class="text-sm text-green-700">
+                        <i class="fas fa-lightbulb mr-2"></i>
+                        <strong>Tip:</strong> Our AI will look for keywords indicating these excellence factors in profiles. For example: "graduated summa cum laude", "promoted to lead in 6 months", "recognized with award".
+                    </p>
+                </div>
+            </div>
+
+            <!-- Additional Filters -->
+            <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">
+                    <i class="fas fa-sliders-h text-indigo-500 mr-2"></i>Additional Filters
+                </h2>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Education Level</label>
+                        <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Any Education Level</option>
+                            <option value="bachelor">Bachelor's Degree</option>
+                            <option value="master">Master's Degree</option>
+                            <option value="phd">PhD</option>
+                            <option value="bootcamp">Bootcamp/Certificate</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Location</label>
+                        <input type="text" placeholder="e.g. Tel Aviv, Remote, etc." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Leadership Experience</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-2">
+                                <span class="text-sm">Team Lead</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-2">
+                                <span class="text-sm">Manager</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-2">
+                                <span class="text-sm">Executive (VP/C-level)</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-6 grid md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Key Achievements (Keywords)</label>
+                        <textarea rows="3" placeholder="e.g. scaled, launched, improved, reduced costs by 40%, launched product, led architecture redesign, implemented CI/CD, scaled..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                        <p class="text-xs text-gray-500 mt-1">Comma-separated keywords to look for in profiles</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Additional Keywords</label>
+                        <textarea rows="3" placeholder="Any other important keywords..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                        <p class="text-xs text-gray-500 mt-1">Other specific terms to prioritize in candidate ranking</p>
                     </div>
                 </div>
             </div>
 
-            <div class="section">
-                <h2>💼 Job Description</h2>
-                <textarea id="jobDesc" placeholder="Describe the position, required skills, and ideal candidate..."></textarea>
-            </div>
-
-            <div class="section">
-                <h2>🏆 Excellence Indicators</h2>
-                <div class="checkbox-grid">
-                    <label><input type="checkbox"> 🎓 Graduated with honors/distinction</label>
-                    <label><input type="checkbox"> 🏅 Industry awards/recognition</label>
-                    <label><input type="checkbox"> 🪖 Elite military unit experience</label>
-                    <label><input type="checkbox"> 🚀 High-impact projects</label>
-                    <label><input type="checkbox"> 📈 Rapid career advancement</label>
-                    <label><input type="checkbox"> 📚 Publications/Patents</label>
+            <!-- AI Ranking Enhancement -->
+            <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">
+                    <i class="fas fa-brain text-pink-500 mr-2"></i>AI Ranking Enhancement
+                </h2>
+                <div class="p-4 bg-blue-50 rounded-lg mb-4">
+                    <p class="text-sm text-blue-700 mb-2">
+                        <strong>🤖 AI Understanding:</strong> Our model will analyze profiles for indicators of excellence like rapid promotions, significant achievements, and recognition, even if not explicitly mentioned in keywords.
+                    </p>
+                </div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Provide specific instructions to improve the AI's ranking accuracy for your needs</label>
+                <textarea rows="4" placeholder='Example: "Prioritize candidates who have worked with large-scale systems" or "Look for evidence of leadership in cross-functional teams"' class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                <div class="mt-4 grid md:grid-cols-4 gap-4">
+                    <button class="focus-btn px-4 py-2 border border-gray-300 rounded-lg text-center hover:bg-gray-50 transition-all">
+                        <div class="text-2xl mb-1">💡</div>
+                        <div class="text-sm font-medium">Innovation focus</div>
+                    </button>
+                    <button class="focus-btn px-4 py-2 border border-gray-300 rounded-lg text-center hover:bg-gray-50 transition-all">
+                        <div class="text-2xl mb-1">🎯</div>
+                        <div class="text-sm font-medium">Initiative focus</div>
+                    </button>
+                    <button class="focus-btn px-4 py-2 border border-gray-300 rounded-lg text-center hover:bg-gray-50 transition-all">
+                        <div class="text-2xl mb-1">🏢</div>
+                        <div class="text-sm font-medium">Top company focus</div>
+                    </button>
+                    <button class="focus-btn px-4 py-2 border border-gray-300 rounded-lg text-center hover:bg-gray-50 transition-all">
+                        <div class="text-2xl mb-1">📈</div>
+                        <div class="text-sm font-medium">Career growth focus</div>
+                    </button>
                 </div>
             </div>
 
-            <div class="section">
-                <h2>🔧 AI Model Configuration</h2>
-                <div class="model-selection">
-                    <label><input type="radio" name="model" value="hybrid" checked> 🎯 Hybrid (30% Embedding + 70% GPT-4)</label>
-                    <label><input type="radio" name="model" value="embedding"> ⚡ Embedding Only (Fast)</label>
-                    <label><input type="radio" name="model" value="gpt4"> 🧠 GPT-4 Only (Highest Quality)</label>
+            <!-- Model Selection -->
+            <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">
+                    <i class="fas fa-cogs text-blue-500 mr-2"></i>AI Model Configuration
+                </h2>
+                <div class="grid md:grid-cols-3 gap-4">
+                    <div class="model-option selected" data-model="hybrid">
+                        <div class="text-center">
+                            <div class="text-2xl mb-2">🎯</div>
+                            <h3 class="font-semibold mb-2">Hybrid (Recommended)</h3>
+                            <p class="text-sm text-gray-600 mb-2">30% Embedding + 70% GPT-4</p>
+                            <p class="text-xs text-gray-500">Best balance of speed and accuracy</p>
+                        </div>
+                    </div>
+                    <div class="model-option" data-model="embedding">
+                        <div class="text-center">
+                            <div class="text-2xl mb-2">⚡</div>
+                            <h3 class="font-semibold mb-2">Embedding Only</h3>
+                            <p class="text-sm text-gray-600 mb-2">Fast, cost-effective</p>
+                            <p class="text-xs text-gray-500">Good for large datasets</p>
+                        </div>
+                    </div>
+                    <div class="model-option" data-model="gpt4">
+                        <div class="text-center">
+                            <div class="text-2xl mb-2">🧠</div>
+                            <h3 class="font-semibold mb-2">GPT-4 Only</h3>
+                            <p class="text-sm text-gray-600 mb-2">Highest quality, slower</p>
+                            <p class="text-xs text-gray-500">Most accurate analysis</p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="section">
-                <button class="btn-primary" onclick="startRanking()">🚀 Start Ranking</button>
+            <!-- Start Button -->
+            <div class="text-center">
+                <button id="start-ranking" class="gradient-bg text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all transform hover:scale-105">
+                    <i class="fas fa-rocket mr-2"></i>Start AI Ranking
+                </button>
             </div>
         </div>
 
         <!-- Ranking Tab -->
-        <div id="ranking" class="tab-content">
-            <div class="ranking-progress">
-                <h2>⚡ AI Ranking in Progress</h2>
-                <div class="progress-info">
-                    <div class="batch-info">
-                        <p>Processing Batch: <span id="currentBatch">1</span> of <span id="totalBatches">17</span></p>
-                        <p>Rows: <span id="currentRange">2-51</span> (50 profiles)</p>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 35%"></div>
-                    </div>
-                    <p>Progress: 175/500 profiles (35%)</p>
-                </div>
-                
-                <div class="ranking-controls">
-                    <button class="btn-secondary">⏸️ Pause Ranking</button>
-                    <button class="btn-primary">▶️ Continue from Row 176</button>
+        <div id="ranking-content" class="tab-content hidden">
+            <div class="bg-white rounded-xl shadow-md p-8">
+                <div class="text-center mb-8">
+                    <div class="text-6xl mb-4">⚡</div>
+                    <h2 class="text-3xl font-bold text-gray-800 mb-2">AI Ranking in Progress</h2>
+                    <p class="text-gray-600">Analyzing LinkedIn profiles with advanced AI algorithms</p>
                 </div>
 
-                <div class="feedback-section">
-                    <h3>📝 Provide Feedback</h3>
-                    <textarea placeholder="Adjust ranking criteria based on current results..."></textarea>
-                    <button class="btn-secondary">💡 Apply Feedback</button>
+                <!-- Batch Configuration -->
+                <div class="bg-gray-50 rounded-lg p-6 mb-8">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Ranking Configuration</h3>
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-blue-600" id="total-profiles">847</div>
+                            <div class="text-sm text-gray-600">Total Profiles</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-green-600" id="ranked-profiles">320</div>
+                            <div class="text-sm text-gray-600">Previously Ranked</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-orange-600" id="remaining-profiles">527</div>
+                            <div class="text-sm text-gray-600">Remaining</div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Batch Range</label>
+                            <div class="flex items-center space-x-2">
+                                <span class="text-sm text-gray-500">From:</span>
+                                <input type="number" id="batch-start" value="321" min="2" class="w-20 px-2 py-1 border border-gray-300 rounded">
+                                <span class="text-sm text-gray-500">To:</span>
+                                <input type="number" id="batch-end" value="370" class="w-20 px-2 py-1 border border-gray-300 rounded">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Batch Size</label>
+                            <select id="batch-size" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                                <option value="20">20 profiles</option>
+                                <option value="50" selected>50 profiles</option>
+                                <option value="100">100 profiles</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress Tracking -->
+                <div class="mb-8">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm font-medium text-gray-700">Session Progress</span>
+                        <span class="text-sm text-gray-500" id="session-progress">67% (320/847 total)</span>
+                    </div>
+                    <div class="progress-bar mb-4">
+                        <div class="progress-fill" style="width: 67%" id="session-progress-bar"></div>
+                    </div>
+                    
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm font-medium text-gray-700">Current Batch</span>
+                        <span class="text-sm text-gray-500" id="batch-progress">60% (30/50 current)</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 60%" id="batch-progress-bar"></div>
+                    </div>
+                </div>
+
+                <!-- Ranking Controls -->
+                <div class="flex justify-center space-x-4 mb-8">
+                    <button id="pause-ranking" class="px-6 py-3 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg font-medium transition-all">
+                        <i class="fas fa-pause mr-2"></i>Pause Ranking
+                    </button>
+                    <button id="continue-ranking" class="px-6 py-3 gradient-bg text-white rounded-lg font-medium transition-all">
+                        <i class="fas fa-play mr-2"></i>Continue from Row 176
+                    </button>
+                    <button id="stop-ranking" class="px-6 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-all">
+                        <i class="fas fa-stop mr-2"></i>Stop Ranking
+                    </button>
+                </div>
+
+                <!-- Feedback Section -->
+                <div class="bg-blue-50 rounded-lg p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                        <i class="fas fa-comment-alt text-blue-500 mr-2"></i>Provide Feedback
+                    </h3>
+                    <textarea id="ranking-feedback" rows="4" placeholder="Adjust ranking criteria based on current results. For example: 'The technical scores seem too high for junior developers. Focus more on practical experience vs theoretical knowledge.'" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                    
+                    <div class="mt-4 p-4 bg-white rounded-lg border border-blue-200">
+                        <h4 class="font-medium text-gray-800 mb-2">📊 Feedback Impact:</h4>
+                        <div class="grid md:grid-cols-2 gap-4 text-sm">
+                            <div>• Technical Weight: <span class="text-red-500">85% → 70%</span></div>
+                            <div>• Experience Weight: <span class="text-green-500">60% → 80%</span></div>
+                        </div>
+                        <div class="mt-3 space-y-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-2">
+                                <span class="text-sm">Apply to previous rankings</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" checked class="mr-2">
+                                <span class="text-sm">Apply to future rankings</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <button id="apply-feedback" class="mt-4 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-all">
+                        <i class="fas fa-magic mr-2"></i>Apply Feedback
+                    </button>
                 </div>
             </div>
         </div>
 
         <!-- Results Tab -->
-        <div id="results" class="tab-content">
-            <div class="results-header">
-                <h2>📊 Ranking Results</h2>
-                <div class="export-section">
-                    <button class="btn-primary">📥 Export CSV (Score ≥60)</button>
-                    <button class="btn-secondary">📄 Export AI Insights</button>
+        <div id="results-content" class="tab-content hidden">
+            <!-- Results Header -->
+            <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800">📊 Ranking Results</h2>
+                        <p class="text-gray-600">AI-powered analysis complete</p>
+                    </div>
+                    <div class="flex space-x-3">
+                        <button id="export-csv" class="px-6 py-3 gradient-bg text-white rounded-lg font-medium hover:shadow-lg transition-all">
+                            <i class="fas fa-download mr-2"></i>Export CSV (Score ≥60)
+                        </button>
+                        <button id="export-insights" class="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition-all">
+                            <i class="fas fa-file-alt mr-2"></i>Export AI Insights
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Summary Cards -->
+                <div class="grid md:grid-cols-4 gap-6">
+                    <div class="text-center p-6 bg-green-50 rounded-lg border border-green-200">
+                        <div class="text-3xl font-bold text-green-600">23</div>
+                        <div class="text-sm text-green-700">🏆 TOP Candidates</div>
+                        <div class="text-xs text-green-600">75-100 score</div>
+                    </div>
+                    <div class="text-center p-6 bg-blue-50 rounded-lg border border-blue-200">
+                        <div class="text-3xl font-bold text-blue-600">19</div>
+                        <div class="text-sm text-blue-700">✅ GOOD Candidates</div>
+                        <div class="text-xs text-blue-600">60-74 score</div>
+                    </div>
+                    <div class="text-center p-6 bg-purple-50 rounded-lg border border-purple-200">
+                        <div class="text-3xl font-bold text-purple-600">3</div>
+                        <div class="text-sm text-purple-700">💎 Hidden Gems</div>
+                        <div class="text-xs text-purple-600">Special cases</div>
+                    </div>
+                    <div class="text-center p-6 bg-gray-50 rounded-lg border border-gray-200">
+                        <div class="text-3xl font-bold text-gray-600">802</div>
+                        <div class="text-sm text-gray-700">📋 Total Analyzed</div>
+                        <div class="text-xs text-gray-600">All profiles</div>
+                    </div>
                 </div>
             </div>
 
-            <div class="results-summary">
-                <div class="summary-card">
-                    <h3>🏆 TOP Candidates</h3>
-                    <div class="summary-number">23</div>
-                    <p>75-100 score</p>
-                </div>
-                <div class="summary-card">
-                    <h3>✅ GOOD Candidates</h3>
-                    <div class="summary-number">19</div>
-                    <p>60-74 score</p>
-                </div>
-                <div class="summary-card">
-                    <h3>💎 Hidden Gems</h3>
-                    <div class="summary-number">3</div>
-                    <p>Special cases</p>
+            <!-- Filter Controls -->
+            <div class="bg-white rounded-xl shadow-md p-4 mb-6">
+                <div class="flex flex-wrap items-center justify-between gap-4">
+                    <div class="flex items-center space-x-4">
+                        <input type="text" id="search-candidates" placeholder="🔍 Search candidates..." class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <select id="filter-category" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="all">All Categories</option>
+                            <option value="top">TOP Candidates</option>
+                            <option value="good">GOOD Candidates</option>
+                            <option value="gems">Hidden Gems</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-sm text-gray-600">Sort by:</span>
+                        <select id="sort-candidates" class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                            <option value="score">Score (High to Low)</option>
+                            <option value="name">Name (A-Z)</option>
+                            <option value="company">Company</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
-            <!-- Candidate Cards will be inserted here by JavaScript -->
-            <div id="candidateCards"></div>
+            <!-- TOP Candidates -->
+            <div id="top-candidates" class="mb-8">
+                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                    <span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm mr-3">🏆 TOP</span>
+                    Exceptional Candidates (75-100)
+                </h3>
+                <div class="space-y-4" id="top-candidates-list">
+                    <!-- TOP candidate cards will be inserted here -->
+                </div>
+            </div>
+
+            <!-- GOOD Candidates -->
+            <div id="good-candidates" class="mb-8">
+                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                    <span class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm mr-3">✅ GOOD</span>
+                    Strong Candidates (60-74)
+                </h3>
+                <div class="space-y-4" id="good-candidates-list">
+                    <!-- GOOD candidate cards will be inserted here -->
+                </div>
+            </div>
+
+            <!-- Hidden Gems -->
+            <div id="hidden-gems" class="mb-8">
+                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                    <span class="bg-purple-500 text-white px-3 py-1 rounded-full text-sm mr-3">💎 GEMS</span>
+                    Hidden Potential
+                </h3>
+                <div class="space-y-4" id="hidden-gems-list">
+                    <!-- Hidden gem cards will be inserted here -->
+                </div>
+            </div>
+
+            <!-- Smart AI Insights -->
+            <div class="insights-panel p-6 mb-8">
+                <h3 class="text-xl font-bold text-gray-800 mb-6">
+                    <i class="fas fa-brain text-purple-500 mr-2"></i>Smart AI Engine Insights
+                </h3>
+                
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="font-semibold text-gray-700 mb-3">🔍 Common Success Patterns</h4>
+                        <ul class="space-y-2 text-sm text-gray-600">
+                            <li>• 78% of top candidates have startup experience</li>
+                            <li>• Strong correlation between rapid promotions and high scores</li>
+                            <li>• Tech leads from Series B companies perform exceptionally</li>
+                            <li>• Full-stack developers with DevOps skills rank higher</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-700 mb-3">🏢 Top Companies Analysis</h4>
+                        <ul class="space-y-2 text-sm text-gray-600">
+                            <li>• <strong>Google:</strong> 12 candidates, avg score 84</li>
+                            <li>• <strong>Microsoft:</strong> 8 candidates, avg score 81</li>
+                            <li>• <strong>Meta:</strong> 6 candidates, avg score 79</li>
+                            <li>• <strong>Startup Alumni:</strong> Higher cultural fit scores</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-700 mb-3">📈 Recommended Searches</h4>
+                        <ul class="space-y-2 text-sm text-blue-600">
+                            <li>• "Search for Senior R&D VPs from Google"</li>
+                            <li>• "Look for ML engineers with startup experience"</li>
+                            <li>• "Find DevOps experts with Kubernetes background"</li>
+                            <li>• "Target full-stack leads from Series B companies"</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-700 mb-3">✅ Action Items</h4>
+                        <ul class="space-y-2 text-sm text-green-600">
+                            <li>• Focus outreach on TOP and GOOD categories</li>
+                            <li>• Consider Hidden Gems for future roles</li>
+                            <li>• Expand search to include more startup alumni</li>
+                            <li>• Look for similar profiles in target companies</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Average Candidates Summary -->
+            <div class="bg-gray-50 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-700 mb-4">📋 Other Candidates (<60 score)</h3>
+                <div class="grid md:grid-cols-3 gap-4 text-sm">
+                    <div>
+                        <div class="font-medium text-gray-600 mb-2">Insufficient Experience</div>
+                        <div class="text-gray-500">127 candidates - Lack required years of experience</div>
+                    </div>
+                    <div>
+                        <div class="font-medium text-gray-600 mb-2">Skills Mismatch</div>
+                        <div class="text-gray-500">89 candidates - Missing key technical skills</div>
+                    </div>
+                    <div>
+                        <div class="font-medium text-gray-600 mb-2">Limited Data</div>
+                        <div class="text-gray-500">45 candidates - Incomplete LinkedIn profiles</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <script src="js/script.js"></script>
+    <script>
+        // Global Variables
+        let csvData = null;
+        let rankingInProgress = false;
+        let currentBatch = 1;
+        let totalBatches = 17;
+        let rankedProfiles = 320;
+        let totalProfiles = 847;
+
+        // Tab Management
+        function initializeTabs() {
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const tabName = button.id.replace('tab-', '');
+                    
+                    // Update active tab button
+                    tabButtons.forEach(btn => btn.classList.remove('tab-active'));
+                    button.classList.add('tab-active');
+
+                    // Show corresponding content
+                    tabContents.forEach(content => content.classList.add('hidden'));
+                    document.getElementById(tabName + '-content').classList.remove('hidden');
+                });
+            });
+        }
+
+        // File Upload Handler
+        function initializeFileUpload() {
+            const csvFileInput = document.getElementById('csv-file');
+            const fileInfo = document.getElementById('file-info');
+
+            csvFileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    fileInfo.textContent = `Selected: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+                    fileInfo.classList.remove('hidden');
+                    
+                    // Parse CSV
+                    Papa.parse(file, {
+                        header: true,
+                        complete: function(results) {
+                            csvData = results.data;
+                            totalProfiles = csvData.length;
+                            document.getElementById('total-profiles').textContent = totalProfiles;
+                            console.log('CSV parsed:', csvData.length, 'profiles loaded');
+                        }
+                    });
+                }
+            });
+        }
+
+        // Model Selection
+        function initializeModelSelection() {
+            const modelOptions = document.querySelectorAll('.model-option');
+            
+            modelOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    modelOptions.forEach(opt => opt.classList.remove('selected'));
+                    option.classList.add('selected');
+                });
+            });
+        }
+
+        // Ideal Profile Type Toggle
+        function initializeProfileToggle() {
+            const profile1Radios = document.querySelectorAll('input[name="profile1-type"]');
+            const profile2Radios = document.querySelectorAll('input[name="profile2-type"]');
+            
+            profile1Radios.forEach(radio => {
+                radio.addEventListener('change', () => {
+                    const pdfBtn = document.getElementById('profile1-pdf-btn');
+                    const textarea = document.getElementById('profile1-text');
+                    
+                    if (radio.value === 'pdf') {
+                        pdfBtn.classList.remove('hidden');
+                        textarea.classList.add('hidden');
+                    } else {
+                        pdfBtn.classList.add('hidden');
+                        textarea.classList.remove('hidden');
+                    }
+                });
+            });
+
+            profile2Radios.forEach(radio => {
+                radio.addEventListener('change', () => {
+                    const pdfBtn = document.getElementById('profile2-pdf-btn');
+                    const textarea = document.getElementById('profile2-text');
+                    
+                    if (radio.value === 'pdf') {
+                        pdfBtn.classList.remove('hidden');
+                        textarea.classList.add('hidden');
+                    } else {
+                        pdfBtn.classList.add('hidden');
+                        textarea.classList.remove('hidden');
+                    }
+                });
+            });
+        }
+
+        // Start Ranking
+        function startRanking() {
+            if (!csvData) {
+                alert('Please upload a CSV file first');
+                return;
+            }
+
+            // Switch to ranking tab
+            document.getElementById('tab-ranking').click();
+            
+            // Start simulation
+            simulateRanking();
+        }
+
+        // Simulate Ranking Process
+        function simulateRanking() {
+            rankingInProgress = true;
+            let progress = 0;
+            const maxProgress = 100;
+            
+            const interval = setInterval(() => {
+                progress += Math.random() * 5;
+                
+                if (progress >= maxProgress) {
+                    progress = maxProgress;
+                    clearInterval(interval);
+                    completeRanking();
+                }
+                
+                updateProgress(progress);
+            }, 1000);
+        }
+
+        function updateProgress(progress) {
+            const sessionBar = document.getElementById('session-progress-bar');
+            const batchBar = document.getElementById('batch-progress-bar');
+            
+            sessionBar.style.width = progress + '%';
+            batchBar.style.width = (progress % 50) * 2 + '%';
+            
+            document.getElementById('session-progress').textContent = 
+                `${Math.round(progress)}% (${Math.round(rankedProfiles + (progress/100) * 200)}/${totalProfiles} total)`;
+            document.getElementById('batch-progress').textContent = 
+                `${Math.round((progress % 50) * 2)}% (${Math.round((progress % 50) * 2 * 0.5)}/50 current)`;
+        }
+
+        function completeRanking() {
+            rankingInProgress = false;
+            
+            // Switch to results tab
+            setTimeout(() => {
+                document.getElementById('tab-results').click();
+                generateResults();
+            }, 2000);
+        }
+
+        // Generate Sample Results
+        function generateResults() {
+            generateTopCandidates();
+            generateGoodCandidates();
+            generateHiddenGems();
+        }
+
+        function generateTopCandidates() {
+            const container = document.getElementById('top-candidates-list');
+            const topCandidates = [
+                {
+                    name: "Alex Semyzhonov",
+                    title: "Full Stack Developer",
+                    company: "Inetex LTD",
+                    location: "Ramat Gan, Israel",
+                    score: 87,
+                    technical: 92,
+                    cultural: 85,
+                    experience: 88,
+                    startup: 84,
+                    strengths: ["Full-stack expertise", "Spring Boot & React mastery", "Microservices architecture", "Strong analytical background"],
+                    concerns: ["May need DevOps mentoring", "Limited enterprise experience"],
+                    insights: "Strong technical foundation with startup mindset. Excellent cultural fit for fast-paced environment."
+                },
+                {
+                    name: "Tomer Landesman",
+                    title: "Full Stack Engineer", 
+                    company: "env0",
+                    location: "Tel Aviv, Israel",
+                    score: 89,
+                    technical: 94,
+                    cultural: 87,
+                    experience: 86,
+                    startup: 89,
+                    strengths: ["Infrastructure as Code expertise", "AWS & Terraform mastery", "Leadership experience", "B.Sc Computer Science"],
+                    concerns: ["Higher salary expectations", "May be overqualified for junior roles"],
+                    insights: "Exceptional technical leadership with proven track record in IaC and cloud technologies."
+                },
+                {
+                    name: "Aviram Shubeili",
+                    title: "Software Engineer",
+                    company: "Philips",
+                    location: "Haifa, Israel", 
+                    score: 85,
+                    technical: 90,
+                    cultural: 82,
+                    experience: 84,
+                    startup: 83,
+                    strengths: ["Full-stack development", "C#/.NET expertise", "Healthcare tech experience", "Technion graduate"],
+                    concerns: ["Corporate background", "May need startup culture adjustment"],
+                    insights: "Strong engineering fundamentals with healthcare domain knowledge. Good potential for product-focused roles."
+                }
+            ];
+
+            container.innerHTML = topCandidates.map(candidate => createCandidateCard(candidate, 'top')).join('');
+        }
+
+        function generateGoodCandidates() {
+            const container = document.getElementById('good-candidates-list');
+            const goodCandidates = [
+                {
+                    name: "Dror Reshef",
+                    title: "Full-stack Developer",
+                    company: "SuperCom",
+                    location: "Tel Aviv District, Israel",
+                    score: 72,
+                    technical: 78,
+                    cultural: 70,
+                    experience: 72,
+                    startup: 68,
+                    strengths: ["React & C# expertise", "Real-time applications", "Mobile development"],
+                    concerns: ["Limited leadership experience", "Smaller company background"],
+                    insights: "Solid technical skills with potential for growth in larger team environment."
+                },
+                {
+                    name: "Tal Yohay", 
+                    title: "Full Stack Developer",
+                    company: "Nipendo",
+                    location: "Tel Aviv District, Israel",
+                    score: 68,
+                    technical: 72,
+                    cultural: 65,
+                    experience: 66,
+                    startup: 70,
+                    strengths: ["MEAN stack expertise", "Multiple project experience", "Self-motivated"],
+                    concerns: ["Junior level experience", "Limited scale exposure"],
+                    insights: "Promising junior developer with strong fundamentals and learning mindset."
+                }
+            ];
+
+            container.innerHTML = goodCandidates.map(candidate => createCandidateCard(candidate, 'good')).join('');
+        }
+
+        function generateHiddenGems() {
+            const container = document.getElementById('hidden-gems-list');
+            const hiddenGems = [
+                {
+                    name: "Tal Moran",
+                    title: "Senior Fullstack Engineer",
+                    company: "T-REX",
+                    location: "Israel",
+                    score: 58,
+                    technical: 85,
+                    cultural: 92,
+                    experience: 88,
+                    startup: 95,
+                    strengths: ["Entrepreneurial mindset", "Product leadership", "Full-stack mastery", "Startup co-founder"],
+                    concerns: ["Overall score affected by profile gaps", "May be overqualified"],
+                    insights: "Exceptional entrepreneurial talent with strong technical and leadership background. Hidden gem due to incomplete profile data."
+                }
+            ];
+
+            container.innerHTML = hiddenGems.map(candidate => createCandidateCard(candidate, 'gem')).join('');
+        }
+
+        function createCandidateCard(candidate, type) {
+            const typeClass = type === 'top' ? 'top-candidate' : type === 'good' ? 'good-candidate' : 'hidden-gem';
+            const typeBadge = type === 'top' ? '🏆 TOP CANDIDATE' : type === 'good' ? '✅ GOOD CANDIDATE' : '💎 HIDDEN GEM';
+            const typeColor = type === 'top' ? 'bg-green-500' : type === 'good' ? 'bg-blue-500' : 'bg-purple-500';
+
+            return `
+                <div class="card-shadow rounded-xl p-6 ${typeClass} transition-all hover:shadow-lg">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-3 mb-2">
+                                <h3 class="text-xl font-bold text-gray-800">${candidate.name}</h3>
+                                <span class="${typeColor} text-white px-3 py-1 rounded-full text-xs font-medium">${typeBadge}</span>
+                            </div>
+                            <p class="text-gray-600 font-medium">${candidate.title} @ ${candidate.company}</p>
+                            <p class="text-gray-500 text-sm"><i class="fas fa-map-marker-alt mr-1"></i>${candidate.location}</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-3xl font-bold text-gray-800">${candidate.score}</div>
+                            <div class="text-sm text-gray-500">Overall Score</div>
+                        </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-4 gap-4 mb-6">
+                        <div class="text-center">
+                            <div class="text-lg font-bold text-blue-600">${candidate.technical}</div>
+                            <div class="text-xs text-gray-600">Technical</div>
+                            <div class="score-bar mt-1">
+                                <div class="score-fill bg-blue-500" style="width: ${candidate.technical}%"></div>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-lg font-bold text-green-600">${candidate.cultural}</div>
+                            <div class="text-xs text-gray-600">Cultural</div>
+                            <div class="score-bar mt-1">
+                                <div class="score-fill bg-green-500" style="width: ${candidate.cultural}%"></div>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-lg font-bold text-orange-600">${candidate.experience}</div>
+                            <div class="text-xs text-gray-600">Experience</div>
+                            <div class="score-bar mt-1">
+                                <div class="score-fill bg-orange-500" style="width: ${candidate.experience}%"></div>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-lg font-bold text-purple-600">${candidate.startup}</div>
+                            <div class="text-xs text-gray-600">Startup</div>
+                            <div class="score-bar mt-1">
+                                <div class="score-fill bg-purple-500" style="width: ${candidate.startup}%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <h4 class="font-semibold text-green-700 mb-2">💪 Strengths</h4>
+                            <ul class="text-sm text-gray-600 space-y-1">
+                                ${candidate.strengths.map(strength => `<li>• ${strength}</li>`).join('')}
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-orange-700 mb-2">⚠️ Concerns</h4>
+                            <ul class="text-sm text-gray-600 space-y-1">
+                                ${candidate.concerns.map(concern => `<li>• ${concern}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <h4 class="font-semibold text-blue-700 mb-2">🧠 AI Insights</h4>
+                        <p class="text-sm text-gray-600">${candidate.insights}</p>
+                    </div>
+
+                    <div class="flex space-x-3">
+                        <a href="https://linkedin.com/in/profile" target="_blank" class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-center font-medium transition-all">
+                            <i class="fab fa-linkedin mr-2"></i>View LinkedIn
+                        </a>
+                        <button class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-all">
+                            <i class="fas fa-star mr-2"></i>Favorite
+                        </button>
+                        <button class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition-all">
+                            <i class="fas fa-envelope mr-2"></i>Contact
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Export Functions
+        function exportCSV() {
+            // Simulate CSV export
+            const csvContent = "Name,Company,Score,Technical,Cultural,Experience,Startup\n" +
+                "Alex Semyzhonov,Inetex LTD,87,92,85,88,84\n" +
+                "Tomer Landesman,env0,89,94,87,86,89\n" +
+                "Aviram Shubeili,Philips,85,90,82,84,83";
+            
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = `scorely-results-${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        function exportInsights() {
+            const insights = {
+                summary: "AI Analysis Report",
+                date: new Date().toISOString(),
+                topPatterns: ["78% of top candidates have startup experience", "Strong correlation between rapid promotions and high scores"],
+                recommendations: ["Focus outreach on TOP and GOOD categories", "Consider Hidden Gems for future roles"],
+                actionItems: ["Expand search to include more startup alumni", "Look for similar profiles in target companies"]
+            };
+            
+            const blob = new Blob([JSON.stringify(insights, null, 2)], { type: 'application/json' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = `scorely-insights-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Search and Filter Functions
+        function initializeSearchAndFilter() {
+            const searchInput = document.getElementById('search-candidates');
+            const categoryFilter = document.getElementById('filter-category');
+            const sortSelect = document.getElementById('sort-candidates');
+
+            searchInput.addEventListener('input', filterCandidates);
+            categoryFilter.addEventListener('change', filterCandidates);
+            sortSelect.addEventListener('change', sortCandidates);
+        }
+
+        function filterCandidates() {
+            const searchTerm = document.getElementById('search-candidates').value.toLowerCase();
+            const category = document.getElementById('filter-category').value;
+
+            // Show/hide sections based on category filter
+            const sections = ['top-candidates', 'good-candidates', 'hidden-gems'];
+            sections.forEach(sectionId => {
+                const section = document.getElementById(sectionId);
+                const shouldShow = category === 'all' || 
+                    (category === 'top' && sectionId === 'top-candidates') ||
+                    (category === 'good' && sectionId === 'good-candidates') ||
+                    (category === 'gems' && sectionId === 'hidden-gems');
+                
+                section.style.display = shouldShow ? 'block' : 'none';
+            });
+
+            // Filter individual cards based on search term
+            if (searchTerm) {
+                const cards = document.querySelectorAll('.card-shadow');
+                cards.forEach(card => {
+                    const text = card.textContent.toLowerCase();
+                    card.style.display = text.includes(searchTerm) ? 'block' : 'none';
+                });
+            }
+        }
+
+        function sortCandidates() {
+            // Placeholder for sorting functionality
+            console.log('Sorting candidates...');
+        }
+
+        // Initialize everything when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeTabs();
+            initializeFileUpload();
+            initializeModelSelection();
+            initializeProfileToggle();
+            initializeSearchAndFilter();
+
+            // Add event listeners
+            document.getElementById('start-ranking').addEventListener('click', startRanking);
+            document.getElementById('export-csv').addEventListener('click', exportCSV);
+            document.getElementById('export-insights').addEventListener('click', exportInsights);
+            
+            // Reset button
+            document.getElementById('reset-btn').addEventListener('click', () => {
+                if (confirm('Are you sure you want to reset all data?')) {
+                    location.reload();
+                }
+            });
+
+            // Store API keys in localStorage
+            const openaiKey = document.getElementById('openai-key');
+            const embeddingKey = document.getElementById('embedding-key');
+            
+            // Load saved keys
+            if (localStorage.getItem('openai-key')) {
+                openaiKey.value = localStorage.getItem('openai-key');
+            }
+            if (localStorage.getItem('embedding-key')) {
+                embeddingKey.value = localStorage.getItem('embedding-key');
+            }
+            
+            // Save keys on change
+            openaiKey.addEventListener('change', () => {
+                localStorage.setItem('openai-key', openaiKey.value);
+            });
+            embeddingKey.addEventListener('change', () => {
+                localStorage.setItem('embedding-key', embeddingKey.value);
+            });
+        });
+    </script>
 </body>
 </html>
-

@@ -1020,9 +1020,336 @@
             transition: width 0.3s ease;
             border-radius: 2px;
         }
+
+/* API Key Save Indicators */
+.api-input-container {
+    position: relative;
+}
+
+.save-indicator {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--success-color);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.save-indicator.show {
+    opacity: 1;
+}
+
+/* File Upload Enhanced Styles */
+.upload-area {
+    position: relative;
+    border: 2px dashed var(--border-color);
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    background: var(--gray-50);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.upload-area:hover {
+    border-color: var(--primary-color);
+    background: var(--gray-100);
+}
+
+.upload-area.dragover {
+    border-color: var(--primary-color);
+    background: rgba(37, 99, 235, 0.1);
+}
+
+.upload-progress {
+    display: none;
+    margin-top: 1rem;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: var(--gray-200);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--primary-color);
+    transition: width 0.3s ease;
+    width: 0%;
+}
+
+.file-info {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: var(--gray-50);
+    border-radius: 8px;
+    display: none;
+}
+
+.file-preview {
+    margin-top: 1rem;
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+}
+
+.file-preview table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.file-preview th,
+.file-preview td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.8rem;
+}
+
+.file-preview th {
+    background: var(--gray-100);
+    font-weight: 600;
+}
+
+/* Bottom Navigation */
+.tab-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2rem;
+    padding: 1rem 0;
+    border-top: 1px solid var(--border-color);
+}
+
+.nav-btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    background: var(--primary-color);
+    color: white;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.nav-btn:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+}
+
+.nav-btn:disabled {
+    background: var(--gray-300);
+    cursor: not-allowed;
+    transform: none;
+}
+
+.nav-btn.secondary {
+    background: var(--gray-200);
+    color: var(--text-primary);
+}
+
+.nav-btn.secondary:hover {
+    background: var(--gray-300);
+}
+
+/* Enhanced Filtering Dashboard */
+.filtering-dashboard {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    display: none;
+}
+
+.filtering-dashboard.show {
+    display: block;
+    animation: slideDown 0.5s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.filter-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.filter-stat {
+    background: rgba(255, 255, 255, 0.15);
+    padding: 1.5rem;
+    border-radius: 12px;
+    text-align: center;
+    backdrop-filter: blur(10px);
+}
+
+.filter-stat .number {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.filter-stat .label {
+    font-size: 0.875rem;
+    opacity: 0.9;
+}
+
+/* Success Messages */
+.success-message {
+    background: var(--success-color);
+    color: white;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-top: 1rem;
+    display: none;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.success-message.show {
+    display: block;
+}
+
+/* Sticky Bottom Navigation */
+.tab-content {
+    min-height: calc(100vh - 200px);
+    padding-bottom: 100px; /* Space for fixed navigation */
+}
+
+.tab-navigation {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    background: white !important;
+    border-top: 2px solid var(--border-color) !important;
+    box-shadow: 0 -4px 8px -2px rgba(0, 0, 0, 0.15) !important;
+    z-index: 1000 !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 1.2rem 2rem !important;
+    margin: 0 !important;
+}
+
+.tab-navigation .tab-progress {
+    text-align: center;
+    flex-grow: 1;
+    margin: 0 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.tab-navigation .nav-btn {
+    padding: 0.75rem 1.5rem !important;
+    border: none !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+    cursor: pointer !important;
+    min-width: 120px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.5rem !important;
+}
+
+.tab-navigation .nav-btn:not(.secondary) {
+    background: var(--primary-color) !important;
+    color: white !important;
+}
+
+.tab-navigation .nav-btn.secondary {
+    background: var(--gray-200) !important;
+    color: var(--text-primary) !important;
+}
+
+.tab-navigation .nav-btn:hover:not(:disabled) {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
+}
+
+.tab-navigation .nav-btn:disabled {
+    background: var(--gray-300) !important;
+    color: var(--gray-500) !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+}
+
+.container {
+    padding-bottom: 120px !important;
+}
+
+/* Hide duplicate navigations - keep only the last one visible */
+.tab-navigation:not(:last-of-type) {
+    display: none !important;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .tab-navigation {
+        padding: 1rem !important;
+        flex-direction: column !important;
+        gap: 1rem !important;
+    }
+
+    .tab-navigation .nav-btn {
+        width: 100% !important;
+        max-width: 200px !important;
+    }
+
+    .tab-content {
+        padding-bottom: 140px !important;
+    }
+}
+
 </style>
 </head>
 <body>
+    
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Save Indicator -->
+    <div id="saveIndicator" class="save-indicator"> Saving...</div>
+
+    <!-- Export List Indicator -->
+    <div id="exportListIndicator" class="export-list-indicator">
+         Export List: <span id="exportCount">0</span> items
+    </div>
+
     <!-- Loading Overlay -->
     <div id="loadingOverlay" class="loading-overlay">
         <div style="text-align: center; color: white;">
@@ -1066,18 +1393,7 @@
             <div class="tab-progress">
                 <div id="tabProgress" class="tab-progress-fill"></div>
             </div>
-            <div class="nav-controls">
-                <button id="prevBtn" class="nav-btn" onclick="previousTab()">
-                    ← Previous
-                </button>
-                <div style="flex-grow: 1; text-align: center;">
-                    <span id="currentStepText" style="font-weight: 600; color: var(--text-primary);">Step 1 of 3: Setup</span>
-                </div>
-                <button id="nextBtn" class="nav-btn" onclick="nextTab()">
-                    Next →
-                </button>
-            </div>
- </nav>
+</nav>
 
  <!-- Setup Tab -->
  <div id="setup" class="tab-content active">            <!-- Enhanced API Configuration -->
@@ -1102,23 +1418,49 @@
             </div>            <!-- File Upload -->
             <div class="section">
                 <h2>📁 File Upload</h2>
-                <div class="upload-area-enhanced" onclick="document.getElementById('csvFile').click()" 
-                     ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
-                    <input type="file" id="csvFile" accept=".csv,.xlsx,.xls" style="display: none;" onchange="handleFileUpload(event)">
-                    <div class="upload-icon">📁</div>
-                    <p style="color: var(--text-primary); font-weight: 500; margin: 0.5rem 0;">
-                        <span id="uploadText">Click to upload CSV/Excel file or drag & drop here</span>
-                    </p>
-                    <small style="color: var(--text-secondary);">LinkedIn profiles data (CSV, Excel formats supported)</small>
+                <div class="upload-area" id="uploadArea" onclick="document.getElementById('csvFile').click()">
+                    <input type="file" id="csvFile" accept=".csv" style="display: none;">
+                    <div class="upload-icon">📄</div>
+                    <p style="color: var(--text-primary); font-weight: 500; margin: 0.5rem 0;">Click to upload CSV file or drag & drop</p>
+                    <small style="color: var(--text-secondary);">LinkedIn profiles data</small>
                 </div>
 
-                <div id="fileInfoEnhanced" class="file-info-enhanced">
-                    <div class="real-time-stats">
-                        <h4 style="margin-bottom: 1rem; color: var(--text-primary);">📊 File Analysis</h4>
-                        <div class="stats-row">
-                            <span class="stats-label">File Name:</span>
-                            <span class="stats-value" id="fileNameStat">-</span>
+                <div class="upload-progress" id="uploadProgress">
+                    <p>Uploading file...</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                </div>
+
+                <div class="success-message" id="uploadSuccess">
+                    <strong>✓ File uploaded successfully!</strong>
+                    <p>File processed and ready for analysis.</p>
+                </div>
+
+                <div class="file-info" id="fileInfo">
+                    <h4>📊 File Information</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin: 1rem 0;">
+                        <div>
+                            <strong>File Name:</strong>
+                            <p id="fileName">-</p>
                         </div>
+                        <div>
+                            <strong>File Size:</strong>
+                            <p id="fileSize">-</p>
+                        </div>
+                        <div>
+                            <strong>Total Rows:</strong>
+                            <p id="fileRows">-</p>
+                        </div>
+                    </div>
+
+                    <h4>📋 Columns Found</h4>
+                    <div id="fileColumns" style="margin-bottom: 1rem;"></div>
+
+                    <h4>👀 Data Preview (First 5 rows)</h4>
+                    <div class="file-preview" id="filePreview"></div>
+                </div>
+            </div>
                         <div class="stats-row">
                             <span class="stats-label">File Size:</span>
                             <span class="stats-value" id="fileSizeStat">-</span>
@@ -1135,7 +1477,20 @@
                             <span class="stats-label">Columns Detected:</span>
                             <span class="stats-value" id="columnsStat">-</span>
                         </div>
-                    </div>
+                    
+            
+            <!-- Tab Navigation -->
+            <div class="tab-navigation">
+                <button class="nav-btn secondary" id="prevBtn" onclick="navigateTab(-1)">
+                    ← Previous
+                </button>
+                <div class="tab-progress">
+                    <span id="currentTabInfo">Step 1 of 3</span>
+                </div>
+                <button class="nav-btn" id="nextBtn" onclick="navigateTab(1)">
+                    Next →
+                </button>
+            </div>
                 </div>
             </div>            <!-- Enhanced Filtering Dashboard -->
             <div id="filteringDashboardEnhanced" class="filtering-dashboard-enhanced">
@@ -1410,6 +1765,18 @@
  <br><small style="color: var(--text-secondary);">Most thorough but slower</small>
  </div>
  </label>
+            <!-- Tab Navigation -->
+            <div class="tab-navigation">
+                <button class="nav-btn secondary" id="prevBtn" onclick="navigateTab(-1)">
+                    ← Previous
+                </button>
+                <div class="tab-progress">
+                    <span id="currentTabInfo">Step 1 of 3</span>
+                </div>
+                <button class="nav-btn" id="nextBtn" onclick="navigateTab(1)">
+                    Next →
+                </button>
+            </div>
  </div>
  </div>
 
@@ -1496,9 +1863,22 @@
  <button onclick="applyFeedback()" class="btn-primary">
  💡 Apply Feedback
  </button>
+            <!-- Tab Navigation -->
+            <div class="tab-navigation">
+                <button class="nav-btn secondary" id="prevBtn" onclick="navigateTab(-1)">
+                    ← Previous
+                </button>
+                <div class="tab-progress">
+                    <span id="currentTabInfo">Step 1 of 3</span>
+                </div>
+                <button class="nav-btn" id="nextBtn" onclick="navigateTab(1)">
+                    Next →
+                </button>
+            </div>
  </div>
  </div>
- </div>
+ 
+            
 
  <!-- Results Tab -->
  <div id="results" class="tab-content">
@@ -1819,7 +2199,8 @@
  </div>
  </div>
  </div>
- </div>
+ 
+            
  </div>
 
  <!-- Modal for Candidate Details -->
@@ -1836,7 +2217,368 @@
  </div>
 
  <!-- PapaParse Library -->
- <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js">
+    // Global variables for file data and application state
+    let uploadedFileData = null;
+    let filteredData = null;
+    let currentTab = 0;
+    const tabs = ['setup', 'ranking', 'results'];
+    const tabNames = ['Setup', 'Ranking', 'Results'];
+
+    // Enhanced Navigation Functions
+    function navigateTab(direction) {
+        const newTab = currentTab + direction;
+        if (newTab >= 0 && newTab < tabs.length) {
+            // Hide current tab
+            document.getElementById(tabs[currentTab]).classList.remove('active');
+            document.querySelector(`[data-tab="${tabs[currentTab]}"]`).classList.remove('active');
+
+            // Show new tab
+            currentTab = newTab;
+            document.getElementById(tabs[currentTab]).classList.add('active');
+            document.querySelector(`[data-tab="${tabs[currentTab]}"]`).classList.add('active');
+
+            // Update navigation buttons
+            updateNavigationButtons();
+            updateTabInfo();
+        }
+    }
+
+    function updateNavigationButtons() {
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+
+        if (prevBtn && nextBtn) {
+            prevBtn.disabled = currentTab === 0;
+            nextBtn.disabled = currentTab === tabs.length - 1;
+
+            // Update button text based on current tab
+            if (currentTab === tabs.length - 1) {
+                nextBtn.style.display = 'none';
+            } else {
+                nextBtn.style.display = 'flex';
+            }
+        }
+    }
+
+    function updateTabInfo() {
+        const tabInfo = document.getElementById('currentTabInfo');
+        if (tabInfo) {
+            tabInfo.textContent = `Step ${currentTab + 1} of ${tabs.length}: ${tabNames[currentTab]}`;
+        }
+    }
+
+    // API Key Save Functionality
+    function setupApiKeySaving() {
+        const embeddingApiKey = document.getElementById('embeddingApiKey');
+        const gptApiKey = document.getElementById('gptApiKey');
+
+        if (embeddingApiKey) {
+            embeddingApiKey.addEventListener('input', function() {
+                saveApiKey('embeddingApiKey', this.value);
+                showSaveIndicator('embeddingApiKeySaved');
+            });
+
+            // Load saved value
+            const saved = localStorage.getItem('embeddingApiKey');
+            if (saved) {
+                embeddingApiKey.value = saved;
+            }
+        }
+
+        if (gptApiKey) {
+            gptApiKey.addEventListener('input', function() {
+                saveApiKey('gptApiKey', this.value);
+                showSaveIndicator('gptApiKeySaved');
+            });
+
+            // Load saved value
+            const saved = localStorage.getItem('gptApiKey');
+            if (saved) {
+                gptApiKey.value = saved;
+            }
+        }
+    }
+
+    function saveApiKey(keyName, value) {
+        localStorage.setItem(keyName, value);
+    }
+
+    function showSaveIndicator(indicatorId) {
+        const indicator = document.getElementById(indicatorId);
+        if (indicator) {
+            indicator.classList.add('show');
+            setTimeout(() => {
+                indicator.classList.remove('show');
+            }, 2000);
+        }
+    }
+
+    // Enhanced File Upload Functionality
+    function setupFileUpload() {
+        const fileInput = document.getElementById('csvFile');
+        const uploadArea = document.getElementById('uploadArea');
+
+        if (fileInput && uploadArea) {
+            // Drag and drop functionality
+            uploadArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.classList.add('dragover');
+            });
+
+            uploadArea.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                this.classList.remove('dragover');
+            });
+
+            uploadArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleFileUpload(files[0]);
+                }
+            });
+
+            fileInput.addEventListener('change', function(e) {
+                if (e.target.files.length > 0) {
+                    handleFileUpload(e.target.files[0]);
+                }
+            });
+        }
+    }
+
+    function handleFileUpload(file) {
+        if (!file.name.toLowerCase().endsWith('.csv')) {
+            showToast('Please upload a CSV file only', 'error');
+            return;
+        }
+
+        // Show progress
+        const progressDiv = document.getElementById('uploadProgress');
+        const progressFill = document.getElementById('progressFill');
+        const successMessage = document.getElementById('uploadSuccess');
+
+        if (progressDiv) progressDiv.style.display = 'block';
+        if (successMessage) successMessage.classList.remove('show');
+
+        // Simulate progress
+        let progress = 0;
+        const progressInterval = setInterval(() => {
+            progress += 10;
+            if (progressFill) progressFill.style.width = progress + '%';
+
+            if (progress >= 100) {
+                clearInterval(progressInterval);
+                setTimeout(() => {
+                    parseCSVFile(file);
+                }, 500);
+            }
+        }, 100);
+    }
+
+    function parseCSVFile(file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const csv = e.target.result;
+            const lines = csv.split('\n');
+            const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+
+            // Parse data
+            const data = [];
+            for (let i = 1; i < lines.length && i < 1000; i++) { // Limit to 1000 rows for performance
+                if (lines[i].trim()) {
+                    const row = lines[i].split(',').map(cell => cell.trim().replace(/"/g, ''));
+                    if (row.length === headers.length) {
+                        const rowObj = {};
+                        headers.forEach((header, index) => {
+                            rowObj[header] = row[index];
+                        });
+                        data.push(rowObj);
+                    }
+                }
+            }
+
+            uploadedFileData = {
+                filename: file.name,
+                size: formatFileSize(file.size),
+                totalRows: lines.length - 1,
+                headers: headers,
+                data: data
+            };
+
+            displayFileInfo();
+            hideProgress();
+            showSuccess();
+            enableFiltering();
+        };
+        reader.readAsText(file);
+    }
+
+    function displayFileInfo() {
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const fileRows = document.getElementById('fileRows');
+        const fileColumns = document.getElementById('fileColumns');
+        const filePreview = document.getElementById('filePreview');
+
+        if (fileInfo && uploadedFileData) {
+            fileInfo.style.display = 'block';
+
+            if (fileName) fileName.textContent = uploadedFileData.filename;
+            if (fileSize) fileSize.textContent = uploadedFileData.size;
+            if (fileRows) fileRows.textContent = uploadedFileData.totalRows.toLocaleString();
+
+            // Display columns
+            if (fileColumns) {
+                fileColumns.innerHTML = uploadedFileData.headers.map(header => 
+                    `<span style="display: inline-block; background: var(--gray-100); padding: 4px 8px; margin: 2px; border-radius: 4px; font-size: 0.8rem;">${header}</span>`
+                ).join('');
+            }
+
+            // Display preview
+            if (filePreview && uploadedFileData.data.length > 0) {
+                const previewData = uploadedFileData.data.slice(0, 5);
+                let tableHTML = '<table><thead><tr>';
+                uploadedFileData.headers.forEach(header => {
+                    tableHTML += `<th>${header}</th>`;
+                });
+                tableHTML += '</tr></thead><tbody>';
+
+                previewData.forEach(row => {
+                    tableHTML += '<tr>';
+                    uploadedFileData.headers.forEach(header => {
+                        tableHTML += `<td>${row[header] || ''}</td>`;
+                    });
+                    tableHTML += '</tr>';
+                });
+                tableHTML += '</tbody></table>';
+                filePreview.innerHTML = tableHTML;
+            }
+        }
+    }
+
+    function hideProgress() {
+        const progressDiv = document.getElementById('uploadProgress');
+        if (progressDiv) {
+            setTimeout(() => {
+                progressDiv.style.display = 'none';
+            }, 500);
+        }
+    }
+
+    function showSuccess() {
+        const successMessage = document.getElementById('uploadSuccess');
+        if (successMessage) {
+            successMessage.classList.add('show');
+        }
+    }
+
+    function enableFiltering() {
+        const applyButton = document.querySelector('button[onclick="applyFiltering()"]');
+        if (applyButton) {
+            applyButton.disabled = false;
+            applyButton.textContent = '🔍 Apply Filters & Show Summary';
+        }
+    }
+
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    // Enhanced Apply Filtering Function
+    function applyFiltering() {
+        if (!uploadedFileData) {
+            showToast('Please upload a CSV file first', 'error');
+            return;
+        }
+
+        const blacklistText = document.getElementById('blacklistCompanies').value.trim();
+        const inProcessText = document.getElementById('inProcessCandidates').value.trim();
+
+        const blacklistCompanies = blacklistText ? blacklistText.split(',').map(c => c.trim().toLowerCase()) : [];
+        const inProcessCandidates = inProcessText ? inProcessText.split(',').map(c => c.trim().toLowerCase()) : [];
+
+        // Apply filtering
+        let filteredByBlacklist = 0;
+        let filteredByInProcess = 0;
+
+        filteredData = uploadedFileData.data.filter(row => {
+            // Check company blacklist
+            const company = (row.Company || row.company || '').toLowerCase();
+            if (blacklistCompanies.some(bc => company.includes(bc))) {
+                filteredByBlacklist++;
+                return false;
+            }
+
+            // Check already in process
+            const name = (row.Name || row.name || row['Full Name'] || '').toLowerCase();
+            if (inProcessCandidates.some(ip => name.includes(ip))) {
+                filteredByInProcess++;
+                return false;
+            }
+
+            return true;
+        });
+
+        // Update dashboard
+        updateFilteringDashboard(uploadedFileData.totalRows, filteredByBlacklist, filteredByInProcess, filteredData.length);
+
+        showToast('Filtering applied successfully!', 'success');
+    }
+
+    function updateFilteringDashboard(total, blacklisted, inProcess, remaining) {
+        const dashboard = document.getElementById('filteringDashboard');
+        const totalCount = document.getElementById('totalRowsCount');
+        const blacklistCount = document.getElementById('blacklistFilteredCount');
+        const inProcessCount = document.getElementById('inProcessFilteredCount');
+        const remainingCount = document.getElementById('remainingForRankingCount');
+
+        if (dashboard) {
+            dashboard.classList.add('show');
+        }
+
+        if (totalCount) totalCount.textContent = total.toLocaleString();
+        if (blacklistCount) blacklistCount.textContent = blacklisted.toLocaleString();
+        if (inProcessCount) inProcessCount.textContent = inProcess.toLocaleString();
+        if (remainingCount) remainingCount.textContent = remaining.toLocaleString();
+    }
+
+    // Toast notification function
+    function showToast(message, type = 'info') {
+        const toast = document.getElementById('toast');
+        if (toast) {
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+    }
+
+    // Initialize everything when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        setupApiKeySaving();
+        setupFileUpload();
+        updateNavigationButtons();
+        updateTabInfo();
+
+        // Set up tab switching
+        document.querySelectorAll('.tab-btn').forEach((btn, index) => {
+            btn.addEventListener('click', function() {
+                currentTab = index;
+                updateNavigationButtons();
+                updateTabInfo();
+            });
+        });
+    });
+
+    </script>
  
  
     <script>
@@ -2464,6 +3206,6 @@
  <!-- Analytics content would go here -->
  </div>
 
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"rayId":"94f2d5da7a931e75","serverTiming":{"name":{"cfExtPri":true,"cfEdge":true,"cfOrigin":true,"cfL4":true,"cfSpeedBrain":true,"cfCacheStatus":true}},"version":"2025.6.2","token":"4edd5f8ec12a48cfa682ab8261b80a79"}' crossorigin="anonymous"></script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"rayId":"94f302eeba495623","serverTiming":{"name":{"cfExtPri":true,"cfEdge":true,"cfOrigin":true,"cfL4":true,"cfSpeedBrain":true,"cfCacheStatus":true}},"version":"2025.6.2","token":"4edd5f8ec12a48cfa682ab8261b80a79"}' crossorigin="anonymous"></script>
 </body>
 </html>

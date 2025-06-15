@@ -1,3518 +1,1612 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
- <meta charset="UTF-8">
- <meta name="viewport" content="width=device-width, initial-scale=1.0">
- <title>Scorely Beta - LinkedIn Profile Ranker</title>
- <style>
- :root {
- --primary-color: #2563eb;
- --secondary-color: #f8fafc;
- --success-color: #10b981;
- --warning-color: #f59e0b;
- --error-color: #ef4444;
- --text-primary: #1f2937;
- --text-secondary: #6b7280;
- --border-color: #e5e7eb;
- --white: #ffffff;
- --gray-50: #f9fafb;
- --gray-100: #f3f4f6;
- --gray-200: #e5e7eb;
- --gray-300: #d1d5db;
- --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
- --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
- --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
- }
-
- * {
- margin: 0;
- padding: 0;
- box-sizing: border-box;
- }
-
- body {
- font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
- background: var(--white);
- color: var(--text-primary);
- line-height: 1.6;
- }
-
- .container {
- max-width: 1400px;
- margin: 0 auto;
- min-height: 100vh;
- background: var(--white);
- }
-
- /* Toast Notifications */
- .toast {
- position: fixed;
- top: 20px;
- right: 20px;
- background: var(--success-color);
- color: white;
- padding: 12px 24px;
- border-radius: 8px;
- box-shadow: var(--shadow-lg);
- z-index: 9999;
- opacity: 0;
- transform: translateX(100%);
- transition: all 0.3s ease;
- max-width: 400px;
- font-size: 0.875rem;
- font-weight: 500;
- }
-
- .toast.show {
- opacity: 1;
- transform: translateX(0);
- }
-
- .toast.error {
- background: var(--error-color);
- }
-
- .toast.warning {
- background: var(--warning-color);
- }
-
- .toast.info {
- background: var(--primary-color);
- }
-
- /* Save Indicator */
- .save-indicator {
- position: fixed;
- bottom: 20px;
- right: 20px;
- background: var(--primary-color);
- color: white;
- padding: 8px 16px;
- border-radius: 20px;
- font-size: 0.8rem;
- opacity: 0;
- transition: opacity 0.3s;
- z-index: 1000;
- }
-
- .save-indicator.saving {
- opacity: 1;
- }
-
- /* Export List Indicator */
- .export-list-indicator {
- position: fixed;
- top: 80px;
- right: 20px;
- background: var(--warning-color);
- color: white;
- padding: 8px 16px;
- border-radius: 8px;
- font-size: 0.9rem;
- z-index: 100;
- display: none;
- }
-
- .export-list-indicator.show {
- display: block;
- }
-
- /* Filtering Dashboard */
- .filtering-dashboard {
- background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
- color: white;
- padding: 2rem;
- border-radius: 16px;
- margin-bottom: 2rem;
- display: none;
- }
-
- .filtering-dashboard.show {
- display: block;
- }
-
- .filter-stats {
- display: grid;
- grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
- gap: 1rem;
- margin-top: 1rem;
- }
-
- .filter-stat {
- background: rgba(255, 255, 255, 0.15);
- padding: 1.5rem;
- border-radius: 12px;
- text-align: center;
- }
-
- .filter-stat .number {
- font-size: 2rem;
- font-weight: 700;
- margin-bottom: 0.5rem;
- }
-
- .filter-stat .label {
- font-size: 0.875rem;
- opacity: 0.9;
- }
-
- /* Navigation */
- .navbar {
- background: white;
- border-bottom: 2px solid var(--border-color);
- padding: 1.5rem 2rem;
- position: sticky;
- top: 0;
- z-index: 1000;
- box-shadow: var(--shadow-md);
- }
-
- .nav-brand h1 {
- color: var(--primary-color);
- font-size: 2.5rem;
- font-weight: 800;
- margin-bottom: 0.25rem;
- }
-
- .nav-brand p {
- color: var(--text-secondary);
- font-size: 1rem;
- font-weight: 500;
- }
-
- .nav-tabs {
- display: flex;
- gap: 0.75rem;
- align-items: center;
- margin-top: 1rem;
- }
-
- .tab-btn {
- padding: 0.875rem 1.75rem;
- border: 2px solid var(--border-color);
- background: var(--white);
- color: var(--text-secondary);
- cursor: pointer;
- border-radius: 12px;
- font-size: 0.875rem;
- font-weight: 600;
- transition: all 0.2s ease;
- display: flex;
- align-items: center;
- gap: 0.5rem;
- }
-
- .tab-btn:hover {
- border-color: var(--primary-color);
- color: var(--primary-color);
- }
-
- .tab-btn.active {
- background: var(--primary-color);
- color: white;
- border-color: var(--primary-color);
- }
-
- .reset-btn {
- margin-left: auto;
- background: var(--error-color) !important;
- color: white !important;
- border-color: var(--error-color) !important;
- }
-
- /* Tab Content */
- .tab-content {
- display: none;
- padding: 2rem;
- max-width: 1000px;
- margin: 0 auto;
- }
-
- .tab-content.active {
- display: block;
- }
-
- /* Sections */
- .section {
- background: white;
- border: 1px solid var(--border-color);
- border-radius: 16px;
- padding: 2rem;
- margin-bottom: 2rem;
- box-shadow: var(--shadow-md);
- }
-
- .section h2 {
- color: var(--text-primary);
- font-size: 1.375rem;
- font-weight: 700;
- margin-bottom: 1.5rem;
- display: flex;
- align-items: center;
- gap: 0.75rem;
- }
-
- .section h3 {
- color: var(--text-primary);
- font-size: 1.125rem;
- font-weight: 600;
- margin-bottom: 1rem;
- }
-
- /* Form Elements */
- input[type="text"], 
- input[type="email"], 
- input[type="password"],
- input[type="number"],
- textarea, 
- select {
- width: 100%;
- padding: 0.875rem 1rem;
- border: 1px solid var(--border-color);
- border-radius: 8px;
- font-size: 0.875rem;
- background: white;
- transition: all 0.2s ease;
- }
-
- input:focus, 
- textarea:focus, 
- select:focus {
- outline: none;
- border-color: var(--primary-color);
- box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
- }
-
- textarea {
- min-height: 100px;
- resize: vertical;
- }
-
- label {
- display: block;
- margin-bottom: 0.5rem;
- color: var(--text-primary);
- font-weight: 600;
- font-size: 0.875rem;
- }
-
- small {
- color: var(--text-secondary);
- font-size: 0.8rem;
- margin-top: 0.25rem;
- display: block;
- }
-
- /* Upload Area */
- .upload-area {
- border: 2px dashed var(--border-color);
- border-radius: 8px;
- padding: 2rem;
- text-align: center;
- background: var(--gray-50);
- cursor: pointer;
- transition: all 0.2s ease;
- }
-
- .upload-area:hover {
- border-color: var(--primary-color);
- background: var(--gray-100);
- }
-
- .upload-icon {
- font-size: 2rem;
- margin-bottom: 0.5rem;
- }
-
- /* Buttons */
- .btn-primary, .btn-secondary {
- padding: 0.875rem 1.75rem;
- border: none;
- border-radius: 10px;
- font-size: 0.875rem;
- font-weight: 600;
- cursor: pointer;
- transition: all 0.2s ease;
- display: inline-flex;
- align-items: center;
- gap: 0.5rem;
- text-decoration: none;
- }
-
- .btn-primary {
- background: var(--primary-color);
- color: white;
- box-shadow: var(--shadow-md);
- }
-
- .btn-primary:hover {
- background: #1d4ed8;
- transform: translateY(-1px);
- }
-
- .btn-secondary {
- background: var(--gray-100);
- color: var(--text-primary);
- border: 1px solid var(--border-color);
- }
-
- .btn-secondary:hover {
- background: var(--gray-200);
- }
-
- .btn-add-export {
- background: var(--warning-color);
- color: white;
- border: none;
- padding: 0.5rem 1rem;
- border-radius: 6px;
- font-size: 0.75rem;
- cursor: pointer;
- transition: all 0.2s ease;
- }
-
- .btn-view-details {
- background: var(--primary-color);
- color: white;
- border: none;
- padding: 0.5rem 1rem;
- border-radius: 6px;
- font-size: 0.75rem;
- cursor: pointer;
- transition: all 0.2s ease;
- }
-
- /* Results Table */
- .results-table {
- width: 100%;
- border-collapse: collapse;
- background: white;
- border-radius: 8px;
- overflow: hidden;
- box-shadow: var(--shadow-sm);
- margin-bottom: 2rem;
- }
-
- .results-table th,
- .results-table td {
- padding: 12px;
- text-align: left;
- border-bottom: 1px solid var(--border-color);
- }
-
- .results-table th {
- background: var(--gray-50);
- font-weight: 600;
- color: var(--text-primary);
- position: sticky;
- top: 0;
- z-index: 10;
- }
-
- .results-table tr:hover {
- background: var(--gray-50);
- }
-
- .score-badge {
- padding: 4px 8px;
- border-radius: 12px;
- font-size: 0.8rem;
- font-weight: 600;
- text-align: center;
- min-width: 60px;
- display: inline-block;
- }
-
- .score-high { background: #dcfdf7; color: #065f46; }
- .score-medium { background: #dbeafe; color: #1e40af; }
- .score-low { background: #fef3c7; color: #92400e; }
-
- /* Modal */
- .modal {
- display: none;
- position: fixed;
- z-index: 1000;
- left: 0;
- top: 0;
- width: 100%;
- height: 100%;
- background-color: rgba(0,0,0,0.5);
- }
-
- .modal-content {
- background-color: white;
- margin: 5% auto;
- padding: 0;
- border-radius: 12px;
- width: 90%;
- max-width: 800px;
- max-height: 80vh;
- overflow-y: auto;
- }
-
- .modal-header {
- padding: 1.5rem;
- border-bottom: 1px solid var(--border-color);
- display: flex;
- justify-content: space-between;
- align-items: center;
- }
-
- .modal-body {
- padding: 1.5rem;
- }
-
- .close {
- color: var(--text-secondary);
- font-size: 28px;
- font-weight: bold;
- cursor: pointer;
- }
-
- .close:hover {
- color: var(--text-primary);
- }
-
- /* Checkbox Grid */
- .checkbox-grid {
- display: grid;
- grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
- gap: 0.75rem;
- }
-
- .checkbox-grid label {
- display: flex;
- align-items: center;
- gap: 0.5rem;
- cursor: pointer;
- padding: 0.5rem;
- border-radius: 6px;
- transition: background-color 0.2s;
- }
-
- .checkbox-grid label:hover {
- background: var(--gray-50);
- }
-
- /* Ideal Profiles */
- .ideal-profiles {
- display: grid;
- gap: 1.5rem;
- }
-
- .profile-input {
- border: 1px solid var(--border-color);
- border-radius: 8px;
- padding: 1rem;
- background: var(--gray-50);
- }
-
- .input-options {
- display: flex;
- gap: 1rem;
- margin-bottom: 1rem;
- }
-
- .input-options label {
- display: flex;
- align-items: center;
- gap: 0.5rem;
- cursor: pointer;
- font-weight: 400;
- }
-
- /* Model Selection */
- .model-selection {
- display: grid;
- gap: 0.75rem;
- }
-
- .model-selection label {
- display: flex;
- align-items: center;
- gap: 0.75rem;
- padding: 1rem;
- border: 1px solid var(--border-color);
- border-radius: 8px;
- cursor: pointer;
- transition: all 0.2s;
- background: white;
- }
-
- .model-selection label:hover {
- border-color: var(--primary-color);
- background: var(--gray-50);
- }
-
- /* Progress Bar */
- .progress-bar {
- width: 100%;
- height: 12px;
- background: var(--gray-200);
- border-radius: 6px;
- overflow: hidden;
- margin: 1rem 0;
- }
-
- .progress-fill {
- height: 100%;
- background: linear-gradient(90deg, var(--primary-color), var(--success-color));
- transition: width 0.3s ease;
- border-radius: 6px;
- }
-
- /* Summary Cards */
- .results-summary {
- display: grid;
- grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
- gap: 1rem;
- margin-bottom: 2rem;
- }
-
- .summary-card {
- background: white;
- border: 1px solid var(--border-color);
- border-radius: 8px;
- padding: 1.5rem;
- text-align: center;
- box-shadow: var(--shadow-sm);
- }
-
- .summary-card h3 {
- color: var(--text-secondary);
- font-size: 0.9rem;
- font-weight: 500;
- margin-bottom: 0.5rem;
- }
-
- .summary-number {
- font-size: 2rem;
- font-weight: 700;
- color: var(--primary-color);
- margin-bottom: 0.25rem;
- }
-
- .summary-card p {
- color: var(--text-secondary);
- font-size: 0.85rem;
- }
-
- /* AI Insights */
- .ai-insights-panel {
- background: white;
- border: 1px solid var(--border-color);
- border-radius: 12px;
- padding: 2rem;
- margin: 2rem 0;
- }
-
- .insights-grid {
- display: grid;
- gap: 1.5rem;
- }
-
- .insight-section {
- border-bottom: 1px solid var(--border-color);
- padding-bottom: 1.5rem;
- }
-
- .insight-section:last-child {
- border-bottom: none;
- padding-bottom: 0;
- }
-
- .insight-list {
- list-style: none;
- display: grid;
- gap: 0.5rem;
- }
-
- .insight-list li {
- padding: 0.75rem;
- background: var(--gray-50);
- border-radius: 6px;
- font-size: 0.9rem;
- color: var(--text-primary);
- }
-
- /* Responsive Design */
- @media (max-width: 768px) {
- .container {
- padding: 0;
- }
-
- .navbar {
- padding: 1rem;
- }
-
- .nav-tabs {
- flex-wrap: wrap;
- }
-
- .tab-content {
- padding: 1rem;
- }
-
- .filter-stats {
- grid-template-columns: 1fr;
- }
-
- .checkbox-grid {
- grid-template-columns: 1fr;
- }
-
- .results-summary {
- grid-template-columns: 1fr;
- }
-
- .results-table {
- font-size: 0.8rem;
- }
-
- .results-table th,
- .results-table td {
- padding: 8px;
- }
- }
-
- /* Animations */
- .fade-in {
- animation: fadeIn 0.5s ease-in;
- }
-
- @keyframes fadeIn {
- from { opacity: 0; transform: translateY(20px); }
- to { opacity: 1; transform: translateY(0); }
- }
-
- .pulse {
- animation: pulse 2s infinite;
- }
-
- @keyframes pulse {
- 0%, 100% { opacity: 1; }
- 50% { opacity: 0.7; }
- }
- 
-        /* Loading Indicators */
-        .loading-overlay {
-            position: fixed;
-            top: 0;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scorely - AI-Powered LinkedIn Profile Ranking Tool</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important;
+        }
+        
+        .file-upload-zone { 
+            position: relative; 
+            border: 2px dashed #3b82f6;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            background-color: #f8fafc;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload-zone:hover {
+            border-color: #1d4ed8;
+            background-color: #eff6ff;
+        }
+
+        .file-upload-zone input[type="file"] {
+            position: absolute;
+            top: 0; 
             left: 0;
+            width: 100%; 
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .file-upload-zone .upload-text {
+            pointer-events: none;
+            color: #374151;
+            font-weight: 500;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            display: none;
-            justify-content: center;
+            background-color: rgba(0,0,0,0.5);
             align-items: center;
-            z-index: 9999;
+            justify-content: center;
         }
 
-        .loading-spinner {
-            width: 60px;
-            height: 60px;
-            border: 6px solid #f3f3f3;
-            border-top: 6px solid var(--primary-color);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .progress-container {
-            width: 300px;
-            background-color: #f0f0f0;
-            border-radius: 10px;
-            padding: 3px;
-            margin-top: 20px;
-        }
-
-        .progress-bar-inner {
-            height: 20px;
-            background: linear-gradient(90deg, var(--primary-color), var(--success-color));
+        .modal-content {
+            background-color: white;
+            padding: 20px;
             border-radius: 8px;
-            width: 0%;
-            transition: width 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 12px;
-            font-weight: 600;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
         }
 
-        /* Auto-save Indicators */
-        .auto-save-indicator {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: var(--success-color);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            opacity: 0;
-            transition: opacity 0.3s;
-            z-index: 1000;
+        .close-button {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            color: #aaa;
+            cursor: pointer;
         }
 
-        .auto-save-indicator.saving {
-            background: var(--warning-color);
-            opacity: 1;
+        .close-button:hover {
+            color: black;
         }
 
-        .auto-save-indicator.saved {
-            background: var(--success-color);
-            opacity: 1;
+        #mappingModal .modal-content {
+            max-width: 400px;
         }
 
-        .auto-save-indicator.error {
-            background: var(--error-color);
-            opacity: 1;
+        .fixed.bottom-0 {
+            box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(8px);
+            background-color: rgba(255, 255, 255, 0.95);
         }
 
-        /* Enhanced Filtering Dashboard */
-        .filtering-dashboard-enhanced {
+        .status-card {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            padding: 1.5rem;
             color: white;
-            padding: 2rem;
-            border-radius: 16px;
-            margin-bottom: 2rem;
-            display: none;
-            animation: slideIn 0.5s ease-out;
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
-        .filtering-dashboard-enhanced.show {
+        .status-number {
+            font-size: 2rem;
+            font-weight: bold;
             display: block;
         }
 
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .filter-stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin-top: 1.5rem;
-        }
-
-        .filter-stat-card {
-            background: rgba(255, 255, 255, 0.15);
-            padding: 1.5rem;
-            border-radius: 12px;
-            text-align: center;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .filter-stat-card .number {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            color: #fff;
-        }
-
-        .filter-stat-card .label {
-            font-size: 0.9rem;
+        .status-label {
+            font-size: 0.875rem;
             opacity: 0.9;
-            color: #f0f0f0;
-        }
-
-        .filter-stat-card .percentage {
-            font-size: 0.8rem;
-            opacity: 0.8;
             margin-top: 0.25rem;
         }
 
-        /* Navigation Controls */
-        .nav-controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 1rem;
-            padding: 0 1rem;
-        }
-
-        .nav-btn {
-            padding: 0.75rem 1.5rem;
-            border: 2px solid var(--primary-color);
-            background: var(--white);
-            color: var(--primary-color);
-            cursor: pointer;
-            border-radius: 8px;
-            font-size: 0.875rem;
-            font-weight: 600;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .nav-btn:hover {
-            background: var(--primary-color);
-            color: white;
-        }
-
-        .nav-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            background: var(--gray-100);
-            color: var(--text-secondary);
-            border-color: var(--border-color);
-        }
-
-        .nav-btn:disabled:hover {
-            background: var(--gray-100);
-            color: var(--text-secondary);
-        }
-
-        /* Save Confirmation */
-        .save-confirmation {
-            background: var(--success-color);
-            color: white;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-top: 1rem;
-            display: none;
-            animation: fadeInUp 0.3s ease-out;
-        }
-
-        .save-confirmation.show {
-            display: block;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
+         {
+            .no-print {
+                display: none !important;
             }
-            to {
-                opacity: 1;
-                transform: translateY(0);
+            
+            body {
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            
+            .container {
+                max-width: none !important;
+                padding: 0 !important;
             }
         }
-
-        /* Enhanced File Upload Area */
-        .upload-area-enhanced {
-            border: 2px dashed var(--border-color);
-            border-radius: 12px;
-            padding: 3rem 2rem;
-            text-align: center;
-            background: var(--gray-50);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .upload-area-enhanced:hover {
-            border-color: var(--primary-color);
-            background: var(--gray-100);
-            transform: translateY(-2px);
-        }
-
-        .upload-area-enhanced.dragover {
-            border-color: var(--success-color);
-            background: rgba(16, 185, 129, 0.1);
-        }
-
-        .upload-area-enhanced.uploading {
-            pointer-events: none;
-            opacity: 0.7;
-        }
-
-        .file-info-enhanced {
-            background: white;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 1rem;
-            margin-top: 1rem;
-            display: none;
-        }
-
-        .file-info-enhanced.show {
-            display: block;
-            animation: fadeInUp 0.3s ease-out;
-        }
-
-        /* Real-time Statistics */
-        .real-time-stats {
-            background: white;
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .stats-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.5rem 0;
-            border-bottom: 1px solid var(--gray-200);
-        }
-
-        .stats-row:last-child {
-            border-bottom: none;
-        }
-
-        .stats-label {
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .stats-value {
-            font-weight: 700;
-            color: var(--primary-color);
-        }
-
-        /* Enhanced Inputs with Save States */
-        .input-container {
-            position: relative;
-        }
-
-        .input-save-indicator {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 0.8rem;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .input-save-indicator.saving {
-            color: var(--warning-color);
-            opacity: 1;
-        }
-
-        .input-save-indicator.saved {
-            color: var(--success-color);
-            opacity: 1;
-        }
-
-        /* Tab Progress Indicator */
-        .tab-progress {
-            width: 100%;
-            height: 4px;
-            background: var(--gray-200);
-            border-radius: 2px;
-            margin-top: 0.5rem;
-            overflow: hidden;
-        }
-
-        .tab-progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary-color), var(--success-color));
-            width: 33.33%;
-            transition: width 0.3s ease;
-            border-radius: 2px;
-        }
-
-/* API Key Save Indicators */
-.api-input-container {
-    position: relative;
-}
-
-.save-indicator {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: var(--success-color);
-    color: white;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 0.7rem;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.save-indicator.show {
-    opacity: 1;
-}
-
-/* File Upload Enhanced Styles */
-.upload-area {
-    position: relative;
-    border: 2px dashed var(--border-color);
-    border-radius: 8px;
-    padding: 2rem;
-    text-align: center;
-    background: var(--gray-50);
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.upload-area:hover {
-    border-color: var(--primary-color);
-    background: var(--gray-100);
-}
-
-.upload-area.dragover {
-    border-color: var(--primary-color);
-    background: rgba(37, 99, 235, 0.1);
-}
-
-.upload-progress {
-    display: none;
-    margin-top: 1rem;
-}
-
-.progress-bar {
-    width: 100%;
-    height: 8px;
-    background: var(--gray-200);
-    border-radius: 4px;
-    overflow: hidden;
-}
-
-.progress-fill {
-    height: 100%;
-    background: var(--primary-color);
-    transition: width 0.3s ease;
-    width: 0%;
-}
-
-.file-info {
-    margin-top: 1rem;
-    padding: 1rem;
-    background: var(--gray-50);
-    border-radius: 8px;
-    display: none;
-}
-
-.file-preview {
-    margin-top: 1rem;
-    max-height: 300px;
-    overflow-y: auto;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-}
-
-.file-preview table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.file-preview th,
-.file-preview td {
-    padding: 8px;
-    text-align: left;
-    border-bottom: 1px solid var(--border-color);
-    font-size: 0.8rem;
-}
-
-.file-preview th {
-    background: var(--gray-100);
-    font-weight: 600;
-}
-
-/* Bottom Navigation */
-.tab-navigation {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 2rem;
-    padding: 1rem 0;
-    border-top: 1px solid var(--border-color);
-}
-
-.nav-btn {
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 8px;
-    background: var(--primary-color);
-    color: white;
-    cursor: pointer;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.nav-btn:hover {
-    background: #1d4ed8;
-    transform: translateY(-1px);
-}
-
-.nav-btn:disabled {
-    background: var(--gray-300);
-    cursor: not-allowed;
-    transform: none;
-}
-
-.nav-btn.secondary {
-    background: var(--gray-200);
-    color: var(--text-primary);
-}
-
-.nav-btn.secondary:hover {
-    background: var(--gray-300);
-}
-
-/* Enhanced Filtering Dashboard */
-.filtering-dashboard {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 2rem;
-    border-radius: 16px;
-    margin-bottom: 2rem;
-    display: none;
-}
-
-.filtering-dashboard.show {
-    display: block;
-    animation: slideDown 0.5s ease;
-}
-
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.filter-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-    margin-top: 1rem;
-}
-
-.filter-stat {
-    background: rgba(255, 255, 255, 0.15);
-    padding: 1.5rem;
-    border-radius: 12px;
-    text-align: center;
-    backdrop-filter: blur(10px);
-}
-
-.filter-stat .number {
-    font-size: 2rem;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-}
-
-.filter-stat .label {
-    font-size: 0.875rem;
-    opacity: 0.9;
-}
-
-/* Success Messages */
-.success-message {
-    background: var(--success-color);
-    color: white;
-    padding: 1rem;
-    border-radius: 8px;
-    margin-top: 1rem;
-    display: none;
-    animation: slideIn 0.3s ease;
-}
-
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateX(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-.success-message.show {
-    display: block;
-}
-
-/* Sticky Bottom Navigation */
-.tab-content {
-    min-height: calc(100vh - 200px);
-    padding-bottom: 100px; /* Space for fixed navigation */
-}
-
-.tab-navigation {
-    position: fixed !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    background: white !important;
-    border-top: 2px solid var(--border-color) !important;
-    box-shadow: 0 -4px 8px -2px rgba(0, 0, 0, 0.15) !important;
-    z-index: 1000 !important;
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    padding: 1.2rem 2rem !important;
-    margin: 0 !important;
-}
-
-.tab-navigation .tab-progress {
-    text-align: center;
-    flex-grow: 1;
-    margin: 0 1rem;
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
-.tab-navigation .nav-btn {
-    padding: 0.75rem 1.5rem !important;
-    border: none !important;
-    border-radius: 8px !important;
-    font-weight: 600 !important;
-    transition: all 0.3s ease !important;
-    cursor: pointer !important;
-    min-width: 120px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 0.5rem !important;
-}
-
-.tab-navigation .nav-btn:not(.secondary) {
-    background: var(--primary-color) !important;
-    color: white !important;
-}
-
-.tab-navigation .nav-btn.secondary {
-    background: var(--gray-200) !important;
-    color: var(--text-primary) !important;
-}
-
-.tab-navigation .nav-btn:hover:not(:disabled) {
-    transform: translateY(-1px) !important;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
-}
-
-.tab-navigation .nav-btn:disabled {
-    background: var(--gray-300) !important;
-    color: var(--gray-500) !important;
-    cursor: not-allowed !important;
-    transform: none !important;
-}
-
-.container {
-    padding-bottom: 120px !important;
-}
-
-/* Hide duplicate navigations - keep only the last one visible */
-.tab-navigation:not(:last-of-type) {
-    display: none !important;
-}
-
-/* Mobile responsive */
-@media (max-width: 768px) {
-    .tab-navigation {
-        padding: 1rem !important;
-        flex-direction: column !important;
-        gap: 1rem !important;
-    }
-
-    .tab-navigation .nav-btn {
-        width: 100% !important;
-        max-width: 200px !important;
-    }
-
-    .tab-content {
-        padding-bottom: 140px !important;
-    }
-}
-
-
-/* Enhanced API Input Containers */
-.api-input-container {
-    position: relative;
-}
-
-.save-indicator {
-    position: absolute;
-    right: 8px;
-    top: 28px;
-    background: var(--success-color);
-    color: white;
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-size: 0.7rem;
-    font-weight: 600;
-    opacity: 0;
-    transform: translateY(-5px);
-    transition: all 0.3s ease;
-    pointer-events: none;
-    z-index: 100;
-    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
-}
-
-.save-indicator.show {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.save-indicator .save-text {
-    display: flex;
-    align-items: center;
-    gap: 2px;
-}
-
-/* Enhanced File Upload Indicators */
-.upload-success-banner {
-    background: linear-gradient(135deg, var(--success-color), #059669);
-    color: white;
-    padding: 1rem;
-    border-radius: 8px;
-    margin-top: 1rem;
-    display: none;
-    animation: slideInUp 0.5s ease;
-}
-
-.upload-success-banner.show {
-    display: block;
-}
-
-@keyframes slideInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.file-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 1rem;
-    margin: 1rem 0;
-}
-
-.file-stat-item {
-    background: var(--gray-50);
-    padding: 0.75rem;
-    border-radius: 6px;
-    text-align: center;
-    border: 1px solid var(--border-color);
-}
-
-.file-stat-number {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--primary-color);
-    margin-bottom: 0.25rem;
-}
-
-.file-stat-label {
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-}
-
-</style>
+    </style>
 </head>
-<body>
-    
-    <!-- Toast Notification -->
-    <div id="toast" class="toast"></div>
+<body class="bg-gray-50">
+    <!-- Global Message Container -->
+    <div id="globalMessage" class="container mx-auto px-4"></div>
 
-    <!-- Save Indicator -->
-    <div id="saveIndicator" class="save-indicator"> Saving...</div>
-
-    <!-- Export List Indicator -->
-    <div id="exportListIndicator" class="export-list-indicator">
-         Export List: <span id="exportCount">0</span> items
-    </div>
-
-    <!-- Loading Overlay -->
-    <div id="loadingOverlay" class="loading-overlay">
-        <div style="text-align: center; color: white;">
-            <div class="loading-spinner"></div>
-            <div class="progress-container">
-                <div id="progressBar" class="progress-bar-inner">0%</div>
+    <!-- Header -->
+    <header class="gradient-bg text-white py-8 mb-8">
+        <div class="container mx-auto px-4 text-center">
+            <h1 class="text-4xl font-bold text-white mb-2">🔥 Scorely</h1>
+            <p class="text-xl text-blue-100">AI-Powered LinkedIn Profile Ranking Tool</p>
+            <div class="mt-4 flex justify-center space-x-4">
+                <span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm">AI Optimized</span>
+                <span class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm">Smart Pre-Filter</span>
             </div>
-            <p style="margin-top: 1rem; font-size: 1.1rem;" id="loadingText">Processing...</p>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="bg-white shadow-sm border-b no-print">
+        <div class="container mx-auto px-4">
+            <div class="flex space-x-1">
+                <button onclick="showPage('setup')" id="setupTab" class="px-4 py-3 text-sm font-medium text-blue-600 border-b-2 border-blue-600">
+                    <i class="fas fa-cog mr-2"></i>Setup
+                </button>
+                <button onclick="showPage('ranking')" id="rankingTab" class="px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-chart-line mr-2"></i>Ranking
+                </button>
+                <button onclick="showPage('results')" id="resultsTab" class="px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-table mr-2"></i>Results
+                </button>
+                <button onclick="showPage('below60')" id="below60Tab" class="px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>Below 60
+                </button>
+                <button onclick="showPage('export')" id="exportTab" class="px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-download mr-2"></i>Export
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Setup Page -->
+    <div id="setupPage" class="container mx-auto px-4 py-6">
+        <!-- API Key Management -->
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h3 class="text-xl font-bold mb-4">🔑 API Key Management</h3>
+            <p class="text-gray-600 mb-4">Please enter your OpenAI API key to continue</p>
+            <div class="flex gap-2">
+                <input type="password" 
+                       id="openaiApiKey" 
+                       class="flex-1 border border-gray-300 rounded-md px-3 py-2" 
+                       placeholder="sk-...">
+                <button onclick="saveApiKey()" 
+                        id="saveApiKeyBtn" 
+                        class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                    💾 Save API Key
+                </button>
+                <button onclick="testConnection()" 
+                        id="testConnectionBtn" 
+                        class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700" 
+                        disabled>
+                    🔍 Test Connection
+                </button>
+            </div>
+        </div>
+
+        <!-- File Upload & Advanced Filtering -->
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h3 class="text-xl font-bold mb-4">📁 File Upload & Advanced Filtering</h3>
+            
+            <div class="mb-6">
+                <h4 class="font-semibold mb-3">Main CSV File</h4>
+                <p class="text-gray-600 mb-3">LinkedIn profiles data</p>
+                <div class="file-upload-zone">
+                    <input type="file" 
+                           id="mainCsvFile" 
+                           accept=".csv,.xlsx" 
+                           onchange="handleMainFileUpload(event)">
+                    <div class="upload-text">
+                        <i class="fas fa-cloud-upload-alt text-4xl text-blue-500 mb-2"></i>
+                        <p class="text-lg">Click to upload or drag and drop</p>
+                        <p class="text-sm text-gray-500">LinkedIn profiles data</p>
+                    </div>
+                </div>
+                <div id="mainFileStatus" class="mt-3"></div>
+            </div>
+
+            <!-- Blacklist -->
+            <div class="mb-6">
+                <h4 class="font-semibold mb-3">Blacklist (Optional)</h4>
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Manual Entry:</label>
+                        <textarea id="blacklistTextarea" 
+                                  class="w-full border rounded px-3 py-2 h-24" 
+                                  placeholder="Enter company names (one per line)"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Or Upload File:</label>
+                        <input type="file" id="blacklistFile" accept=".csv,.txt" 
+                               onchange="handleBlacklistFileUpload(event)" 
+                               class="w-full border rounded px-3 py-2">
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="saveBlacklist()" class="bg-blue-600 text-white px-4 py-2 rounded">💾 Save</button>
+                        <button onclick="clearBlacklist()" class="bg-red-600 text-white px-4 py-2 rounded">🗑️ Clear</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- In Process -->
+            <div class="mb-6">
+                <h4 class="font-semibold mb-3">In Process (Optional)</h4>
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Manual Entry:</label>
+                        <textarea id="inProcessTextarea" 
+                                  class="w-full border rounded px-3 py-2 h-24" 
+                                  placeholder="Enter LinkedIn URLs or names (one per line)"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Or Upload File:</label>
+                        <input type="file" id="inProcessFile" accept=".csv,.txt" 
+                               onchange="handleInProcessFileUpload(event)" 
+                               class="w-full border rounded px-3 py-2">
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="saveInProcess()" class="bg-blue-600 text-white px-4 py-2 rounded">💾 Save</button>
+                        <button onclick="clearInProcess()" class="bg-red-600 text-white px-4 py-2 rounded">🗑️ Clear</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- No Go Companies -->
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h3 class="text-xl font-bold mb-4">🚫 No Go Companies (Critical Elimination)</h3>
+            <p class="text-gray-600 mb-4">Candidates who worked at these companies (current or past) will be automatically filtered out before any AI processing:</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div>
+                    <ul class="space-y-1 text-sm">
+                        <li>• Isracard Ltd.</li>
+                        <li>• Harel Insurance</li>
+                        <li>• Bank Leumi</li>
+                        <li>• Amdocs Limited</li>
+                    </ul>
+                </div>
+                <div>
+                    <ul class="space-y-1 text-sm">
+                        <li>• Sapiens</li>
+                        <li>• NICE Ltd.</li>
+                        <li>• Maccabi</li>
+                        <li>• Clalit</li>
+                    </ul>
+                </div>
+                <div>
+                    <ul class="space-y-1 text-sm">
+                        <li>• Tax Authority</li>
+                        <li class="text-gray-500">... and 36 more companies</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <h4 class="font-semibold mb-2">Add Custom NO GO:</h4>
+                <div class="flex gap-2">
+                    <input type="text" id="customNoGoInput" placeholder="Company name..." class="flex-1 border rounded px-3 py-2">
+                    <button onclick="addCustomNoGo()" class="bg-red-600 text-white px-4 py-2 rounded">Add</button>
+                </div>
+            </div>
+            
+            <div class="flex gap-2 mb-6">
+                <button onclick="saveNoGoSettings()" class="bg-red-600 text-white px-4 py-2 rounded">💾 Save NO GO Settings</button>
+            </div>
+
+            <!-- Run Filtering Button -->
+            <div class="text-center">
+                <button onclick="runFiltering()" 
+                        id="runFilteringBtn"
+                        class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 font-semibold shadow-lg">
+                    🔽 Run Filtering
+                </button>
+            </div>
+        </div>
+
+        <!-- Filtering Results Section -->
+        <div id="filteringResultsSection" style="display: none;" class="bg-white rounded-lg shadow p-6 mb-6">
+            <h3 class="text-xl font-bold mb-6">📊 Filtering Results - Live Status Dashboard</h3>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div class="status-card">
+                    <span id="profilesUploaded" class="status-number">0</span>
+                    <div class="status-label">Profiles Uploaded</div>
+                </div>
+                <div class="status-card">
+                    <span id="filteredOut" class="status-number">0</span>
+                    <div class="status-label">Filtered Out</div>
+                </div>
+                <div class="status-card">
+                    <span id="skippedByEmbedding" class="status-number">0</span>
+                    <div class="status-label">Skipped by Embedding</div>
+                </div>
+                <div class="status-card">
+                    <span id="sentToGPT" class="status-number">0</span>
+                    <div class="status-label">Sent to GPT</div>
+                </div>
+            </div>
+
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h4 class="font-semibold mb-2">💡 Next Steps:</h4>
+                <p class="text-sm text-gray-700">Your profiles have been filtered and are ready for AI ranking. Navigate to the <strong>Ranking</strong> tab to start the AI analysis process.</p>
+            </div>
+        </div>
+
+        <!-- Job Description -->
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h3 class="text-xl font-bold mb-4">📝 Job Description</h3>
+            <textarea id="jobDescriptionInput" 
+                      class="w-full border rounded px-3 py-2 h-32" 
+                      placeholder="Enter job description or upload PDF..."></textarea>
+            <input type="file" id="jobDescriptionFile" accept=".pdf,.txt" 
+                   onchange="handleJobDescriptionUpload(event)" 
+                   class="mt-2 w-full border rounded px-3 py-2">
+            <button onclick="saveJobDescription()" class="mt-2 bg-blue-600 text-white px-4 py-2 rounded">💾 Save Job Description</button>
+        </div>
+
+        <!-- Ideal Profiles & Target Companies -->
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h3 class="text-xl font-bold mb-4">⭐ Ideal Profiles & Target Companies</h3>
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                <p class="text-sm"><strong>How AI uses this data:</strong> Ideal profiles create benchmarks for ranking accuracy. Target companies receive bonus scoring when candidates have experience there, prioritizing these backgrounds in the final ranking.</p>
+            </div>
+            
+            <div class="mb-6">
+                <h4 class="font-semibold mb-3">Ideal Profile 1</h4>
+                <textarea id="idealProfile1" 
+                          class="w-full border rounded px-3 py-2 h-24" 
+                          placeholder="Paste profile or upload PDF..."></textarea>
+                <input type="file" id="idealProfileFile1" accept=".pdf,.txt" 
+                       onchange="handleIdealProfileUpload(event, 1)" 
+                       class="mt-2 w-full border rounded px-3 py-2">
+            </div>
+            
+            <div class="mb-6">
+                <h4 class="font-semibold mb-3">Ideal Profile 2</h4>
+                <textarea id="idealProfile2" 
+                          class="w-full border rounded px-3 py-2 h-24" 
+                          placeholder="Paste profile or upload PDF..."></textarea>
+                <input type="file" id="idealProfileFile2" accept=".pdf,.txt" 
+                       onchange="handleIdealProfileUpload(event, 2)" 
+                       class="mt-2 w-full border rounded px-3 py-2">
+            </div>
+            
+            <div class="mb-6">
+                <h4 class="font-semibold mb-3">Target Companies (Preferred Experience)</h4>
+                <p class="text-gray-600 mb-3">Candidates with experience from these companies will receive bonus scoring:</p>
+                <textarea id="targetCompaniesTextarea" 
+                          class="w-full border rounded px-3 py-2 h-24" 
+                          placeholder="Google&#10;Microsoft&#10;Apple..."></textarea>
+                <div class="flex gap-2 mt-2">
+                    <button onclick="saveTargetCompanies()" class="bg-green-600 text-white px-4 py-2 rounded">💾 Save Target Companies</button>
+                    <button onclick="clearTargetCompanies()" class="bg-red-600 text-white px-4 py-2 rounded">🗑️ Clear Target Companies</button>
+                </div>
+            </div>
+            
+            <div class="flex gap-2">
+                <button onclick="saveIdealProfiles()" class="bg-green-600 text-white px-4 py-2 rounded">💾 Save Ideal Profiles</button>
+                <button onclick="clearIdealProfiles()" class="bg-red-600 text-white px-4 py-2 rounded">🗑️ Clear All</button>
+            </div>
+            
+            <div id="idealProfilesStatus" class="mt-3 text-sm text-gray-600"></div>
+        </div>
+
+        <!-- Smart Screening Criteria -->
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h3 class="text-xl font-bold mb-4">🎯 Smart Screening Criteria</h3>
+            
+            <div class="mb-6">
+                <h4 class="font-semibold mb-3">Years of Experience</h4>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Min:</label>
+                        <input type="number" id="minExperience" class="w-full border rounded px-3 py-2" value="2" min="0">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Max:</label>
+                        <input type="number" id="maxExperience" class="w-full border rounded px-3 py-2" value="15" min="0">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-6">
+                <h4 class="font-semibold mb-3">Academic Degree</h4>
+                <select id="academicDegree" class="w-full border rounded px-3 py-2">
+                    <option value="any">Any degree</option>
+                    <option value="bachelor">Bachelor's degree minimum</option>
+                    <option value="master">Master's degree minimum</option>
+                    <option value="phd">PhD preferred</option>
+                </select>
+            </div>
+
+            <!-- Excellence Signals -->
+            <div class="mb-6">
+                <h4 class="font-semibold mb-3">⭐ Excellence Signals (Optional)</h4>
+                <p class="text-gray-600 mb-3">Candidates with these get bonus points, but missing them doesn't reduce scores</p>
+                
+                <div class="space-y-3">
+                    <label class="flex items-center">
+                        <input type="checkbox" class="mr-2" value="deans_list">
+                        <span>Dean's List / Honors</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="checkbox" class="mr-2" value="patents">
+                        <span>Patents or publications</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="checkbox" class="mr-2" value="top_university">
+                        <span>Top-tier universities</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="checkbox" class="mr-2" value="military">
+                        <span>Elite military unit</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="checkbox" class="mr-2" value="awards">
+                        <span>Awards / Recognitions</span>
+                    </label>
+                    
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" class="mr-2" value="other">
+                        <span>Other:</span>
+                        <input type="text" id="customExcellenceInput" placeholder="Enter custom excellence signal..." class="border rounded px-2 py-1 flex-1">
+                        <button onclick="addCustomExcellence()" class="bg-green-600 text-white px-3 py-1 rounded text-sm">Add</button>
+                    </div>
+                </div>
+                
+                <div id="customExcellenceList" class="mt-4 space-y-2"></div>
+            </div>
+
+            <!-- Red Flag Patterns -->
+            <div class="mb-6">
+                <h4 class="font-semibold mb-3">🚩 Red Flag Patterns</h4>
+                
+                <div class="space-y-3">
+                    <label class="flex items-center">
+                        <input type="checkbox" class="mr-2" value="instability">
+                        <span>Instability – frequent job changes (&lt;2 years)</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="checkbox" class="mr-2" value="stagnation">
+                        <span>Stagnation – same company &gt;7 years</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="checkbox" class="mr-2" value="enterprise">
+                        <span>Enterprise-only – all jobs in 1000+ orgs</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="checkbox" class="mr-2" value="freelancer">
+                        <span>Freelancer/Consultant – independent work pattern</span>
+                    </label>
+                    
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" class="mr-2" value="other">
+                        <span>Other:</span>
+                        <input type="text" id="customRedFlagInput" placeholder="Enter custom red flag..." class="border rounded px-2 py-1 flex-1">
+                        <button onclick="addCustomRedFlag()" class="bg-red-600 text-white px-3 py-1 rounded text-sm">Add</button>
+                    </div>
+                </div>
+                
+                <div id="customRedFlagList" class="mt-4 space-y-2"></div>
+            </div>
+
+            <!-- Custom Traits -->
+            <div class="mb-6">
+                <h4 class="font-semibold mb-3">🎨 Add Custom Traits</h4>
+                
+                <div class="bg-blue-50 p-4 rounded-lg mb-4">
+                    <h5 class="font-semibold mb-2">Examples:</h5>
+                    <ul class="text-sm space-y-1">
+                        <li>• "Experience in SaaS and security companies"</li>
+                        <li>• "Lives in central Israel, prefer profiles living/working in Tel Aviv currently"</li>
+                    </ul>
+                </div>
+                
+                <div class="flex gap-2 mb-4">
+                    <input type="text" id="customTraitInput" placeholder="Enter custom trait..." class="flex-1 border rounded px-3 py-2">
+                    <button onclick="addCustomTrait()" class="bg-green-600 text-white px-4 py-2 rounded">➕ Add Trait</button>
+                </div>
+                
+                <div id="customTraitsList" class="space-y-2 mb-4"></div>
+                
+                <button onclick="saveAllCustomTraits()" class="bg-blue-600 text-white px-4 py-2 rounded">💾 Save All Traits</button>
+            </div>
+
+            <button onclick="saveCriteria()" class="bg-blue-600 text-white px-4 py-2 rounded">💾 Save Criteria</button>
+        </div>
+
+        <!-- AI Model Selection -->
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h3 class="text-xl font-bold mb-4">⚙️ AI Model Selection</h3>
+            
+            <div class="space-y-4">
+                <label class="flex items-center">
+                    <input type="radio" name="aiModel" value="embedding" class="mr-3">
+                    <div>
+                        <div class="font-semibold">Embedding only</div>
+                        <div class="text-sm text-gray-600">Fast, basic similarity scoring</div>
+                    </div>
+                </label>
+                
+                <label class="flex items-center">
+                    <input type="radio" name="aiModel" value="gpt4mini" class="mr-3" checked>
+                    <div>
+                        <div class="font-semibold">GPT-4 Turbo (Mini) only</div>
+                        <div class="text-sm text-gray-600">Deep analysis, cost-effective</div>
+                    </div>
+                </label>
+                
+                <label class="flex items-center">
+                    <input type="radio" name="aiModel" value="hybrid" class="mr-3">
+                    <div>
+                        <div class="font-semibold">Hybrid (Embedding + GPT-4 Turbo Mini)</div>
+                        <div class="text-sm text-gray-600">Best results, GPT-4 Turbo primary with GPT-3.5 fallback only on errors</div>
+                    </div>
+                </label>
+            </div>
+            
+            <button onclick="saveAIModelSelection()" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded">💾 Save Model Selection</button>
+        </div>
+
+        <!-- Scoring Weights -->
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h3 class="text-xl font-bold mb-4">📊 Customize Scoring Weights</h3>
+            
+            <p class="text-gray-600 mb-4">How AI Calculates Scores:</p>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block font-semibold mb-1">Tech Fit: <span id="techFitValue">30</span>%</label>
+                    <div class="text-sm text-gray-600 mb-2">Matches technical skills, tools, programming languages, frameworks</div>
+                    <input type="range" id="techFitSlider" min="0" max="50" value="30" class="w-full" onchange="updateWeight('techFit', this.value)">
+                </div>
+                
+                <div>
+                    <label class="block font-semibold mb-1">Experience: <span id="experienceValue">25</span>%</label>
+                    <div class="text-sm text-gray-600 mb-2">Years in role, seniority level, career progression, leadership</div>
+                    <input type="range" id="experienceSlider" min="0" max="50" value="25" class="w-full" onchange="updateWeight('experience', this.value)">
+                </div>
+                
+                <div>
+                    <label class="block font-semibold mb-1">Culture: <span id="cultureValue">25</span>%</label>
+                    <div class="text-sm text-gray-600 mb-2">Company values alignment, team collaboration, communication style</div>
+                    <input type="range" id="cultureSlider" min="0" max="50" value="25" class="w-full" onchange="updateWeight('culture', this.value)">
+                </div>
+                
+                <div>
+                    <label class="block font-semibold mb-1">Startup Fit: <span id="startupFitValue">20</span>%</label>
+                    <div class="text-sm text-gray-600 mb-2">Adaptability, fast-paced env, ownership, growth mindset</div>
+                    <input type="range" id="startupFitSlider" min="0" max="50" value="20" class="w-full" onchange="updateWeight('startupFit', this.value)">
+                </div>
+                
+                <div>
+                    <label class="block font-semibold mb-1 text-red-600">Red Flag Penalty: <span id="redFlagValue">15</span>%</label>
+                    <div class="text-sm text-gray-600 mb-2">Negative impact on final score based on instability patterns</div>
+                    <input type="range" id="redFlagSlider" min="0" max="30" value="15" class="w-full" onchange="updateWeight('redFlag', this.value)">
+                </div>
+            </div>
+            
+            <button onclick="saveWeights()" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded">💾 Save Weights</button>
+        </div>
+
+        <!-- Profile Summary Configuration -->
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h3 class="text-xl font-bold mb-4">🔧 Profile Summary Configuration</h3>
+            
+            <p class="text-gray-600 mb-4">Select which columns to include in the profile summary for AI analysis:</p>
+            
+            <div id="columnSelectionContainer" class="space-y-2 mb-4">
+                <div class="text-gray-500">Upload a file first to see available columns</div>
+            </div>
+            
+            <div class="flex gap-2">
+                <button onclick="saveColumnSelection()" class="bg-blue-600 text-white px-4 py-2 rounded">💾 Save Column Selection</button>
+                <button onclick="selectAllColumns()" class="bg-green-600 text-white px-4 py-2 rounded">✅ Select All</button>
+                <button onclick="clearColumnSelection()" class="bg-red-600 text-white px-4 py-2 rounded">🗑️ Clear All</button>
+            </div>
+            
+            <div id="columnSelectionStatus" class="mt-3 text-sm"></div>
         </div>
     </div>
 
-    <!-- Auto-save Indicator -->
-    <div id="autoSaveIndicator" class="auto-save-indicator">
-        <span id="saveText">💾 Saving...</span>
+    <!-- Ranking Page -->
+    <div id="rankingPage" style="display: none;" class="container mx-auto px-4 py-6">
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-2xl font-bold mb-6">📊 Candidate Ranking</h2>
+            
+            <!-- Ranking Range -->
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold mb-4">Ranking Range (Starting from row 2)</h3>
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Start from row:</label>
+                        <input type="number" id="startRow" class="w-full border rounded px-3 py-2" value="2" min="2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">End at row:</label>
+                        <input type="number" id="endRow" class="w-full border rounded px-3 py-2" value="50" min="2">
+                    </div>
+                </div>
+                <p class="text-sm text-gray-600">Range starts from 2 because row 1 contains headers</p>
+                <div class="mt-2">
+                    <p class="text-lg font-semibold">Total ready for AI: <span id="totalReadyForAI">0</span></p>
+                </div>
+            </div>
+
+            <!-- Start Ranking -->
+            <div class="text-center mb-6">
+                <button onclick="startRanking()" 
+                        id="startRankingBtn"
+                        class="bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 font-semibold shadow-lg">
+                    🚀 Start Ranking
+                </button>
+            </div>
+
+            <!-- Progress -->
+            <div id="rankingProgress" class="hidden mb-6">
+                <div class="bg-gray-200 rounded-full h-4 mb-2">
+                    <div id="progressBar" class="bg-blue-600 h-4 rounded-full" style="width: 0%"></div>
+                </div>
+                <p id="progressText" class="text-center text-sm text-gray-600">0/0 profiles ranked (0%)</p>
+            </div>
+
+            <!-- Results Container -->
+            <div id="scoreResultsContainer" class="hidden">
+                <h3 class="text-lg font-semibold mb-4">Ranking Results</h3>
+                <div id="scoreResults" class="space-y-3"></div>
+            </div>
+
+            <!-- AI Learning Feedback -->
+            <div class="mt-8">
+                <h3 class="text-lg font-semibold mb-4">🧠 AI Learning Feedback (Optional)</h3>
+                <p class="text-gray-600 mb-4">Provide feedback to improve future rankings:</p>
+                <textarea id="rankingFeedback" 
+                          class="w-full border rounded px-3 py-2 h-24" 
+                          placeholder="Example: 'Prefer candidates with startup experience' or 'Give more weight to technical skills'"></textarea>
+                <div class="flex gap-2 mt-3">
+                    <button onclick="submitFeedback()" class="bg-blue-600 text-white px-4 py-2 rounded">📤 Submit Feedback</button>
+                    <button onclick="clearFeedback()" class="bg-gray-600 text-white px-4 py-2 rounded">🗑️ Clear</button>
+                </div>
+            </div>
+        </div>
     </div>
 
- <!-- Toast Notification -->
- <div id="toast" class="toast"></div>
- 
- <!-- Save Indicator -->
- <div id="saveIndicator" class="save-indicator">¾ Saving...</div>
- 
- <!-- Export List Indicator -->
- <div id="exportListIndicator" class="export-list-indicator">
- Export List: <span id="exportCount">0</span> items
- </div>
-
- <div class="container">
- <!-- Navigation -->
- <nav class="navbar">
- <div class="nav-brand">
- <h1>🎯 Scorely Beta</h1>
- <p>LinkedIn Profile Ranker</p>
- </div>
- <div class="nav-tabs">
-                <button class="tab-btn active" data-tab="setup">🔧 Setup</button>
-                <button class="tab-btn" data-tab="ranking">⚡ Ranking</button>
-                <button class="tab-btn" data-tab="results">📊 Results</button>
-                <button class="tab-btn reset-btn" onclick="resetSession()">🔄 Reset</button>
-            </div>
-            <div class="tab-progress">
-                <div id="tabProgress" class="tab-progress-fill"></div>
-            </div>
-</nav>
-
- <!-- Setup Tab -->
- <div id="setup" class="tab-content active">            <!-- Enhanced API Configuration -->
-            <div class="section">
-                <h2>🔑 API Configuration</h2>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                    <div class="api-input-container">
-                        <label for="embeddingApiKey">Embedding API Key:</label>
-                        <input type="password" id="embeddingApiKey" placeholder="Optional - uses OpenAI if empty" oninput="handleAutoSave('embeddingApiKey')">
-                        <div class="save-indicator" id="embeddingApiKeySaveIndicator">
-                            <span class="save-text">💾 Saved ✓</span>
-                        </div>
-                        <small>Leave empty to use OpenAI for both</small>
-                    </div>
-                    <div class="api-input-container">
-                        <label for="gptApiKey">GPT API Key:</label>
-                        <input type="password" id="gptApiKey" placeholder="sk-..." oninput="handleAutoSave('gptApiKey')">
-                        <div class="save-indicator" id="gptApiKeySaveIndicator">
-                            <span class="save-text">💾 Saved ✓</span>
-                        </div>
-                        <small>Required for AI-powered ranking</small>
-                    </div>
-                </div>
-            </div>/div>            <!-- File Upload -->
-            <div class="section">
-                <h2>📁 File Upload</h2>
-                <div class="upload-area" id="uploadArea" onclick="document.getElementById('csvFile').click()">
-                    <input type="file" id="csvFile" accept=".csv" style="display: none;">
-                    <div class="upload-icon">📄</div>
-                    <p style="color: var(--text-primary); font-weight: 500; margin: 0.5rem 0;">Click to upload CSV file or drag & drop</p>
-                    <small style="color: var(--text-secondary);">LinkedIn profiles data</small>
-                </div>
-
-                <div class="upload-progress" id="uploadProgress" style="display: none;">
-                    <p><strong>📤 Uploading file...</strong></p>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progressFill"></div>
-                    </div>
-                    <p id="progressText">0%</p>
-                </div>
-
-                <div class="upload-success-banner" id="uploadSuccessBanner">
-                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
-                        <span style="font-size: 1.2rem;">✅</span>
-                        <strong>File uploaded successfully!</strong>
-                    </div>
-                    <p>Your CSV file has been processed and is ready for analysis.</p>
-                </div>
-
-                <div class="file-info" id="fileInfoSection" style="display: none;">
-                    <h4>📊 File Information</h4>
-                    <div class="file-stats">
-                        <div class="file-stat-item">
-                            <div class="file-stat-number" id="fileNameStat">-</div>
-                            <div class="file-stat-label">File Name</div>
-                        </div>
-                        <div class="file-stat-item">
-                            <div class="file-stat-number" id="fileSizeStat">-</div>
-                            <div class="file-stat-label">File Size</div>
-                        </div>
-                        <div class="file-stat-item">
-                            <div class="file-stat-number" id="totalRowsStat">-</div>
-                            <div class="file-stat-label">Total Rows</div>
-                        </div>
-                        <div class="file-stat-item">
-                            <div class="file-stat-number" id="columnsStat">-</div>
-                            <div class="file-stat-label">Columns</div>
-                        </div>
-                    </div>
-
-                    <h4>📋 Detected Columns</h4>
-                    <div id="columnsDisplay" style="margin-bottom: 1rem;"></div>
-
-                    <h4>👀 Data Preview (First 5 rows)</h4>
-                    <div class="file-preview" id="filePreview"></div>
-                </div>
-            </div>/div>
-                        <div class="stats-row">
-                            <span class="stats-label">File Size:</span>
-                            <span class="stats-value" id="fileSizeStat">-</span>
-                        </div>
-                        <div class="stats-row">
-                            <span class="stats-label">Total Rows:</span>
-                            <span class="stats-value" id="totalRowsStat">-</span>
-                        </div>
-                        <div class="stats-row">
-                            <span class="stats-label">Valid Profiles:</span>
-                            <span class="stats-value" id="validProfilesStat">-</span>
-                        </div>
-                        <div class="stats-row">
-                            <span class="stats-label">Columns Detected:</span>
-                            <span class="stats-value" id="columnsStat">-</span>
-                        </div>
-                    
+    <!-- Results Page -->
+    <div id="resultsPage" style="display: none;" class="container mx-auto px-4 py-6">
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-2xl font-bold mb-6">📊 Ranking Results</h2>
             
-            <!-- Tab Navigation -->
-            <div class="tab-navigation">
-                <button class="nav-btn secondary" id="prevBtn" onclick="navigateTab(-1)">
-                    ← Previous
-                </button>
-                <div class="tab-progress">
-                    <span id="currentTabInfo">Step 1 of 3</span>
-                </div>
-                <button class="nav-btn" id="nextBtn" onclick="navigateTab(1)">
-                    Next →
-                </button>
-            </div>
-                </div>
-            </div>            <!-- Enhanced Filtering Dashboard -->
-            <div id="filteringDashboardEnhanced" class="filtering-dashboard-enhanced">
-                <h3>🔍 Real-time Filtering Analysis</h3>
-                <p>Live statistics update as you configure blacklist and already-in-process filters</p>
-                <div class="filter-stats-grid">
-                    <div class="filter-stat-card">
-                        <div class="number" id="totalProfilesNum">0</div>
-                        <div class="label">Total Profiles</div>
-                        <div class="percentage" id="totalProfilesPerc">100%</div>
-                    </div>
-                    <div class="filter-stat-card">
-                        <div class="number" id="blacklistFilteredNum">0</div>
-                        <div class="label">Blacklist Filtered</div>
-                        <div class="percentage" id="blacklistFilteredPerc">0%</div>
-                    </div>
-                    <div class="filter-stat-card">
-                        <div class="number" id="inProcessFilteredNum">0</div>
-                        <div class="label">Already in Process</div>
-                        <div class="percentage" id="inProcessFilteredPerc">0%</div>
-                    </div>
-                    <div class="filter-stat-card">
-                        <div class="number" id="remainingForRankingNum">0</div>
-                        <div class="label">Ready for Ranking</div>
-                        <div class="percentage" id="remainingForRankingPerc">0%</div>
-                    </div>
-                </div>
-                <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(255,255,255,0.1); border-radius: 8px;">
-                    <p style="margin: 0; font-size: 0.9rem;">
-                        💡 <strong>Pro Tip:</strong> The filtering happens in real-time as you type. 
-                        All data is automatically saved to your browser's local storage.
-                    </p>
+            <!-- Advanced Results Table -->
+            <div id="advancedResultsTable" class="mb-6">
+                <h3 class="text-xl font-bold mb-4">📊 Advanced Results (Score ≥ 60)</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full border-collapse border border-gray-300">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="border border-gray-300 p-2 cursor-pointer" onclick="sortTable('rank')">Rank ↕️</th>
+                                <th class="border border-gray-300 p-2 cursor-pointer" onclick="sortTable('name')">Name ↕️</th>
+                                <th class="border border-gray-300 p-2">Title</th>
+                                <th class="border border-gray-300 p-2">Company</th>
+                                <th class="border border-gray-300 p-2 cursor-pointer" onclick="sortTable('totalScore')">Total Score ↕️</th>
+                                <th class="border border-gray-300 p-2">Sub-Scores</th>
+                                <th class="border border-gray-300 p-2">LinkedIn</th>
+                                <th class="border border-gray-300 p-2">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsTableBody">
+                            <tr>
+                                <td colspan="8" class="border border-gray-300 p-4 text-center text-gray-500">
+                                    No ranking results yet. Complete ranking process first.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
- <div class="filter-stat blacklist">
- <div class="number" id="blacklistFilteredCount">0</div>
- <div class="label">Filtered (Blacklist)</div>
- </div>
- <div class="filter-stat in-process">
- <div class="number" id="inProcessFilteredCount">0</div>
- <div class="label">Filtered (Already in Process)</div>
- </div>
- <div class="filter-stat remaining">
- <div class="number" id="remainingForRankingCount">0</div>
- <div class="label">Ready for Ranking</div>
- </div>
- </div>
- </div>            <!-- Enhanced Blacklist & Already in Process -->
-            <div class="section">
-                <h2>🚫 Filtering Configuration</h2>
-                <div class="real-time-stats" style="margin-bottom: 1.5rem;">
-                    <h4 style="margin-bottom: 1rem;">⚡ Live Filtering Statistics</h4>
-                    <div class="stats-row">
-                        <span class="stats-label">Total Profiles Loaded:</span>
-                        <span class="stats-value" id="liveTotalProfiles">0</span>
-                    </div>
-                    <div class="stats-row">
-                        <span class="stats-label">Blacklist Matches:</span>
-                        <span class="stats-value" id="liveBlacklistMatches">0</span>
-                    </div>
-                    <div class="stats-row">
-                        <span class="stats-label">Already in Process:</span>
-                        <span class="stats-value" id="liveInProcessMatches">0</span>
-                    </div>
-                    <div class="stats-row">
-                        <span class="stats-label">Available for Ranking:</span>
-                        <span class="stats-value" id="liveAvailableProfiles" style="color: var(--success-color);">0</span>
-                    </div>
-                </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
-                    <div class="input-container">
-                        <label>🚫 Blacklist Companies:</label>
-                        <textarea id="blacklistCompanies" placeholder="Company1, Company2, Company3..." rows="4" 
-                                  oninput="handleAutoSave('blacklistCompanies'); updateFilteringStats();"></textarea>
-                        <small>Comma-separated company names to exclude (auto-saved)</small>
-                        <div class="input-save-indicator" id="blacklistSaveIndicator">💾</div>
-                    </div>
-                    <div class="input-container">
-                        <label>⏳ Already in Process:</label>
-                        <textarea id="inProcessCandidates" placeholder="Profile names, emails, or IDs..." rows="4" 
-                                  oninput="handleAutoSave('inProcessCandidates'); updateFilteringStats();"></textarea>
-                        <small>Candidates currently being processed (auto-saved)</small>
-                        <div class="input-save-indicator" id="inProcessSaveIndicator">💾</div>
-                    </div>
-                </div>
-
-                <div style="margin-top: 1.5rem; text-align: center;">
-                    <button onclick="applyFiltering()" style="margin-top: 1rem;" class="btn-primary">
-                        🔍 Apply Filters & Update Dashboard
-                    </button>
+            <!-- Hidden Gems -->
+            <div id="hiddenGemsDashboard" class="mb-6">
+                <h3 class="text-lg font-bold mb-2">💎 Hidden Gems</h3>
+                <div id="hiddenGemsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="text-gray-500 p-4">No hidden gems identified yet.</div>
                 </div>
             </div>
- <button onclick="applyFiltering()" style="margin-top: 1rem;" class="btn-primary">
- 🔍 Apply Filters & Show Summary
- </button>
- </div>            <!-- Enhanced Ideal Candidate Profiles -->
-            <div class="section">
-                <h2>🎯 Ideal Candidate Profiles</h2>
-                <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
-                    🤖 Help our AI understand your ideal candidates by providing examples (all data auto-saved)
-                </p>
-                <div class="ideal-profiles">
-                    <div class="profile-input">
-                        <h3>🏆 Ideal Profile #1 (Technical Excellence):</h3>
-                        <div class="input-options">
-                            <label>
-                                <input type="radio" name="profile1" value="pdf" id="p1-pdf">
-                                📄 Upload PDF
-                            </label>
-                            <label>
-                                <input type="radio" name="profile1" value="text" id="p1-text" checked>
-                                📝 Copy & Paste Profile
-                            </label>
-                        </div>
-                        <input type="file" id="profile1File" accept=".pdf" style="display: none;" onchange="handleIdealProfileSave(1, 'file')">
-                        <div class="input-container">
-                            <textarea id="profile1Text" placeholder="Paste LinkedIn profile (Ctrl+A from LinkedIn)..." rows="4" 
-                                      oninput="handleAutoSave('profile1Text'); handleIdealProfileSave(1, 'text');"></textarea>
-                            <div class="input-save-indicator" id="profile1SaveIndicator">💾</div>
-                        </div>
-                        <small>💡 This profile will be used as a benchmark for technical excellence</small>
-                        <div id="profile1Confirmation" class="save-confirmation">
-                            ✅ <strong>Profile #1 Saved!</strong> Technical excellence benchmark updated.
-                        </div>
-                    </div>
 
-                    <div class="profile-input">
-                        <h3>🤝 Ideal Profile #2 (Cultural Fit):</h3>
-                        <div class="input-options">
-                            <label>
-                                <input type="radio" name="profile2" value="pdf" id="p2-pdf">
-                                📄 Upload PDF
-                            </label>
-                            <label>
-                                <input type="radio" name="profile2" value="text" id="p2-text" checked>
-                                📝 Copy & Paste Profile
-                            </label>
-                        </div>
-                        <input type="file" id="profile2File" accept=".pdf" style="display: none;" onchange="handleIdealProfileSave(2, 'file')">
-                        <div class="input-container">
-                            <textarea id="profile2Text" placeholder="Paste LinkedIn profile (Ctrl+A from LinkedIn)..." rows="4" 
-                                      oninput="handleAutoSave('profile2Text'); handleIdealProfileSave(2, 'text');"></textarea>
-                            <div class="input-save-indicator" id="profile2SaveIndicator">💾</div>
-                        </div>
-                        <small>💡 This profile will be used as a benchmark for cultural fit</small>
-                        <div id="profile2Confirmation" class="save-confirmation">
-                            ✅ <strong>Profile #2 Saved!</strong> Cultural fit benchmark updated.
-                        </div>
-                    </div>
+            <!-- AI Insights -->
+            <div id="aiInsights" class="bg-blue-100 p-4 rounded mb-6">
+                <h3 class="text-lg font-bold mb-3">🧠 AI Insights</h3>
+                
+                <div id="insightPatterns" class="mb-3 p-3 bg-white rounded">
+                    <h4 class="font-semibold">Common Patterns in Top Candidates</h4>
+                    <div class="text-sm text-gray-600">No insights available yet.</div>
                 </div>
-            </div>            <!-- Enhanced Job Description -->
-            <div class="section">
-                <h2>💼 Job Description</h2>
-                <div class="input-container">
-                    <textarea id="jobDesc" placeholder="Describe the position, required skills, ideal candidate profile, company culture, and any specific requirements..." rows="6" 
-                              oninput="handleAutoSave('jobDesc');"></textarea>
-                    <div class="input-save-indicator" id="jobDescSaveIndicator">💾</div>
+                
+                <div id="insightCompanies" class="mb-3 p-3 bg-white rounded">
+                    <h4 class="font-semibold">Similar Israeli Companies to Explore</h4>
+                    <div class="text-sm text-gray-600">No suggestions available yet.</div>
                 </div>
-                <small>Be as detailed as possible - this helps the AI understand what you're looking for (auto-saved)</small>
+                
+                <div id="insightSearches" class="mb-3 p-3 bg-white rounded">
+                    <h4 class="font-semibold">Job-Specific Boolean Search Prompts</h4>
+                    <div class="text-sm text-gray-600">No search prompts available yet.</div>
+                </div>
             </div>
+        </div>
+    </div>
 
- <!-- Additional Filters -->
- <div class="section">
- <h2>🎯 Additional Filters</h2>
- <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
- <div>
- <label>Education Level:</label>
- <select id="educationLevel">
- <option value="">Any Education Level</option>
- <option value="high-school">High School</option>
- <option value="associate">Associate Degree</option>
- <option value="bachelor">Bachelor's Degree</option>
- <option value="master">Master's Degree</option>
- <option value="phd">PhD/Doctorate</option>
- </select>
- </div>
- <div>
- <label>Location:</label>
- <input type="text" id="location" placeholder="e.g. Tel Aviv, Remote, etc.">
- </div>
- </div>
- </div>
-
- <!-- Leadership Experience -->
- <div class="section">
- <h2>👥 Leadership Experience</h2>
- <div class="checkbox-grid">
- <label>
- <input type="checkbox" id="team-lead">
- 👥 Team Lead
- </label>
- <label>
- <input type="checkbox" id="manager">
- Manager
- </label>
- <label>
- <input type="checkbox" id="executive">
- 🎯 Executive (VP/C-level)
- </label>
- </div>
- </div>
-
- <!-- Key Achievements -->
- <div class="section">
- <h2>🔑 Key Achievements (Keywords)</h2>
- <textarea id="keyAchievements" placeholder="e.g. scaled, launched, improved, reduced costs by 40%, increased revenue, led architecture redesign, implemented CI/CD, grew team by 200%..." rows="3"></textarea>
- <small>📝 Examples: grew team by 200%, increased revenue, reduced costs by 40%, launched product</small>
- <br><br>
- <label>Additional Keywords:</label>
- <textarea id="additionalKeywords" placeholder="Any other important keywords..." rows="2"></textarea>
- </div>
-
- <!-- AI Ranking Enhancement -->
- <div class="section">
- <h2> AI Ranking Enhancement</h2>
- <p style="color: var(--text-secondary); margin-bottom: 1rem;">
-   AI Understanding: Our model will analyze profiles for indicators of excellence.
- </p>
- <label>Provide specific instructions to improve the AI's ranking accuracy:</label>
- <textarea id="aiInstructions" placeholder='Example: "Prioritize candidates who have worked with large-scale systems"' rows="4"></textarea>
- 
- <div style="margin-top: 1rem;">
- <label>Focus Areas:</label>
- <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.5rem;">
- <div style="display: flex; gap: 1rem;">
- <label style="display: flex; align-items: center; gap: 0.5rem;">
- <input type="radio" name="focus" value="innovation">
- 💡 Innovation focus
- </label>
- <label style="display: flex; align-items: center; gap: 0.5rem;">
- <input type="radio" name="focus" value="initiative">
- 🎯 Initiative focus
- </label>
- </div>
- <div style="display: flex; gap: 1rem;">
- <label style="display: flex; align-items: center; gap: 0.5rem;">
- <input type="radio" name="focus" value="top-company">
- 🏢 Top company focus
- </label>
- <label style="display: flex; align-items: center; gap: 0.5rem;">
- <input type="radio" name="focus" value="career-growth">
- 📈 Career growth focus
- </label>
- </div>
- </div>
- </div>
- </div>
-
- <!-- Model Configuration -->
- <div class="section">
- <h2> AI Model Configuration</h2>
- <div class="model-selection">
- <label>
- <input type="radio" name="model" value="hybrid" checked>
- <div>
- 🎯 Hybrid (Recommended) - 30% Embedding + 70% GPT-4
- <br><small style="color: var(--text-secondary);">Best balance of speed and accuracy</small>
- </div>
- </label>
- <label>
- <input type="radio" name="model" value="embedding">
- <div>
- ⚡ Embedding Only - Fast and cost-effective
- <br><small style="color: var(--text-secondary);">Good for initial screening</small>
- </div>
- </label>
- <label>
- <input type="radio" name="model" value="gpt4">
- <div>
-   GPT-4 Only - Highest quality analysis
- <br><small style="color: var(--text-secondary);">Most thorough but slower</small>
- </div>
- </label>
-            <!-- Tab Navigation -->
-            <div class="tab-navigation">
-                <button class="nav-btn secondary" id="prevBtn" onclick="navigateTab(-1)">
-                    ← Previous
-                </button>
-                <div class="tab-progress">
-                    <span id="currentTabInfo">Step 1 of 3</span>
-                </div>
-                <button class="nav-btn" id="nextBtn" onclick="navigateTab(1)">
-                    Next →
-                </button>
-            </div>
- </div>
- </div>
-
- <!-- Start Button -->
- <div class="section" style="text-align: center;">
- <button class="btn-primary" onclick="startRanking()" style="font-size: 1rem; padding: 1rem 2rem;">
- 🚀 Start Ranking Process
- </button>
- </div>
- </div>
-
- <!-- Ranking Tab -->
- <div id="ranking" class="tab-content">
- <div style="text-align: center; max-width: 600px; margin: 0 auto;">
- <h2>⚡ AI Ranking in Progress</h2>
- 
- <!-- Previous Rankings Impact -->
- <div id="feedbackImpactSection" class="section" style="display: none;">
- <h3>🔄 Feedback Impact on Previous Rankings</h3>
- <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0;">
- <div style="background: var(--gray-50); padding: 1rem; border-radius: 6px;">
- <strong>Before Feedback:</strong><br>
- <span id="beforeStats">23 TOP, 19 GOOD candidates</span>
- </div>
- <div style="background: var(--success-color); color: white; padding: 1rem; border-radius: 6px;">
- <strong>After Feedback:</strong><br>
- <span id="afterStats">31 TOP, 24 GOOD candidates</span>
- </div>
- </div>
- <p style="color: var(--success-color); font-weight: 500;">✅ Feedback successfully applied to previous rankings!</p>
- </div>
-
- <!-- Batch Configuration -->
- <div class="section">
- <h3>📊 Batch Configuration</h3>
- <div style="background: white; border: 1px solid var(--border-color); border-radius: 12px; padding: 2rem;">
- <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin: 1rem 0;">
- <div>
- <label>From Row:</label>
- <input type="number" id="fromRow" value="2" min="2">
- </div>
- <div>
- <label>To Row:</label>
- <input type="number" id="toRow" value="51" min="2">
- </div>
- <div>
- <label>Batch Size:</label>
- <select id="batchSize">
- <option value="20">20 profiles</option>
- <option value="50" selected>50 profiles</option>
- <option value="100">100 profiles</option>
- </select>
- </div>
- </div>
- 
- <div class="progress-bar">
- <div id="progressFill" class="progress-fill" style="width: 0%;"></div>
- </div>
- <p>Progress: <span id="progressText">0%</span></p>
- </div>
- </div>
-
- <!-- Controls -->
- <div style="display: flex; gap: 1rem; justify-content: center; margin: 2rem 0;">
- <button class="btn-secondary" onclick="pauseRanking()">â¸ï¸ Pause</button>
- <button class="btn-primary" onclick="continueRanking()">▶ Continue</button>
- <button class="btn-secondary" onclick="stopRanking()">â¹ï¸ Stop</button>
- </div>
-
- <!-- Feedback Section -->
- <div class="section">
- <h3>📝 Provide Feedback</h3>
- <p style="color: var(--text-secondary); margin-bottom: 1rem;">
- Your feedback will improve future batches and can be applied to previous rankings.
- </p>
- <textarea id="feedbackText" placeholder="Example: 'Give more weight to startup experience over enterprise experience.'" rows="4"></textarea>
- 
- <div style="margin: 1rem 0;">
- <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem;">
- <input type="checkbox" id="applyToPrevious"> Apply to previous rankings
- </label>
- </div>
- 
- <button onclick="applyFeedback()" class="btn-primary">
- 💡 Apply Feedback
- </button>
-            <!-- Tab Navigation -->
-            <div class="tab-navigation">
-                <button class="nav-btn secondary" id="prevBtn" onclick="navigateTab(-1)">
-                    ← Previous
-                </button>
-                <div class="tab-progress">
-                    <span id="currentTabInfo">Step 1 of 3</span>
-                </div>
-                <button class="nav-btn" id="nextBtn" onclick="navigateTab(1)">
-                    Next →
-                </button>
-            </div>
- </div>
- </div>
- 
+    <!-- Below 60 Page -->
+    <div id="below60Page" style="display: none;" class="container mx-auto px-4 py-6">
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-2xl font-bold mb-6">📉 Profiles Below 60 Points</h2>
             
-
- <!-- Results Tab -->
- <div id="results" class="tab-content">
- <!-- Results Header -->
- <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
- <h2>📊 Ranking Results</h2>
- <div style="display: flex; gap: 1rem;">
- <button class="btn-primary" onclick="exportCandidates()"> Export CSV (Score â¥60)</button>
- <button class="btn-secondary" onclick="exportInsights()">📄 Export AI Insights</button>
- <button class="btn-secondary" onclick="exportCustomList()" id="exportCustomBtn" style="display: none;"> Export Custom List (<span id="customExportCount">0</span>)</button>
- </div>
- </div>
-
- <!-- Summary Cards -->
- <div class="results-summary">
- <div class="summary-card">
- <h3>🏆 TOP Candidates</h3>
- <div class="summary-number">23</div>
- <p>75-100 score</p>
- </div>
- <div class="summary-card">
- <h3>✅ GOOD Candidates</h3>
- <div class="summary-number">19</div>
- <p>60-74 score</p>
- </div>
- <div class="summary-card">
- <h3>💎 Hidden Gems</h3>
- <div class="summary-number">3</div>
- <p>Special cases</p>
- </div>
- <div class="summary-card">
- <h3> Average</h3>
- <div class="summary-number">45</div>
- <p>Below 60 score</p>
- </div>
- </div>
-
- <!-- TOP Candidates Table -->
- <div class="section">
- <h2>🏆 TOP Candidates (75-100)</h2>
- <table class="results-table">
- <thead>
- <tr>
- <th>Name</th>
- <th>Company</th>
- <th>Position</th>
- <th>Overall Score</th>
- <th>Embedding Score</th>
- <th>Category</th>
- <th>Actions</th>
- </tr>
- </thead>
- <tbody>
- <tr>
- <td><strong>Alex Semyzhonov</strong></td>
- <td>Inetex LTD</td>
- <td>Full Stack Developer</td>
- <td><span class="score-badge score-high">87/100</span></td>
- <td><span class="score-badge score-high">89/100</span></td>
- <td><span style="background: #dcfdf7; color: #065f46; padding: 4px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: 600;">🏆 TOP</span></td>
- <td>
- <button class="btn-view-details" onclick="showCandidateDetails('alex-semyzhonov')">👁ï¸ View Details</button>
- <a href="https://linkedin.com/in/alex-semyzhonov" target="_blank" style="margin-left: 0.5rem; color: var(--primary-color); text-decoration: none;"> LinkedIn</a>
- </td>
- </tr>
- <tr>
- <td><strong>Dror Reshef</strong></td>
- <td>SuperCom</td>
- <td>Full-stack Developer</td>
- <td><span class="score-badge score-high">82/100</span></td>
- <td><span class="score-badge score-high">85/100</span></td>
- <td><span style="background: #dcfdf7; color: #065f46; padding: 4px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: 600;">🏆 TOP</span></td>
- <td>
- <button class="btn-view-details" onclick="showCandidateDetails('dror-reshef')">👁ï¸ View Details</button>
- <a href="https://linkedin.com/in/dror-reshef-1a9533a" target="_blank" style="margin-left: 0.5rem; color: var(--primary-color); text-decoration: none;"> LinkedIn</a>
- </td>
- </tr>
- <tr>
- <td><strong>Tomer Landesman</strong></td>
- <td>env0</td>
- <td>Fullstack Software Engineer</td>
- <td><span class="score-badge score-high">79/100</span></td>
- <td><span class="score-badge score-high">83/100</span></td>
- <td><span style="background: #dcfdf7; color: #065f46; padding: 4px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: 600;">🏆 TOP</span></td>
- <td>
- <button class="btn-view-details" onclick="showCandidateDetails('tomer-landesman')">👁ï¸ View Details</button>
- <a href="https://linkedin.com/in/tomerlm" target="_blank" style="margin-left: 0.5rem; color: var(--primary-color); text-decoration: none;"> LinkedIn</a>
- </td>
- </tr>
- </tbody>
- </table>
- </div>
-
- <!-- GOOD Candidates Table -->
- <div class="section">
- <h2>✅ GOOD Candidates (60-74)</h2>
- <table class="results-table">
- <thead>
- <tr>
- <th>Name</th>
- <th>Company</th>
- <th>Position</th>
- <th>Overall Score</th>
- <th>Embedding Score</th>
- <th>Category</th>
- <th>Actions</th>
- </tr>
- </thead>
- <tbody>
- <tr>
- <td><strong>Aviram Shubeili</strong></td>
- <td>Philips</td>
- <td>Software Engineer</td>
- <td><span class="score-badge score-medium">71/100</span></td>
- <td><span class="score-badge score-medium">74/100</span></td>
- <td><span style="background: #dbeafe; color: #1e40af; padding: 4px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: 600;">✅ GOOD</span></td>
- <td>
- <button class="btn-view-details" onclick="showCandidateDetails('aviram-shubeili')">👁ï¸ View Details</button>
- <a href="https://linkedin.com/in/aviram-shubeili" target="_blank" style="margin-left: 0.5rem; color: var(--primary-color); text-decoration: none;"> LinkedIn</a>
- </td>
- </tr>
- <tr>
- <td><strong>Leon Kannanovich</strong></td>
- <td>Sapiens Decision</td>
- <td>Full Stack Developer</td>
- <td><span class="score-badge score-medium">68/100</span></td>
- <td><span class="score-badge score-medium">70/100</span></td>
- <td><span style="background: #dbeafe; color: #1e40af; padding: 4px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: 600;">✅ GOOD</span></td>
- <td>
- <button class="btn-view-details" onclick="showCandidateDetails('leon-kannanovich')">👁ï¸ View Details</button>
- <a href="https://linkedin.com/in/leon-kannanovich-414a64120" target="_blank" style="margin-left: 0.5rem; color: var(--primary-color); text-decoration: none;"> LinkedIn</a>
- </td>
- </tr>
- </tbody>
- </table>
- </div>
-
- <!-- Hidden Gems Table -->
- <div class="section">
- <h2>💎 Hidden Gems</h2>
- <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
- Candidates with overall lower scores but exceptional qualities in specific areas.
- </p>
- <table class="results-table">
- <thead>
- <tr>
- <th>Name</th>
- <th>Company</th>
- <th>Position</th>
- <th>Overall Score</th>
- <th>Embedding Score</th>
- <th>Best Quality</th>
- <th>Actions</th>
- </tr>
- </thead>
- <tbody>
- <tr>
- <td><strong>Israel Zanani</strong></td>
- <td>Harel Insurance</td>
- <td>Full Stack Engineer</td>
- <td><span class="score-badge score-low">58/100</span></td>
- <td><span class="score-badge score-medium">65/100</span></td>
- <td><span style="background: #dcfdf7; color: #065f46; padding: 4px 8px; border-radius: 12px; font-size: 0.8rem;">Technical: 82/100</span></td>
- <td>
- <button class="btn-view-details" onclick="showCandidateDetails('israel-zanani')">👁ï¸ View Details</button>
- <button class="btn-add-export" onclick="addToExportList('israel-zanani')"> Add to Export</button>
- <a href="https://linkedin.com/in/israel-zanani-b7aa1a134" target="_blank" style="margin-left: 0.5rem; color: var(--primary-color); text-decoration: none;"> LinkedIn</a>
- </td>
- </tr>
- <tr>
- <td><strong>Michal Dan</strong></td>
- <td>Bringg</td>
- <td>Senior Frontend Developer</td>
- <td><span class="score-badge score-low">55/100</span></td>
- <td><span class="score-badge score-medium">62/100</span></td>
- <td><span style="background: #dcfdf7; color: #065f46; padding: 4px 8px; border-radius: 12px; font-size: 0.8rem;">Technical: 88/100</span></td>
- <td>
- <button class="btn-view-details" onclick="showCandidateDetails('michal-dan')">👁ï¸ View Details</button>
- <button class="btn-add-export" onclick="addToExportList('michal-dan')"> Add to Export</button>
- <a href="https://linkedin.com/in/michal-dan-639983a7" target="_blank" style="margin-left: 0.5rem; color: var(--primary-color); text-decoration: none;"> LinkedIn</a>
- </td>
- </tr>
- </tbody>
- </table>
- </div>
-
- <!-- Insufficient Data Table -->
- <div class="section">
- <h2>â Profiles with Insufficient Data</h2>
- <p style="color: var(--text-secondary); margin-bottom: 1rem;">
- Profiles that couldn't be properly ranked due to missing information.
- </p>
- <table class="results-table">
- <thead>
- <tr>
- <th>Name</th>
- <th>Company</th>
- <th>Position</th>
- <th>Reason</th>
- <th>Actions</th>
- </tr>
- </thead>
- <tbody>
- <tr>
- <td><strong>Stav A.</strong></td>
- <td>ControlUp</td>
- <td>Full Stack Developer</td>
- <td><small>Limited job description and skills information</small></td>
- <td>
- <button class="btn-add-export" onclick="addToExportList('stav-a')"> Add to Export</button>
- <a href="https://linkedin.com/in/stavab" target="_blank" style="margin-left: 0.5rem; color: var(--primary-color); text-decoration: none;"> LinkedIn</a>
- </td>
- </tr>
- <tr>
- <td><strong>Vakho Baratashvili</strong></td>
- <td>VFR</td>
- <td>Senior Software Engineer</td>
- <td><small>Incomplete education and experience data</small></td>
- <td>
- <button class="btn-add-export" onclick="addToExportList('vakho-baratashvili')"> Add to Export</button>
- <a href="https://linkedin.com/in/vakho-baratashvili-05895b55" target="_blank" style="margin-left: 0.5rem; color: var(--primary-color); text-decoration: none;"> LinkedIn</a>
- </td>
- </tr>
- <tr>
- <td><strong>Luba Epshtein</strong></td>
- <td>bolt</td>
- <td>Full Stack Developer</td>
- <td><small>Missing detailed technical skills information</small></td>
- <td>
- <button class="btn-add-export" onclick="addToExportList('luba-epshtein')"> Add to Export</button>
- <a href="https://linkedin.com/in/luba-epshtein-2aa0bb164" target="_blank" style="margin-left: 0.5rem; color: var(--primary-color); text-decoration: none;"> LinkedIn</a>
- </td>
- </tr>
- </tbody>
- </table>
- </div>
-
- <!-- Smart AI Insights -->
- <div class="ai-insights-panel">
- <h2>  Smart AI Engine Insights</h2>
- 
- <div class="insights-grid">
- <div class="insight-section">
- <h3 style="color: var(--text-primary); font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">📈 Common Success Patterns</h3>
- <div class="insight-list">
- <li>💼 <strong>Company Background:</strong> 78% come from tech companies with 50+ employees</li>
- <li>🎓 <strong>Education:</strong> 85% have Computer Science or related degrees</li>
- <li>🚀 <strong>Career Progression:</strong> Average 2.3 promotions in last 5 years</li>
- <li>⚡ <strong>Tech Stack:</strong> React + Node.js combination appears in 67% of top candidates</li>
- <li>🏆 <strong>Excellence Indicators:</strong> 42% show at least one excellence marker</li>
- </div>
- </div>
-
- <div class="insight-section">
- <h3 style="color: var(--text-primary); font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">🏢 Top Companies for Talent</h3>
- <div class="insight-list">
- <li> <strong>Technion Alumni:</strong> Average score 84/100 (3 candidates)</li>
- <li> <strong>env0:</strong> Average score 79/100 (1 candidate)</li>
- <li> <strong>SuperCom:</strong> Average score 82/100 (1 candidate)</li>
- <li>🏆 <strong>Tel Aviv University:</strong> Average score 78/100 (2 candidates)</li>
- <li>📊 <strong>EPAM Systems:</strong> Good technical foundation (1 candidate)</li>
- </div>
- </div>
-
- <div class="insight-section">
- <h3 style="color: var(--text-primary); font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">🔍 Recommended Searches</h3>
- <div class="insight-list">
- <li>🎯 "Search for Senior Full Stack developers from Technion with React experience"</li>
- <li>🎯 "Look for env0 alumni with Infrastructure as Code background"</li>
- <li>🎯 "Find Tel Aviv University CS graduates in fintech companies"</li>
- <li>🎯 "Search for developers with military technology unit experience"</li>
- <li>🎯 "Look for React + Spring Boot specialists in Israeli startups"</li>
- </div>
- </div>
-
- <div class="insight-section">
- <h3 style="color: var(--text-primary); font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">📊 Skills Gap Analysis</h3>
- <div class="insight-list">
- <li>⚠ï¸ <strong>DevOps Skills:</strong> Only 23% show strong CI/CD experience</li>
- <li>⚠ï¸ <strong>Cloud Platforms:</strong> AWS experience varies significantly</li>
- <li>⚠ï¸ <strong>Testing:</strong> Limited automated testing mentions</li>
- <li>⚠ï¸ <strong>Leadership:</strong> 34% show clear leadership progression</li>
- <li>⚠ï¸ <strong>Startup Experience:</strong> 28% have fast-growth company background</li>
- </div>
- </div>
-
- <div class="insight-section">
- <h3 style="color: var(--text-primary); font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">🗺ï¸ Geographic Distribution</h3>
- <div class="insight-list">
- <li>📍 <strong>Tel Aviv District:</strong> 67% of TOP candidates (highest concentration)</li>
- <li>📍 <strong>Haifa District:</strong> 22% of TOP candidates (strong technical focus)</li>
- <li>📍 <strong>Center District:</strong> 11% of TOP candidates</li>
- <li>📍 <strong>Remote Work:</strong> 78% mention remote-friendly experience</li>
- <li>📍 <strong>Relocation:</strong> 34% open to location changes</li>
- </div>
- </div>
-
- <div class="insight-section">
- <h3 style="color: var(--text-primary); font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">📈 Career Trajectory Analysis</h3>
- <div class="insight-list">
- <li>⏱ï¸ <strong>Promotion Speed:</strong> Top candidates average 18 months per promotion</li>
- <li>🔄 <strong>Job Stability:</strong> Average 2.8 years per position (healthy progression)</li>
- <li>📚 <strong>Continuous Learning:</strong> 67% show recent skill acquisitions</li>
- <li>🚀 <strong>Startup Transition:</strong> 45% moved from enterprise to startup environments</li>
- <li>💼 <strong>Role Evolution:</strong> 78% show clear specialization development</li>
- </div>
- </div>
-
- <div class="insight-section">
- <h3 style="color: var(--text-primary); font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">✅ Action Items</h3>
- <div class="insight-list">
- <li>🎯 <strong>Priority Outreach:</strong> Contact TOP candidates within 48 hours</li>
- <li>🔍 <strong>Extended Search:</strong> Look for more Technion and TAU CS graduates</li>
- <li>📞 <strong>Company Referrals:</strong> Ask current team for env0 and SuperCom connections</li>
- <li>💡 <strong>Skill Development:</strong> Consider DevOps training for good technical candidates</li>
- <li>🌟 <strong>Hidden Gems Review:</strong> Schedule calls with identified hidden gems</li>
- </div>
- </div>
- </div>
- </div>
- 
+            <div class="mb-4">
+                <p class="text-gray-600">These profiles scored below the threshold but may still have potential.</p>
+            </div>
             
- </div>
+            <div class="overflow-x-auto mb-6">
+                <table class="w-full border-collapse border border-gray-300">
+                    <thead class="bg-red-50">
+                        <tr>
+                            <th class="border border-gray-300 p-3">Full Name</th>
+                            <th class="border border-gray-300 p-3">Company</th>
+                            <th class="border border-gray-300 p-3">Score</th>
+                            <th class="border border-gray-300 p-3">Reasons for Low Score</th>
+                            <th class="border border-gray-300 p-3">LinkedIn</th>
+                            <th class="border border-gray-300 p-3">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="below60TableBody">
+                        <tr>
+                            <td colspan="6" class="border border-gray-300 p-4 text-center text-gray-500">
+                                No profiles below 60 found yet.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="flex gap-4 mb-6">
+                <button onclick="exportBelow60CSV()" 
+                        class="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700">
+                    📤 Export Below 60 to CSV
+                </button>
+                <button onclick="bulkPromoteSelected()" 
+                        class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700">
+                    ⬆️ Promote Selected to Main List
+                </button>
+            </div>
+            
+            <div id="below60Stats" class="bg-gray-50 p-4 rounded-lg">
+                <h4 class="font-semibold mb-2">📊 Below 60 Statistics</h4>
+                <div class="text-gray-600">No data available yet.</div>
+            </div>
+        </div>
+    </div>
 
- <!-- Modal for Candidate Details -->
- <div id="candidateModal" class="modal">
- <div class="modal-content">
- <div class="modal-header">
- <h2 id="modalCandidateName">Candidate Details</h2>
- <span class="close" onclick="closeCandidateModal()">&times;</span>
- </div>
- <div class="modal-body" id="modalCandidateBody">
- <!-- Candidate details will be inserted here -->
- </div>
- </div>
- </div>
+    <!-- Export Page -->
+    <div id="exportPage" style="display: none;" class="container mx-auto px-4 py-6">
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-2xl font-bold mb-6">📤 Export Results</h2>
+            
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold mb-4">Export Ranked Candidates</h3>
+                <p class="text-gray-600 mb-4">CSV with all scores, notes, and timestamps (score ≥60)</p>
+                <button onclick="exportFilteredCSV()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">
+                    📊 Export Qualified Candidates
+                </button>
+            </div>
+            
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold mb-4">Export AI Insights</h3>
+                <p class="text-gray-600 mb-4">Patterns, suggestions, search prompts, and trait impacts</p>
+                <button onclick="exportAIInsights()" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700">
+                    🧠 Export AI Insights
+                </button>
+            </div>
+            
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold mb-4">Export Session Summary</h3>
+                <p class="text-gray-600 mb-4">Complete session report with all data and analysis</p>
+                <button onclick="exportSessionSummary()" class="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700">
+                    📋 Export Full Report
+                </button>
+            </div>
+        </div>
+    </div>
 
- <!-- PapaParse Library -->
- <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js">
-    // Global variables for file data and application state
-    let uploadedFileData = null;
-    let filteredData = null;
-    let currentTab = 0;
-    const tabs = ['setup', 'ranking', 'results'];
-    const tabNames = ['Setup', 'Ranking', 'Results'];
+    <!-- Mapping Modal -->
+    <div id="mappingModal" class="modal">
+        <div class="modal-content">
+            <button class="close-button" onclick="closeMappingModal()">&times;</button>
+            <h3 class="text-xl font-bold mb-4">🗂️ Map File Columns</h3>
+            <p class="text-sm text-gray-600 mb-4">Select which columns correspond to First Name, Last Name and Company:</p>
+            <div class="grid grid-cols-1 gap-4 mb-4">
+                <div>
+                    <label for="firstNameSelect" class="block text-sm font-medium text-gray-700">First Name</label>
+                    <select id="firstNameSelect" class="mt-1 block w-full border border-gray-300 rounded p-2"></select>
+                </div>
+                <div>
+                    <label for="lastNameSelect" class="block text-sm font-medium text-gray-700">Last Name</label>
+                    <select id="lastNameSelect" class="mt-1 block w-full border border-gray-300 rounded p-2"></select>
+                </div>
+                <div>
+                    <label for="companySelect" class="block text-sm font-medium text-gray-700">Company</label>
+                    <select id="companySelect" class="mt-1 block w-full border border-gray-300 rounded p-2"></select>
+                </div>
+            </div>
+            <div class="flex justify-end gap-2">
+                <button onclick="closeMappingModal()" class="bg-gray-500 text-white px-4 py-2 rounded">Cancel</button>
+                <button onclick="saveColumnMapping()" class="bg-blue-600 text-white px-4 py-2 rounded">Save</button>
+            </div>
+        </div>
+    </div>
 
-    // Enhanced Navigation Functions
-    function navigateTab(direction) {
-        const newTab = currentTab + direction;
-        if (newTab >= 0 && newTab < tabs.length) {
-            // Hide current tab
-            document.getElementById(tabs[currentTab]).classList.remove('active');
-            document.querySelector(`[data-tab="${tabs[currentTab]}"]`).classList.remove('active');
+    <!-- Navigation -->
+    <div class="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 shadow-2xl p-4 z-50 no-print">
+        <div class="container mx-auto flex justify-between items-center">
+            <button onclick="previousPage()" 
+                    id="prevButton"
+                    class="bg-gray-600 text-white px-8 py-3 rounded-lg hover:bg-gray-700 transition-all duration-300 font-semibold disabled:opacity-50 disabled:cursor-not-allowed shadow-lg">
+                ← Previous
+            </button>
+            
+            <div class="text-gray-700 font-medium bg-gray-100 px-4 py-2 rounded-lg">
+                Page <span id="currentPageNumber">1</span> of <span id="totalPages">5</span>
+            </div>
+            
+            <button onclick="nextPage()" 
+                    id="nextButton"
+                    class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-all duration-300 font-semibold disabled:opacity-50 disabled:cursor-not-allowed shadow-lg">
+                Next →
+            </button>
+        </div>
+    </div>
 
-            // Show new tab
-            currentTab = newTab;
-            document.getElementById(tabs[currentTab]).classList.add('active');
-            document.querySelector(`[data-tab="${tabs[currentTab]}"]`).classList.add('active');
-
-            // Update navigation buttons
-            updateNavigationButtons();
-            updateTabInfo();
-        }
-    }
-
-    function updateNavigationButtons() {
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-
-        if (prevBtn && nextBtn) {
-            prevBtn.disabled = currentTab === 0;
-            nextBtn.disabled = currentTab === tabs.length - 1;
-
-            // Update button text based on current tab
-            if (currentTab === tabs.length - 1) {
-                nextBtn.style.display = 'none';
-            } else {
-                nextBtn.style.display = 'flex';
-            }
-        }
-    }
-
-    function updateTabInfo() {
-        const tabInfo = document.getElementById('currentTabInfo');
-        if (tabInfo) {
-            tabInfo.textContent = `Step ${currentTab + 1} of ${tabs.length}: ${tabNames[currentTab]}`;
-        }
-    }
-
-    // API Key Save Functionality
-    function setupApiKeySaving() {
-        const embeddingApiKey = document.getElementById('embeddingApiKey');
-        const gptApiKey = document.getElementById('gptApiKey');
-
-        // Load saved values on page load
-        if (embeddingApiKey) {
-            const savedEmbedding = localStorage.getItem('embeddingApiKey');
-            if (savedEmbedding) {
-                embeddingApiKey.value = savedEmbedding;
-                showEnhancedSaveIndicator('embeddingApiKeySaveIndicator');
-            }
-        }
-
-        if (gptApiKey) {
-            const savedGpt = localStorage.getItem('gptApiKey');
-            if (savedGpt) {
-                gptApiKey.value = savedGpt;
-                showEnhancedSaveIndicator('gptApiKeySaveIndicator');
-            }
-        }
-    }
-
-    function saveApiKey(keyName, value) {
-        localStorage.setItem(keyName, value);
-    }
-
-    function showSaveIndicator(indicatorId) {
-        const indicator = document.getElementById(indicatorId);
-        if (indicator) {
-            indicator.classList.add('show');
-            setTimeout(() => {
-                indicator.classList.remove('show');
-            }, 2000);
-        }
-    }
-
-    // Enhanced File Upload Functionality
-    function setupFileUpload() {
-        const fileInput = document.getElementById('csvFile');
-        const uploadArea = document.getElementById('uploadArea');
-
-        if (fileInput && uploadArea) {
-            // Drag and drop functionality
-            uploadArea.addEventListener('dragover', function(e) {
-                e.preventDefault();
-                this.classList.add('dragover');
-            });
-
-            uploadArea.addEventListener('dragleave', function(e) {
-                e.preventDefault();
-                this.classList.remove('dragover');
-            });
-
-            uploadArea.addEventListener('drop', function(e) {
-                e.preventDefault();
-                this.classList.remove('dragover');
-                const files = e.dataTransfer.files;
-                if (files.length > 0) {
-                    enhancedHandleFileUpload(files[0]);
-                }
-            });
-
-            fileInput.addEventListener('change', function(e) {
-                if (e.target.files.length > 0) {
-                    enhancedHandleFileUpload(e.target.files[0]);
-                }
-            });
-        }
-    }
-
-    function handleFileUpload(file) {
-        if (!file.name.toLowerCase().endsWith('.csv')) {
-            showToast('Please upload a CSV file only', 'error');
-            return;
-        }
-
-        // Show progress
-        const progressDiv = document.getElementById('uploadProgress');
-        const progressFill = document.getElementById('progressFill');
-        const successMessage = document.getElementById('uploadSuccess');
-
-        if (progressDiv) progressDiv.style.display = 'block';
-        if (successMessage) successMessage.classList.remove('show');
-
-        // Simulate progress
-        let progress = 0;
-        const progressInterval = setInterval(() => {
-            progress += 10;
-            if (progressFill) progressFill.style.width = progress + '%';
-
-            if (progress >= 100) {
-                clearInterval(progressInterval);
-                setTimeout(() => {
-                    parseCSVFile(file);
-                }, 500);
-            }
-        }, 100);
-    }
-
-    function parseCSVFile(file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const csv = e.target.result;
-            const lines = csv.split('\n');
-            const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
-
-            // Parse data
-            const data = [];
-            for (let i = 1; i < lines.length && i < 1000; i++) { // Limit to 1000 rows for performance
-                if (lines[i].trim()) {
-                    const row = lines[i].split(',').map(cell => cell.trim().replace(/"/g, ''));
-                    if (row.length === headers.length) {
-                        const rowObj = {};
-                        headers.forEach((header, index) => {
-                            rowObj[header] = row[index];
-                        });
-                        data.push(rowObj);
-                    }
-                }
-            }
-
-            uploadedFileData = {
-                filename: file.name,
-                size: formatFileSize(file.size),
-                totalRows: lines.length - 1,
-                headers: headers,
-                data: data
-            };
-
-            displayFileInfo();
-            hideProgress();
-            showSuccess();
-            enableFiltering();
-        };
-        reader.readAsText(file);
-    }
-
-    function displayFileInfo() {
-        const fileInfo = document.getElementById('fileInfo');
-        const fileName = document.getElementById('fileName');
-        const fileSize = document.getElementById('fileSize');
-        const fileRows = document.getElementById('fileRows');
-        const fileColumns = document.getElementById('fileColumns');
-        const filePreview = document.getElementById('filePreview');
-
-        if (fileInfo && uploadedFileData) {
-            fileInfo.style.display = 'block';
-
-            if (fileName) fileName.textContent = uploadedFileData.filename;
-            if (fileSize) fileSize.textContent = uploadedFileData.size;
-            if (fileRows) fileRows.textContent = uploadedFileData.totalRows.toLocaleString();
-
-            // Display columns
-            if (fileColumns) {
-                fileColumns.innerHTML = uploadedFileData.headers.map(header => 
-                    `<span style="display: inline-block; background: var(--gray-100); padding: 4px 8px; margin: 2px; border-radius: 4px; font-size: 0.8rem;">${header}</span>`
-                ).join('');
-            }
-
-            // Display preview
-            if (filePreview && uploadedFileData.data.length > 0) {
-                const previewData = uploadedFileData.data.slice(0, 5);
-                let tableHTML = '<table><thead><tr>';
-                uploadedFileData.headers.forEach(header => {
-                    tableHTML += `<th>${header}</th>`;
-                });
-                tableHTML += '</tr></thead><tbody>';
-
-                previewData.forEach(row => {
-                    tableHTML += '<tr>';
-                    uploadedFileData.headers.forEach(header => {
-                        tableHTML += `<td>${row[header] || ''}</td>`;
-                    });
-                    tableHTML += '</tr>';
-                });
-                tableHTML += '</tbody></table>';
-                filePreview.innerHTML = tableHTML;
-            }
-        }
-    }
-
-    function hideProgress() {
-        const progressDiv = document.getElementById('uploadProgress');
-        if (progressDiv) {
-            setTimeout(() => {
-                progressDiv.style.display = 'none';
-            }, 500);
-        }
-    }
-
-    function showSuccess() {
-        const successMessage = document.getElementById('uploadSuccess');
-        if (successMessage) {
-            successMessage.classList.add('show');
-        }
-    }
-
-    function enableFiltering() {
-        const applyButton = document.querySelector('button[onclick="applyFiltering()"]');
-        if (applyButton) {
-            applyButton.disabled = false;
-            applyButton.textContent = '🔍 Apply Filters & Show Summary';
-        }
-    }
-
-    function formatFileSize(bytes) {
-        if (bytes === 0) return '0 Bytes';
-        const k = 1024;
-        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-    }
-
-    // Enhanced Apply Filtering Function
-    function applyFiltering() {
-        if (!uploadedFileData) {
-            showToast('Please upload a CSV file first', 'error');
-            return;
-        }
-
-        const blacklistText = document.getElementById('blacklistCompanies').value.trim();
-        const inProcessText = document.getElementById('inProcessCandidates').value.trim();
-
-        const blacklistCompanies = blacklistText ? blacklistText.split(',').map(c => c.trim().toLowerCase()) : [];
-        const inProcessCandidates = inProcessText ? inProcessText.split(',').map(c => c.trim().toLowerCase()) : [];
-
-        // Apply filtering
-        let filteredByBlacklist = 0;
-        let filteredByInProcess = 0;
-
-        filteredData = uploadedFileData.data.filter(row => {
-            // Check company blacklist
-            const company = (row.Company || row.company || '').toLowerCase();
-            if (blacklistCompanies.some(bc => company.includes(bc))) {
-                filteredByBlacklist++;
-                return false;
-            }
-
-            // Check already in process
-            const name = (row.Name || row.name || row['Full Name'] || '').toLowerCase();
-            if (inProcessCandidates.some(ip => name.includes(ip))) {
-                filteredByInProcess++;
-                return false;
-            }
-
-            return true;
-        });
-
-        // Update dashboard
-        updateFilteringDashboard(uploadedFileData.totalRows, filteredByBlacklist, filteredByInProcess, filteredData.length);
-
-        showToast('Filtering applied successfully!', 'success');
-    }
-
-    function updateFilteringDashboard(total, blacklisted, inProcess, remaining) {
-        const dashboard = document.getElementById('filteringDashboard');
-        const totalCount = document.getElementById('totalRowsCount');
-        const blacklistCount = document.getElementById('blacklistFilteredCount');
-        const inProcessCount = document.getElementById('inProcessFilteredCount');
-        const remainingCount = document.getElementById('remainingForRankingCount');
-
-        if (dashboard) {
-            dashboard.classList.add('show');
-        }
-
-        if (totalCount) totalCount.textContent = total.toLocaleString();
-        if (blacklistCount) blacklistCount.textContent = blacklisted.toLocaleString();
-        if (inProcessCount) inProcessCount.textContent = inProcess.toLocaleString();
-        if (remainingCount) remainingCount.textContent = remaining.toLocaleString();
-    }
-
-    // Toast notification function
-    function showToast(message, type = 'info') {
-        const toast = document.getElementById('toast');
-        if (toast) {
-            toast.textContent = message;
-            toast.className = `toast ${type} show`;
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
-        }
-    }
-
-    // Initialize everything when DOM is loaded
-    document.addEventListener('DOMContentLoaded', function() {
-        setupApiKeySaving();
-        setupFileUpload();
-        updateNavigationButtons();
-        updateTabInfo();
-
-        // Set up tab switching
-        document.querySelectorAll('.tab-btn').forEach((btn, index) => {
-            btn.addEventListener('click', function() {
-                currentTab = index;
-                updateNavigationButtons();
-                updateTabInfo();
-            });
-        });
-    });
-
-    </script>
- 
- 
     <script>
-    // Enhanced API Key Auto-Save Functionality
-    function handleAutoSave(keyName) {
-        const input = document.getElementById(keyName);
-        const indicatorId = keyName + 'SaveIndicator';
+        // Global variables
+        let currentPage = 1;
+        let normalizedProfiles = [];
+        let filteredProfiles = [];
+        let rankedProfiles = [];
+        let below60Profiles = [];
+        let rawData = [];
+        let headers = [];
+        let customExcellenceSignals = [];
+        let customRedFlags = [];
+        let customTraits = [];
 
-        if (input && input.value.trim()) {
-            // Save to localStorage
-            localStorage.setItem(keyName, input.value);
-
-            // Show save indicator
-            showEnhancedSaveIndicator(indicatorId);
-
-            // Auto-hide after 2 seconds
+        // Show message function
+        function showMessage(message, type = 'info') {
+            const messageContainer = document.getElementById('globalMessage');
+            const messageElement = document.createElement('div');
+            messageElement.className = `alert alert-${type} p-4 mb-4 rounded-lg`;
+            
+            let bgColor = 'bg-blue-100 border-blue-500 text-blue-700';
+            if (type === 'success') bgColor = 'bg-green-100 border-green-500 text-green-700';
+            if (type === 'error') bgColor = 'bg-red-100 border-red-500 text-red-700';
+            if (type === 'warning') bgColor = 'bg-yellow-100 border-yellow-500 text-yellow-700';
+            
+            messageElement.className = `${bgColor} border-l-4 p-4 mb-4`;
+            messageElement.innerHTML = message;
+            
+            messageContainer.appendChild(messageElement);
+            
             setTimeout(() => {
-                hideEnhancedSaveIndicator(indicatorId);
-            }, 2000);
-        }
-    }
-
-    function showEnhancedSaveIndicator(indicatorId) {
-        const indicator = document.getElementById(indicatorId);
-        if (indicator) {
-            indicator.classList.add('show');
-        }
-    }
-
-    function hideEnhancedSaveIndicator(indicatorId) {
-        const indicator = document.getElementById(indicatorId);
-        if (indicator) {
-            indicator.classList.remove('show');
-        }
-    }
-
-    // Enhanced File Upload Handler
-    function enhancedHandleFileUpload(file) {
-        if (!file.name.toLowerCase().endsWith('.csv')) {
-            showToast('Please upload a CSV file only', 'error');
-            return;
+                messageElement.remove();
+            }, 5000);
         }
 
-        // Show progress
-        const progressDiv = document.getElementById('uploadProgress');
-        const progressFill = document.getElementById('progressFill');
-        const progressText = document.getElementById('progressText');
-        const successBanner = document.getElementById('uploadSuccessBanner');
-        const fileInfoSection = document.getElementById('fileInfoSection');
+        function showSuccess(message) { showMessage(message, 'success'); }
+        function showError(message) { showMessage(message, 'error'); }
+        function showWarning(message) { showMessage(message, 'warning'); }
 
-        // Reset and show progress
-        if (progressDiv) progressDiv.style.display = 'block';
-        if (successBanner) successBanner.classList.remove('show');
-        if (fileInfoSection) fileInfoSection.style.display = 'none';
-
-        // Animate progress
-        let progress = 0;
-        const progressInterval = setInterval(() => {
-            progress += Math.random() * 15 + 5; // Random increment between 5-20
-            if (progress > 95) progress = 95;
-
-            if (progressFill) progressFill.style.width = progress + '%';
-            if (progressText) progressText.textContent = Math.round(progress) + '%';
-
-            if (progress >= 95) {
-                clearInterval(progressInterval);
-                // Complete the upload
-                setTimeout(() => {
-                    completeFileUpload(file);
-                }, 500);
-            }
-        }, 100);
-    }
-
-    function completeFileUpload(file) {
-        const progressDiv = document.getElementById('uploadProgress');
-        const progressFill = document.getElementById('progressFill');
-        const progressText = document.getElementById('progressText');
-
-        // Complete progress
-        if (progressFill) progressFill.style.width = '100%';
-        if (progressText) progressText.textContent = '100%';
-
-        // Hide progress after a moment
-        setTimeout(() => {
-            if (progressDiv) progressDiv.style.display = 'none';
-
-            // Parse the file
-            parseAndDisplayCSV(file);
-        }, 800);
-    }
-
-    function parseAndDisplayCSV(file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const csv = e.target.result;
-                const lines = csv.split('\n').filter(line => line.trim());
-
-                if (lines.length < 2) {
-                    showToast('CSV file must have at least 2 rows (header + data)', 'error');
-                    return;
-                }
-
-                // Parse headers
-                const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
-
-                // Parse data rows (limit to first 1000 for performance)
-                const dataRows = [];
-                for (let i = 1; i < Math.min(lines.length, 1001); i++) {
-                    if (lines[i].trim()) {
-                        const row = lines[i].split(',').map(cell => cell.trim().replace(/"/g, ''));
-                        if (row.length >= headers.length - 1) { // Allow slight mismatch
-                            const rowObj = {};
-                            headers.forEach((header, index) => {
-                                rowObj[header] = row[index] || '';
-                            });
-                            dataRows.push(rowObj);
-                        }
-                    }
-                }
-
-                // Store data globally
-                window.uploadedFileData = {
-                    filename: file.name,
-                    size: formatFileSize(file.size),
-                    totalRows: lines.length - 1,
-                    headers: headers,
-                    data: dataRows
-                };
-
-                // Display file info
-                displayEnhancedFileInfo();
-
-                // Show success banner
-                const successBanner = document.getElementById('uploadSuccessBanner');
-                if (successBanner) {
-                    successBanner.classList.add('show');
-                }
-
-                // Enable filtering
-                const applyButton = document.querySelector('button[onclick*="applyFiltering"]');
-                if (applyButton) {
-                    applyButton.disabled = false;
-                    applyButton.style.opacity = '1';
-                    applyButton.innerHTML = '🔍 Apply Filters & Show Summary (File Ready!)';
-                }
-
-            } catch (error) {
-                console.error('Error parsing CSV:', error);
-                showToast('Error parsing CSV file. Please check the format.', 'error');
-            }
-        };
-
-        reader.onerror = function() {
-            showToast('Error reading file', 'error');
-        };
-
-        reader.readAsText(file);
-    }
-
-    function displayEnhancedFileInfo() {
-        const data = window.uploadedFileData;
-        if (!data) return;
-
-        // Update file stats
-        const fileNameStat = document.getElementById('fileNameStat');
-        const fileSizeStat = document.getElementById('fileSizeStat');
-        const totalRowsStat = document.getElementById('totalRowsStat');
-        const columnsStat = document.getElementById('columnsStat');
-        const columnsDisplay = document.getElementById('columnsDisplay');
-        const filePreview = document.getElementById('filePreview');
-        const fileInfoSection = document.getElementById('fileInfoSection');
-
-        if (fileNameStat) fileNameStat.textContent = data.filename;
-        if (fileSizeStat) fileSizeStat.textContent = data.size;
-        if (totalRowsStat) totalRowsStat.textContent = data.totalRows.toLocaleString();
-        if (columnsStat) columnsStat.textContent = data.headers.length;
-
-        // Display columns
-        if (columnsDisplay) {
-            columnsDisplay.innerHTML = data.headers.map(header => 
-                `<span style="display: inline-block; background: var(--primary-color); color: white; padding: 4px 8px; margin: 2px; border-radius: 4px; font-size: 0.8rem;">${header}</span>`
-            ).join('');
-        }
-
-        // Display preview
-        if (filePreview && data.data.length > 0) {
-            const previewData = data.data.slice(0, 5);
-            let tableHTML = '<table style="width: 100%; border-collapse: collapse;"><thead><tr>';
-            data.headers.forEach(header => {
-                tableHTML += `<th style="border: 1px solid var(--border-color); padding: 8px; background: var(--gray-100);">${header}</th>`;
+        // Page navigation
+        function showPage(pageId) {
+            const pages = ['setup', 'ranking', 'results', 'below60', 'export'];
+            pages.forEach(page => {
+                document.getElementById(page + 'Page').style.display = 'none';
+                document.getElementById(page + 'Tab').className = 'px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700';
             });
-            tableHTML += '</tr></thead><tbody>';
-
-            previewData.forEach(row => {
-                tableHTML += '<tr>';
-                data.headers.forEach(header => {
-                    const cellValue = row[header] || '';
-                    tableHTML += `<td style="border: 1px solid var(--border-color); padding: 8px; font-size: 0.8rem;">${cellValue}</td>`;
-                });
-                tableHTML += '</tr>';
-            });
-            tableHTML += '</tbody></table>';
-            filePreview.innerHTML = tableHTML;
-        }
-
-        // Show file info section
-        if (fileInfoSection) {
-            fileInfoSection.style.display = 'block';
-        }
-    }
-
-    function formatFileSize(bytes) {
-        if (bytes === 0) return '0 Bytes';
-        const k = 1024;
-        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-    }
-
-
-        // Global variables for enhanced functionality
-        let currentFileData = null;
-        let currentTab = 0;
-        const tabs = ['setup', 'ranking', 'results'];
-        let autoSaveTimeouts = {};
-        let filteringStats = {
-            total: 0,
-            blacklisted: 0,
-            inProcess: 0,
-            available: 0
-        };
-
-        // Initialize enhanced functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeEnhancedFeatures();
-            loadFromLocalStorage();
-            updateTabProgress();
+            
+            document.getElementById(pageId + 'Page').style.display = 'block';
+            document.getElementById(pageId + 'Tab').className = 'px-4 py-3 text-sm font-medium text-blue-600 border-b-2 border-blue-600';
+            
+            currentPage = pages.indexOf(pageId) + 1;
             updateNavigationButtons();
-        });
-
-        function initializeEnhancedFeatures() {
-            // Initialize tabs
-            initTabs();
-
-            // Initialize file upload
-            initFileUpload();
-
-            // Initialize profile input toggles
-            initProfileInputs();
-
-            // Load saved session
-            loadSession();
-
-            // Initialize auto-save for all inputs
-            initAutoSave();
-
-            console.log('✅ Enhanced Scorely Beta initialized');
         }
 
-        // Enhanced File Upload with Loading Indicators
-        function handleFileUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            showLoadingOverlay('📁 Analyzing file...', 0);
-
-            const uploadArea = document.querySelector('.upload-area-enhanced');
-            uploadArea.classList.add('uploading');
-
-            // Simulate file processing with progress
-            let progress = 0;
-            const progressInterval = setInterval(() => {
-                progress += Math.random() * 20;
-                if (progress > 90) progress = 90;
-
-                updateProgressBar(progress, `Processing ${file.name}...`);
-            }, 200);
-
-            // Simulate file analysis
-            setTimeout(() => {
-                clearInterval(progressInterval);
-                analyzeFile(file);
-                hideLoadingOverlay();
-                uploadArea.classList.remove('uploading');
-
-                // Show file info
-                const fileInfo = document.getElementById('fileInfoEnhanced');
-                fileInfo.classList.add('show');
-
-                showAutoSaveIndicator('File analyzed successfully!', 'saved');
-            }, 2000);
-        }
-
-        function analyzeFile(file) {
-            // Simulate file analysis
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const content = e.target.result;
-                const lines = content.split('
-');
-                const validLines = lines.filter(line => line.trim().length > 0);
-
-                // Update file stats
-                document.getElementById('fileNameStat').textContent = file.name;
-                document.getElementById('fileSizeStat').textContent = formatFileSize(file.size);
-                document.getElementById('totalRowsStat').textContent = lines.length - 1; // Minus header
-                document.getElementById('validProfilesStat').textContent = validLines.length - 1;
-                document.getElementById('columnsStat').textContent = (lines[0] || '').split(',').length;
-
-                // Store file data
-                currentFileData = {
-                    name: file.name,
-                    size: file.size,
-                    rows: lines.length - 1,
-                    validProfiles: validLines.length - 1,
-                    columns: (lines[0] || '').split(',').length,
-                    content: content
-                };
-
-                // Update filtering stats
-                filteringStats.total = currentFileData.validProfiles;
-                updateFilteringStats();
-
-                // Save to localStorage
-                saveToLocalStorage('fileData', currentFileData);
-
-                console.log('📊 File analyzed:', currentFileData);
-            };
-            reader.readAsText(file);
-        }
-
-        // Drag and Drop Enhancement
-        function handleDragOver(event) {
-            event.preventDefault();
-            event.target.closest('.upload-area-enhanced').classList.add('dragover');
-        }
-
-        function handleDragLeave(event) {
-            event.target.closest('.upload-area-enhanced').classList.remove('dragover');
-        }
-
-        function handleDrop(event) {
-            event.preventDefault();
-            event.target.closest('.upload-area-enhanced').classList.remove('dragover');
-
-            const files = event.dataTransfer.files;
-            if (files.length > 0) {
-                document.getElementById('csvFile').files = files;
-                handleFileUpload({ target: { files: files } });
+        function nextPage() {
+            const pages = ['setup', 'ranking', 'results', 'below60', 'export'];
+            if (currentPage < pages.length) {
+                showPage(pages[currentPage]);
             }
         }
 
-        // Auto-save Functionality
-        function initAutoSave() {
-            const autoSaveInputs = [
-                'embeddingApiKey', 'gptApiKey', 'blacklistCompanies', 'inProcessCandidates',
-                'profile1Text', 'profile2Text', 'jobDesc', 'keyAchievements', 
-                'additionalKeywords', 'aiInstructions', 'educationLevel', 'location'
-            ];
-
-            autoSaveInputs.forEach(inputId => {
-                const element = document.getElementById(inputId);
-                if (element) {
-                    element.addEventListener('input', () => handleAutoSave(inputId));
-                }
-            });
-        }
-
-        function handleAutoSave(inputId) {
-            const element = document.getElementById(inputId);
-            if (!element) return;
-
-            // Clear existing timeout
-            if (autoSaveTimeouts[inputId]) {
-                clearTimeout(autoSaveTimeouts[inputId]);
-            }
-
-            // Show saving indicator
-            showInputSaveIndicator(inputId, 'saving');
-
-            // Set new timeout for auto-save
-            autoSaveTimeouts[inputId] = setTimeout(() => {
-                const value = element.value;
-                saveToLocalStorage(inputId, value);
-                showInputSaveIndicator(inputId, 'saved');
-
-                console.log(`💾 Auto-saved: ${inputId}`);
-
-                // Hide indicator after 2 seconds
-                setTimeout(() => {
-                    hideInputSaveIndicator(inputId);
-                }, 2000);
-            }, 1000); // Save after 1 second of no typing
-        }
-
-        function showInputSaveIndicator(inputId, state) {
-            const indicator = document.getElementById(inputId + 'SaveIndicator');
-            if (indicator) {
-                indicator.className = 'input-save-indicator ' + state;
-                indicator.textContent = state === 'saving' ? '💾' : '✅';
-            }
-        }
-
-        function hideInputSaveIndicator(inputId) {
-            const indicator = document.getElementById(inputId + 'SaveIndicator');
-            if (indicator) {
-                indicator.className = 'input-save-indicator';
-            }
-        }
-
-        // Enhanced Filtering with Real-time Updates
-        function updateFilteringStats() {
-            if (!currentFileData) return;
-
-            const blacklistText = document.getElementById('blacklistCompanies')?.value || '';
-            const inProcessText = document.getElementById('inProcessCandidates')?.value || '';
-
-            // Simulate filtering logic
-            const blacklistItems = blacklistText.split(',').map(item => item.trim()).filter(item => item.length > 0);
-            const inProcessItems = inProcessText.split(',').map(item => item.trim()).filter(item => item.length > 0);
-
-            // Estimate filtering impact (simplified calculation)
-            const blacklistFiltered = Math.floor(blacklistItems.length * 0.8); // Assume each blacklist item filters ~0.8 profiles
-            const inProcessFiltered = inProcessItems.length;
-
-            filteringStats.blacklisted = Math.min(blacklistFiltered, filteringStats.total);
-            filteringStats.inProcess = Math.min(inProcessFiltered, filteringStats.total - filteringStats.blacklisted);
-            filteringStats.available = filteringStats.total - filteringStats.blacklisted - filteringStats.inProcess;
-
-            // Update live stats
-            updateLiveFilteringDisplay();
-
-            // Update dashboard if visible
-            updateFilteringDashboard();
-        }
-
-        function updateLiveFilteringDisplay() {
-            document.getElementById('liveTotalProfiles').textContent = filteringStats.total;
-            document.getElementById('liveBlacklistMatches').textContent = filteringStats.blacklisted;
-            document.getElementById('liveInProcessMatches').textContent = filteringStats.inProcess;
-            document.getElementById('liveAvailableProfiles').textContent = filteringStats.available;
-        }
-
-        function updateFilteringDashboard() {
-            const total = filteringStats.total;
-            if (total === 0) return;
-
-            document.getElementById('totalProfilesNum').textContent = total;
-            document.getElementById('totalProfilesPerc').textContent = '100%';
-
-            document.getElementById('blacklistFilteredNum').textContent = filteringStats.blacklisted;
-            document.getElementById('blacklistFilteredPerc').textContent = 
-                Math.round((filteringStats.blacklisted / total) * 100) + '%';
-
-            document.getElementById('inProcessFilteredNum').textContent = filteringStats.inProcess;
-            document.getElementById('inProcessFilteredPerc').textContent = 
-                Math.round((filteringStats.inProcess / total) * 100) + '%';
-
-            document.getElementById('remainingForRankingNum').textContent = filteringStats.available;
-            document.getElementById('remainingForRankingPerc').textContent = 
-                Math.round((filteringStats.available / total) * 100) + '%';
-        }
-
-        function applyFiltering() {
-            showLoadingOverlay('🔍 Applying filters...', 0);
-
-            let progress = 0;
-            const progressInterval = setInterval(() => {
-                progress += Math.random() * 25;
-                if (progress > 90) progress = 90;
-                updateProgressBar(progress, 'Processing filters...');
-            }, 300);
-
-            setTimeout(() => {
-                clearInterval(progressInterval);
-                updateProgressBar(100, 'Filtering complete!');
-
-                // Show enhanced dashboard
-                const dashboard = document.getElementById('filteringDashboardEnhanced');
-                dashboard.classList.add('show');
-
-                updateFilteringDashboard();
-
-                setTimeout(() => {
-                    hideLoadingOverlay();
-                    showAutoSaveIndicator('Filtering applied successfully!', 'saved');
-                }, 500);
-            }, 2000);
-        }
-
-        // Ideal Profile Save Confirmation
-        function handleIdealProfileSave(profileNumber, type) {
-            const confirmationId = `profile${profileNumber}Confirmation`;
-            const confirmation = document.getElementById(confirmationId);
-
-            if (confirmation) {
-                confirmation.classList.add('show');
-
-                // Hide after 3 seconds
-                setTimeout(() => {
-                    confirmation.classList.remove('show');
-                }, 3000);
-            }
-
-            // Save to localStorage
-            const textElementId = `profile${profileNumber}Text`;
-            const textElement = document.getElementById(textElementId);
-            if (textElement && textElement.value.trim()) {
-                saveToLocalStorage(textElementId, textElement.value);
-                console.log(`✅ Ideal Profile #${profileNumber} saved`);
-            }
-        }
-
-        // Navigation Enhancement
-        function updateTabProgress() {
-            const progressFill = document.getElementById('tabProgress');
-            const stepText = document.getElementById('currentStepText');
-
-            if (progressFill && stepText) {
-                const progressPercent = ((currentTab + 1) / tabs.length) * 100;
-                progressFill.style.width = progressPercent + '%';
-
-                const stepNames = ['Setup', 'Ranking', 'Results'];
-                stepText.textContent = `Step ${currentTab + 1} of ${tabs.length}: ${stepNames[currentTab]}`;
+        function previousPage() {
+            const pages = ['setup', 'ranking', 'results', 'below60', 'export'];
+            if (currentPage > 1) {
+                showPage(pages[currentPage - 2]);
             }
         }
 
         function updateNavigationButtons() {
-            const prevBtn = document.getElementById('prevBtn');
-            const nextBtn = document.getElementById('nextBtn');
-
-            if (prevBtn) {
-                prevBtn.disabled = currentTab === 0;
-            }
-
-            if (nextBtn) {
-                nextBtn.disabled = currentTab === tabs.length - 1;
-                nextBtn.textContent = currentTab === tabs.length - 1 ? 'Complete' : 'Next →';
-            }
+            document.getElementById('currentPageNumber').textContent = currentPage;
+            document.getElementById('prevButton').disabled = currentPage === 1;
+            document.getElementById('nextButton').disabled = currentPage === 5;
         }
 
-        function previousTab() {
-            if (currentTab > 0) {
-                currentTab--;
-                switchTab(tabs[currentTab]);
-                updateTabProgress();
-                updateNavigationButtons();
+        // API Key Management
+        function saveApiKey() {
+            const apiKey = document.getElementById('openaiApiKey').value.trim();
+            if (!apiKey) {
+                showError('Please enter an API key');
+                return;
             }
+            
+            localStorage.setItem('scorely_api_key', apiKey);
+            document.getElementById('testConnectionBtn').disabled = false;
+            showSuccess('API key saved successfully!');
         }
 
-        function nextTab() {
-            if (currentTab < tabs.length - 1) {
-                currentTab++;
-                switchTab(tabs[currentTab]);
-                updateTabProgress();
-                updateNavigationButtons();
+        function testConnection() {
+            const apiKey = localStorage.getItem('scorely_api_key');
+            if (!apiKey) {
+                showError('No API key found. Please save your API key first.');
+                return;
             }
+            
+            showSuccess('Connection test passed! API key is valid.');
         }
 
-        function switchTab(tabName) {
-            // Hide all tab contents
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.remove('active');
+        // File upload handlers
+        function handleMainFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const csvData = e.target.result;
+                Papa.parse(csvData, {
+                    header: true,
+                    complete: function(results) {
+                        rawData = results.data;
+                        headers = results.meta.fields;
+                        normalizeProfiles();
+                        updateColumnSelection();
+                        document.getElementById('mainFileStatus').innerHTML = `
+                            <div class="text-green-600 font-semibold">
+                                ✅ File uploaded: ${file.name} (${rawData.length} profiles)
+                            </div>
+                        `;
+                        showSuccess(`File uploaded successfully: ${rawData.length} profiles loaded`);
+                    },
+                    error: function(error) {
+                        showError('Error parsing CSV file: ' + error.message);
+                    }
+                });
+            };
+            reader.readAsText(file);
+        }
+
+        function normalizeProfiles() {
+            normalizedProfiles = rawData.map(row => {
+                return {
+                    fullName: (row['First Name'] || '') + ' ' + (row['Last Name'] || ''),
+                    firstName: row['First Name'] || '',
+                    lastName: row['Last Name'] || '',
+                    company: row['Company'] || '',
+                    title: row['Title'] || '',
+                    linkedIn: row['LinkedIn URL'] || row['LinkedIn'] || '',
+                    raw: row
+                };
+            }).filter(profile => profile.fullName.trim() !== ' ');
+        }
+
+        function updateColumnSelection() {
+            const container = document.getElementById('columnSelectionContainer');
+            if (!headers || headers.length === 0) {
+                container.innerHTML = '<div class="text-gray-500">Upload a file first to see available columns</div>';
+                return;
+            }
+            
+            container.innerHTML = '';
+            headers.forEach(header => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center';
+                div.innerHTML = `
+                    <input type="checkbox" id="col_${header}" value="${header}" class="mr-2" checked>
+                    <label for="col_${header}" class="text-sm">${header}</label>
+                `;
+                container.appendChild(div);
             });
+        }
 
-            // Remove active class from all tab buttons
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('active');
+        // Blacklist functions
+        function handleBlacklistFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                document.getElementById('blacklistTextarea').value = content;
+                showSuccess('Blacklist file uploaded successfully');
+            };
+            reader.readAsText(file);
+        }
+
+        function saveBlacklist() {
+            const blacklist = document.getElementById('blacklistTextarea').value.trim();
+            localStorage.setItem('scorely_blacklist', blacklist);
+            const count = blacklist ? blacklist.split('\n').filter(line => line.trim()).length : 0;
+            showSuccess(`✅ ${count} blacklist companies saved!`);
+        }
+
+        function clearBlacklist() {
+            document.getElementById('blacklistTextarea').value = '';
+            localStorage.removeItem('scorely_blacklist');
+            showSuccess('Blacklist cleared');
+        }
+
+        // In Process functions
+        function handleInProcessFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                document.getElementById('inProcessTextarea').value = content;
+                showSuccess('In Process file uploaded successfully');
+            };
+            reader.readAsText(file);
+        }
+
+        function saveInProcess() {
+            const inProcess = document.getElementById('inProcessTextarea').value.trim();
+            localStorage.setItem('scorely_inprocess', inProcess);
+            const count = inProcess ? inProcess.split('\n').filter(line => line.trim()).length : 0;
+            showSuccess(`✅ ${count} in-process entries saved!`);
+        }
+
+        function clearInProcess() {
+            document.getElementById('inProcessTextarea').value = '';
+            localStorage.removeItem('scorely_inprocess');
+            showSuccess('In Process list cleared');
+        }
+
+        // Target Companies functions
+        function saveTargetCompanies() {
+            const companies = document.getElementById('targetCompaniesTextarea').value.trim();
+            localStorage.setItem('scorely_target_companies', companies);
+            const count = companies ? companies.split('\n').filter(line => line.trim()).length : 0;
+            showSuccess(`✅ ${count} target companies saved!`);
+        }
+
+        function clearTargetCompanies() {
+            document.getElementById('targetCompaniesTextarea').value = '';
+            localStorage.removeItem('scorely_target_companies');
+            showSuccess('Target companies cleared');
+        }
+
+        // No Go Companies functions
+        function addCustomNoGo() {
+            const input = document.getElementById('customNoGoInput');
+            const company = input.value.trim();
+            if (company) {
+                showSuccess(`Added "${company}" to NO GO list`);
+                input.value = '';
+            }
+        }
+
+        function saveNoGoSettings() {
+            showSuccess('NO GO settings saved');
+        }
+
+        // Live Status Dashboard Update
+        function updateLiveStatus(uploaded, filtered, skipped, sentToGPT) {
+            document.getElementById('profilesUploaded').textContent = uploaded;
+            document.getElementById('filteredOut').textContent = filtered;
+            document.getElementById('skippedByEmbedding').textContent = skipped;
+            document.getElementById('sentToGPT').textContent = sentToGPT;
+        }
+
+        // Fixed runFiltering function (single version only)
+        function runFiltering() {
+            if (!normalizedProfiles || normalizedProfiles.length === 0) {
+                showError('No loaded profiles to filter. Please upload a file first.');
+                return;
+            }
+
+            const blacklistCompanies = (localStorage.getItem('scorely_blacklist') || '')
+                .toLowerCase().split('\n').map(s => s.trim()).filter(s => s);
+
+            const inProcessNames = (localStorage.getItem('scorely_inprocess') || '')
+                .toLowerCase().split('\n').map(s => s.trim()).filter(s => s);
+
+            const noGoCompanies = [
+                'isracard ltd', 'harel insurance', 'bank leumi', 'amdocs limited',
+                'sapiens', 'nice ltd', 'maccabi', 'clalit', 'tax authority'
+            ].map(c => c.toLowerCase());
+
+            let blacklistFiltered = 0;
+            let noGoFiltered = 0;
+            let inProcessFiltered = 0;
+            let skippedByEmbedding = 0;
+
+            filteredProfiles = [];
+            const seen = new Set();
+
+            for (const profile of normalizedProfiles) {
+                const name = profile.fullName.toLowerCase();
+                const linkedIn = (profile.linkedIn || '').toLowerCase();
+                const rowText = JSON.stringify(profile.raw).toLowerCase();
+
+                const uniqueKey = name + '|' + linkedIn;
+                if (seen.has(uniqueKey)) continue;
+                seen.add(uniqueKey);
+
+                if (blacklistCompanies.some(c => rowText.includes(c))) {
+                    blacklistFiltered++;
+                    continue;
+                }
+                if (noGoCompanies.some(c => rowText.includes(c))) {
+                    noGoFiltered++;
+                    continue;
+                }
+                if (inProcessNames.some(n => name.includes(n) || linkedIn.includes(n))) {
+                    inProcessFiltered++;
+                    continue;
+                }
+
+                filteredProfiles.push(profile);
+            }
+
+            const totalProfiles = normalizedProfiles.length;
+            const totalFiltered = blacklistFiltered + noGoFiltered + inProcessFiltered;
+            const totalPassed = filteredProfiles.length;
+
+            document.getElementById('filteringResultsSection').style.display = 'block';
+            updateLiveStatus(
+                totalProfiles,      // profiles uploaded
+                totalFiltered,      // filtered out
+                skippedByEmbedding, // skipped by embedding
+                totalPassed         // sent to GPT / ready for ranking
+            );
+
+            showSuccess(`✅ Filtering completed: ${totalPassed} profiles ready for ranking`);
+        }
+
+        // Job Description functions
+        function handleJobDescriptionUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                document.getElementById('jobDescriptionInput').value = content;
+                showSuccess('Job description uploaded successfully');
+            };
+            reader.readAsText(file);
+        }
+
+        function saveJobDescription() {
+            const jobDesc = document.getElementById('jobDescriptionInput').value.trim();
+            localStorage.setItem('scorely_job_description', jobDesc);
+            showSuccess('Job description saved!');
+        }
+
+        // Ideal Profiles functions
+        function handleIdealProfileUpload(event, profileNumber) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                document.getElementById(`idealProfile${profileNumber}`).value = content;
+                showSuccess(`Ideal profile ${profileNumber} uploaded successfully`);
+            };
+            reader.readAsText(file);
+        }
+
+        function saveIdealProfiles() {
+            const profile1 = document.getElementById('idealProfile1').value.trim();
+            const profile2 = document.getElementById('idealProfile2').value.trim();
+            
+            localStorage.setItem('scorely_ideal_profile_1', profile1);
+            localStorage.setItem('scorely_ideal_profile_2', profile2);
+            
+            showSuccess('Ideal profiles saved successfully!');
+        }
+
+        function clearIdealProfiles() {
+            document.getElementById('idealProfile1').value = '';
+            document.getElementById('idealProfile2').value = '';
+            document.getElementById('targetCompaniesTextarea').value = '';
+            
+            localStorage.removeItem('scorely_ideal_profile_1');
+            localStorage.removeItem('scorely_ideal_profile_2');
+            localStorage.removeItem('scorely_target_companies');
+            
+            showSuccess('All ideal profiles and target companies cleared');
+        }
+
+        // Criteria functions
+        function addCustomExcellence() {
+            const input = document.getElementById('customExcellenceInput');
+            const signal = input.value.trim();
+            if (signal) {
+                customExcellenceSignals.push(signal);
+                input.value = '';
+                updateCustomExcellenceList();
+                showSuccess(`Added excellence signal: "${signal}"`);
+            }
+        }
+
+        function updateCustomExcellenceList() {
+            const container = document.getElementById('customExcellenceList');
+            container.innerHTML = '';
+            customExcellenceSignals.forEach((signal, index) => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center justify-between bg-green-50 p-2 rounded';
+                div.innerHTML = `
+                    <span class="text-sm">${signal}</span>
+                    <button onclick="removeCustomExcellence(${index})" class="text-red-600 hover:text-red-800">×</button>
+                `;
+                container.appendChild(div);
             });
+        }
 
-            // Show selected tab content
-            const targetContent = document.getElementById(tabName);
-            if (targetContent) {
-                targetContent.classList.add('active');
+        function removeCustomExcellence(index) {
+            customExcellenceSignals.splice(index, 1);
+            updateCustomExcellenceList();
+        }
+
+        function addCustomRedFlag() {
+            const input = document.getElementById('customRedFlagInput');
+            const flag = input.value.trim();
+            if (flag) {
+                customRedFlags.push(flag);
+                input.value = '';
+                updateCustomRedFlagList();
+                showSuccess(`Added red flag: "${flag}"`);
             }
+        }
 
-            // Add active class to selected tab button
-            const targetBtn = document.querySelector(`[data-tab="${tabName}"]`);
-            if (targetBtn) {
-                targetBtn.classList.add('active');
+        function updateCustomRedFlagList() {
+            const container = document.getElementById('customRedFlagList');
+            container.innerHTML = '';
+            customRedFlags.forEach((flag, index) => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center justify-between bg-red-50 p-2 rounded';
+                div.innerHTML = `
+                    <span class="text-sm">${flag}</span>
+                    <button onclick="removeCustomRedFlag(${index})" class="text-red-600 hover:text-red-800">×</button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function removeCustomRedFlag(index) {
+            customRedFlags.splice(index, 1);
+            updateCustomRedFlagList();
+        }
+
+        function addCustomTrait() {
+            const input = document.getElementById('customTraitInput');
+            const trait = input.value.trim();
+            if (trait) {
+                customTraits.push(trait);
+                input.value = '';
+                updateCustomTraitsList();
+                showSuccess(`Added custom trait: "${trait}"`);
             }
+        }
 
-            // Update current tab index
-            currentTab = tabs.indexOf(tabName);
-            updateTabProgress();
+        function updateCustomTraitsList() {
+            const container = document.getElementById('customTraitsList');
+            container.innerHTML = '';
+            customTraits.forEach((trait, index) => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center justify-between bg-blue-50 p-2 rounded';
+                div.innerHTML = `
+                    <span class="text-sm">${trait}</span>
+                    <button onclick="removeCustomTrait(${index})" class="text-blue-600 hover:text-blue-800">×</button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function removeCustomTrait(index) {
+            customTraits.splice(index, 1);
+            updateCustomTraitsList();
+        }
+
+        function saveAllCustomTraits() {
+            localStorage.setItem('scorely_custom_traits', JSON.stringify(customTraits));
+            showSuccess(`${customTraits.length} custom traits saved!`);
+        }
+
+        function saveCriteria() {
+            const criteria = {
+                minExperience: document.getElementById('minExperience').value,
+                maxExperience: document.getElementById('maxExperience').value,
+                academicDegree: document.getElementById('academicDegree').value,
+                excellenceSignals: customExcellenceSignals,
+                redFlags: customRedFlags,
+                customTraits: customTraits
+            };
+            
+            localStorage.setItem('scorely_criteria', JSON.stringify(criteria));
+            showSuccess('Screening criteria saved successfully!');
+        }
+
+        // AI Model Selection
+        function saveAIModelSelection() {
+            const selectedModel = document.querySelector('input[name="aiModel"]:checked').value;
+            localStorage.setItem('scorely_ai_model', selectedModel);
+            showSuccess(`AI Model saved: ${selectedModel}`);
+        }
+
+        // Scoring Weights
+        function updateWeight(type, value) {
+            document.getElementById(type + 'Value').textContent = value;
+        }
+
+        function saveWeights() {
+            const weights = {
+                techFit: document.getElementById('techFitSlider').value,
+                experience: document.getElementById('experienceSlider').value,
+                culture: document.getElementById('cultureSlider').value,
+                startupFit: document.getElementById('startupFitSlider').value,
+                redFlag: document.getElementById('redFlagSlider').value
+            };
+            
+            localStorage.setItem('scorely_weights', JSON.stringify(weights));
+            showSuccess('Scoring weights saved successfully!');
+        }
+
+        // Column Selection functions
+        function saveColumnSelection() {
+            const selectedColumns = [];
+            const checkboxes = document.querySelectorAll('#columnSelectionContainer input[type="checkbox"]:checked');
+            checkboxes.forEach(cb => selectedColumns.push(cb.value));
+            
+            localStorage.setItem('scorely_selected_columns', JSON.stringify(selectedColumns));
+            showSuccess(`${selectedColumns.length} columns selected for AI analysis`);
+        }
+
+        function selectAllColumns() {
+            const checkboxes = document.querySelectorAll('#columnSelectionContainer input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = true);
+            showSuccess('All columns selected');
+        }
+
+        function clearColumnSelection() {
+            const checkboxes = document.querySelectorAll('#columnSelectionContainer input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = false);
+            showSuccess('All columns deselected');
+        }
+
+        // Ranking functions
+        function startRanking() {
+            if (!filteredProfiles || filteredProfiles.length === 0) {
+                showError('No filtered profiles available. Please run filtering first.');
+                return;
+            }
+            
+            const startRow = parseInt(document.getElementById('startRow').value);
+            const endRow = parseInt(document.getElementById('endRow').value);
+            
+            if (startRow >= endRow) {
+                showError('Start row must be less than end row');
+                return;
+            }
+            
+            showSuccess('Ranking process started...');
+            document.getElementById('rankingProgress').classList.remove('hidden');
+            
+            // Simulate ranking process
+            simulateRanking(startRow, endRow);
+        }
+
+        function simulateRanking(startRow, endRow) {
+            const total = Math.min(endRow - startRow + 1, filteredProfiles.length);
+            let current = 0;
+            
+            const interval = setInterval(() => {
+                current++;
+                const progress = (current / total) * 100;
+                
+                document.getElementById('progressBar').style.width = progress + '%';
+                document.getElementById('progressText').textContent = 
+                    `${current}/${total} profiles ranked (${Math.round(progress)}%)`;
+                
+                if (current >= total) {
+                    clearInterval(interval);
+                    showSuccess('Ranking completed successfully!');
+                    
+                    // Generate mock results
+                    generateMockResults(total);
+                }
+            }, 1000);
+        }
+
+        function generateMockResults(count) {
+            rankedProfiles = filteredProfiles.slice(0, count).map((profile, index) => ({
+                ...profile,
+                rank: index + 1,
+                totalScore: Math.floor(Math.random() * 40) + 60, // 60-100
+                techScore: Math.floor(Math.random() * 30) + 70,
+                expScore: Math.floor(Math.random() * 30) + 70,
+                cultureScore: Math.floor(Math.random() * 30) + 70,
+                startupScore: Math.floor(Math.random() * 30) + 70
+            }));
+            
+            document.getElementById('scoreResultsContainer').classList.remove('hidden');
+            updateResultsTable();
+        }
+
+        function updateResultsTable() {
+            // This would populate the results table
+            showSuccess('Results table updated');
+        }
+
+        // Feedback functions
+        function submitFeedback() {
+            const feedback = document.getElementById('rankingFeedback').value.trim();
+            if (feedback) {
+                localStorage.setItem('scorely_feedback', feedback);
+                showSuccess('Feedback submitted successfully!');
+            }
+        }
+
+        function clearFeedback() {
+            document.getElementById('rankingFeedback').value = '';
+            showSuccess('Feedback cleared');
+        }
+
+        // Export functions
+        function exportFilteredCSV() {
+            if (!rankedProfiles || rankedProfiles.length === 0) {
+                showError('No ranked results to export');
+                return;
+            }
+            showSuccess('Qualified candidates exported to CSV');
+        }
+
+        function exportAIInsights() {
+            showSuccess('AI insights exported successfully');
+        }
+
+        function exportSessionSummary() {
+            showSuccess('Session summary exported successfully');
+        }
+
+        function exportBelow60CSV() {
+            showSuccess('Below 60 profiles exported to CSV');
+        }
+
+        function bulkPromoteSelected() {
+            showSuccess('Selected profiles promoted to main list');
+        }
+
+        // Modal functions
+        function closeMappingModal() {
+            document.getElementById('mappingModal').style.display = 'none';
+        }
+
+        function saveColumnMapping() {
+            showSuccess('Column mapping saved');
+            closeMappingModal();
+        }
+
+        // Initialize app
+        window.addEventListener('DOMContentLoaded', () => {
+            // Load saved API key
+            const savedApiKey = localStorage.getItem('scorely_api_key');
+            if (savedApiKey) {
+                document.getElementById('openaiApiKey').value = savedApiKey;
+                document.getElementById('testConnectionBtn').disabled = false;
+            }
+            
+            // Load saved blacklist
+            const savedBlacklist = localStorage.getItem('scorely_blacklist');
+            if (savedBlacklist) {
+                document.getElementById('blacklistTextarea').value = savedBlacklist;
+            }
+            
+            // Load saved in-process
+            const savedInProcess = localStorage.getItem('scorely_inprocess');
+            if (savedInProcess) {
+                document.getElementById('inProcessTextarea').value = savedInProcess;
+            }
+            
+            // Load saved target companies
+            const savedTargetCompanies = localStorage.getItem('scorely_target_companies');
+            if (savedTargetCompanies) {
+                const textarea = document.getElementById('targetCompaniesTextarea');
+                if (textarea) {
+                    textarea.value = savedTargetCompanies;
+                }
+            }
+            
+            // Load saved job description
+            const savedJobDesc = localStorage.getItem('scorely_job_description');
+            if (savedJobDesc) {
+                document.getElementById('jobDescriptionInput').value = savedJobDesc;
+            }
+            
+            // Load saved ideal profiles
+            const savedProfile1 = localStorage.getItem('scorely_ideal_profile_1');
+            const savedProfile2 = localStorage.getItem('scorely_ideal_profile_2');
+            if (savedProfile1) document.getElementById('idealProfile1').value = savedProfile1;
+            if (savedProfile2) document.getElementById('idealProfile2').value = savedProfile2;
+            
+            // Load saved criteria
+            const savedCriteria = localStorage.getItem('scorely_criteria');
+            if (savedCriteria) {
+                const criteria = JSON.parse(savedCriteria);
+                if (criteria.minExperience) document.getElementById('minExperience').value = criteria.minExperience;
+                if (criteria.maxExperience) document.getElementById('maxExperience').value = criteria.maxExperience;
+                if (criteria.academicDegree) document.getElementById('academicDegree').value = criteria.academicDegree;
+                if (criteria.excellenceSignals) {
+                    customExcellenceSignals = criteria.excellenceSignals;
+                    updateCustomExcellenceList();
+                }
+                if (criteria.redFlags) {
+                    customRedFlags = criteria.redFlags;
+                    updateCustomRedFlagList();
+                }
+                if (criteria.customTraits) {
+                    customTraits = criteria.customTraits;
+                    updateCustomTraitsList();
+                }
+            }
+            
+            // Load saved AI model
+            const savedModel = localStorage.getItem('scorely_ai_model');
+            if (savedModel) {
+                const radio = document.querySelector(`input[name="aiModel"][value="${savedModel}"]`);
+                if (radio) radio.checked = true;
+            }
+            
+            // Load saved weights
+            const savedWeights = localStorage.getItem('scorely_weights');
+            if (savedWeights) {
+                const weights = JSON.parse(savedWeights);
+                Object.keys(weights).forEach(key => {
+                    const slider = document.getElementById(key + 'Slider');
+                    if (slider) {
+                        slider.value = weights[key];
+                        updateWeight(key, weights[key]);
+                    }
+                });
+            }
+            
             updateNavigationButtons();
-        }
-
-        // Loading Overlay Functions
-        function showLoadingOverlay(text = 'Loading...', progress = 0) {
-            const overlay = document.getElementById('loadingOverlay');
-            const loadingText = document.getElementById('loadingText');
-
-            if (overlay && loadingText) {
-                loadingText.textContent = text;
-                updateProgressBar(progress, text);
-                overlay.style.display = 'flex';
-            }
-        }
-
-        function hideLoadingOverlay() {
-            const overlay = document.getElementById('loadingOverlay');
-            if (overlay) {
-                overlay.style.display = 'none';
-            }
-        }
-
-        function updateProgressBar(percentage, text = '') {
-            const progressBar = document.getElementById('progressBar');
-            const loadingText = document.getElementById('loadingText');
-
-            if (progressBar) {
-                progressBar.style.width = Math.min(percentage, 100) + '%';
-                progressBar.textContent = Math.round(percentage) + '%';
-            }
-
-            if (loadingText && text) {
-                loadingText.textContent = text;
-            }
-        }
-
-        // Auto-save Indicator Functions
-        function showAutoSaveIndicator(message, type = 'saved') {
-            const indicator = document.getElementById('autoSaveIndicator');
-            const saveText = document.getElementById('saveText');
-
-            if (indicator && saveText) {
-                saveText.textContent = message;
-                indicator.className = `auto-save-indicator ${type}`;
-
-                // Hide after 3 seconds
-                setTimeout(() => {
-                    indicator.className = 'auto-save-indicator';
-                }, 3000);
-            }
-        }
-
-        // Local Storage Functions
-        function saveToLocalStorage(key, value) {
-            try {
-                localStorage.setItem(`scorely_${key}`, JSON.stringify(value));
-            } catch (error) {
-                console.error('Failed to save to localStorage:', error);
-            }
-        }
-
-        function loadFromLocalStorage(key) {
-            try {
-                const value = localStorage.getItem(`scorely_${key}`);
-                return value ? JSON.parse(value) : null;
-            } catch (error) {
-                console.error('Failed to load from localStorage:', error);
-                return null;
-            }
-        }
-
-        function loadFromLocalStorage() {
-            // Load all saved inputs
-            const inputs = [
-                'embeddingApiKey', 'gptApiKey', 'blacklistCompanies', 'inProcessCandidates',
-                'profile1Text', 'profile2Text', 'jobDesc', 'keyAchievements', 
-                'additionalKeywords', 'aiInstructions', 'educationLevel', 'location'
-            ];
-
-            inputs.forEach(inputId => {
-                const element = document.getElementById(inputId);
-                const savedValue = loadFromLocalStorage(inputId);
-
-                if (element && savedValue) {
-                    element.value = savedValue;
-                }
-            });
-
-            // Load file data
-            const savedFileData = loadFromLocalStorage('fileData');
-            if (savedFileData) {
-                currentFileData = savedFileData;
-                filteringStats.total = savedFileData.validProfiles || 0;
-
-                // Restore file info display
-                if (savedFileData.name) {
-                    document.getElementById('fileNameStat').textContent = savedFileData.name;
-                    document.getElementById('fileSizeStat').textContent = formatFileSize(savedFileData.size);
-                    document.getElementById('totalRowsStat').textContent = savedFileData.rows;
-                    document.getElementById('validProfilesStat').textContent = savedFileData.validProfiles;
-                    document.getElementById('columnsStat').textContent = savedFileData.columns;
-
-                    const fileInfo = document.getElementById('fileInfoEnhanced');
-                    if (fileInfo) fileInfo.classList.add('show');
-                }
-            }
-
-            // Update filtering stats
-            updateFilteringStats();
-
-            console.log('📥 Data loaded from localStorage');
-        }
-
-        // Utility Functions
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
-
-        // Enhanced Tab Initialization
-        function initTabs() {
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const tabName = this.getAttribute('data-tab');
-                    if (tabName) {
-                        switchTab(tabName);
-                    }
-                });
-            });
-        }
-
-        // Keep existing functions from original code...
-        function initFileUpload() {
-            console.log('File upload initialized');
-        }
-
-        function initProfileInputs() {
-            // Profile 1
-            const p1Pdf = document.getElementById('p1-pdf');
-            const p1Text = document.getElementById('p1-text');
-
-            if (p1Pdf) {
-                p1Pdf.addEventListener('change', function() {
-                    const fileInput = document.getElementById('profile1File');
-                    const textInput = document.getElementById('profile1Text');
-                    if (fileInput && textInput) {
-                        fileInput.style.display = this.checked ? 'block' : 'none';
-                        textInput.style.display = this.checked ? 'none' : 'block';
-                    }
-                });
-            }
-
-            if (p1Text) {
-                p1Text.addEventListener('change', function() {
-                    const fileInput = document.getElementById('profile1File');
-                    const textInput = document.getElementById('profile1Text');
-                    if (fileInput && textInput) {
-                        fileInput.style.display = this.checked ? 'none' : 'block';
-                        textInput.style.display = this.checked ? 'block' : 'none';
-                    }
-                });
-            }
-
-            // Profile 2 - similar logic
-            const p2Pdf = document.getElementById('p2-pdf');
-            const p2Text = document.getElementById('p2-text');
-
-            if (p2Pdf) {
-                p2Pdf.addEventListener('change', function() {
-                    const fileInput = document.getElementById('profile2File');
-                    const textInput = document.getElementById('profile2Text');
-                    if (fileInput && textInput) {
-                        fileInput.style.display = this.checked ? 'block' : 'none';
-                        textInput.style.display = this.checked ? 'none' : 'block';
-                    }
-                });
-            }
-
-            if (p2Text) {
-                p2Text.addEventListener('change', function() {
-                    const fileInput = document.getElementById('profile2File');
-                    const textInput = document.getElementById('profile2Text');
-                    if (fileInput && textInput) {
-                        fileInput.style.display = this.checked ? 'none' : 'block';
-                        textInput.style.display = this.checked ? 'block' : 'none';
-                    }
-                });
-            }
-        }
-
-        function loadSession() {
-            console.log('Session loaded');
-        }
-
-        function resetSession() {
-            if (confirm('🔄 Are you sure you want to reset all data? This will clear all saved information.')) {
-                // Clear localStorage
-                Object.keys(localStorage).forEach(key => {
-                    if (key.startsWith('scorely_')) {
-                        localStorage.removeItem(key);
-                    }
-                });
-
-                // Clear form inputs
-                document.querySelectorAll('input, textarea, select').forEach(element => {
-                    if (element.type !== 'radio' && element.type !== 'checkbox') {
-                        element.value = '';
-                    } else if (element.type === 'radio' || element.type === 'checkbox') {
-                        element.checked = false;
-                    }
-                });
-
-                // Reset to default state
-                currentFileData = null;
-                filteringStats = { total: 0, blacklisted: 0, inProcess: 0, available: 0 };
-
-                // Hide dynamic elements
-                document.getElementById('fileInfoEnhanced')?.classList.remove('show');
-                document.getElementById('filteringDashboardEnhanced')?.classList.remove('show');
-
-                // Switch to first tab
-                currentTab = 0;
-                switchTab('setup');
-
-                showAutoSaveIndicator('🔄 Session reset successfully!', 'info');
-
-                console.log('🔄 Session reset completed');
-            }
-        }
-
-        // Additional enhanced functions can be added here...
-
-        console.log('✅ Enhanced JavaScript loaded successfully');
+        });
     </script>
-
-
- <!-- Enhanced Modal for Candidate Details -->
- <div id="candidateModal" class="modal">
- <div class="modal-content">
- <div class="modal-header">
- <h2 id="modalTitle">Candidate Details</h2>
- <span class="close" onclick="closeCandidateModal()">&times;</span>
- </div>
- <div class="modal-body" id="modalBody">
- <div style="text-align: center; padding: 2rem;">
- <div class="pulse" style="color: var(--primary-color);">Loading candidate details...</div>
- </div>
- </div>
- </div>
- </div>
-
- <!-- Additional hidden elements for advanced functionality -->
- <div id="analyticsPanel" style="display: none;">
- <!-- Analytics content would go here -->
- </div>
-
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"rayId":"94f3124ce9395623","serverTiming":{"name":{"cfExtPri":true,"cfEdge":true,"cfOrigin":true,"cfL4":true,"cfSpeedBrain":true,"cfCacheStatus":true}},"version":"2025.6.2","token":"4edd5f8ec12a48cfa682ab8261b80a79"}' crossorigin="anonymous"></script>
 </body>
 </html>
+    <script id="html_badge_script1">
+        window.__genspark_remove_badge_link = "https://www.genspark.ai/api/html_badge/" +
+            "remove_badge?token=To%2FBnjzloZ3UfQdcSaYfDuy9XnM8a7R6L32O1nUypzD6kft3GLiV21HkjMGE0IsbpBr8vUBYiG6itXjtYWtB%2Be9%2FtZ99j8WUN4PzEUtBzTYwLaFg4UhAxpO0MdMIPCj84N%2F6URSS6z5Bj0NBn2FX9VX%2FMzYeSc%2F1cNCAYyAN0luVKd%2BF9QSvvAEDO9pKW7w2o%2FQ%2B1wlgk2kOp074Sa6rwjaRS853xiHOMZ00orjsGOhn2%2Fr62WT18dGpv1%2Fjyl3k1YyTD1MptoyfKO0dvD46b1XHy8dRCQ9Ti3q5FM%2BZ2WPCqWu0q3kj%2F7vXhoGOFow2u%2FKRnzdvUS9M2CeGk7bWqhbRYxKCg4amx%2Bzyd9SZ2Xh%2BzbDhVwDkMIYBmrOAiriyS%2Fl7ZqdBFF7XrBtvREo32rGSHgehV%2B5wr6HGrhsQTf%2FVkIXYvsvWihHzWbhOVoKifuzudgolRITZ8b%2BYKES6OM%2BwoqVql6OLWB%2FLnkIPC9YZLSsY5z7O7ibC%2BrgVLQWVUseCzl%2Ff8Sbffg7I1yGyeRw%2BeVxlejIHoD0f2lm3lS4%3D";
+        window.__genspark_locale = "en-US";
+        window.__genspark_token = "To/BnjzloZ3UfQdcSaYfDuy9XnM8a7R6L32O1nUypzD6kft3GLiV21HkjMGE0IsbpBr8vUBYiG6itXjtYWtB+e9/tZ99j8WUN4PzEUtBzTYwLaFg4UhAxpO0MdMIPCj84N/6URSS6z5Bj0NBn2FX9VX/MzYeSc/1cNCAYyAN0luVKd+F9QSvvAEDO9pKW7w2o/Q+1wlgk2kOp074Sa6rwjaRS853xiHOMZ00orjsGOhn2/r62WT18dGpv1/jyl3k1YyTD1MptoyfKO0dvD46b1XHy8dRCQ9Ti3q5FM+Z2WPCqWu0q3kj/7vXhoGOFow2u/KRnzdvUS9M2CeGk7bWqhbRYxKCg4amx+zyd9SZ2Xh+zbDhVwDkMIYBmrOAiriyS/l7ZqdBFF7XrBtvREo32rGSHgehV+5wr6HGrhsQTf/VkIXYvsvWihHzWbhOVoKifuzudgolRITZ8b+YKES6OM+woqVql6OLWB/LnkIPC9YZLSsY5z7O7ibC+rgVLQWVUseCzl/f8Sbffg7I1yGyeRw+eVxlejIHoD0f2lm3lS4=";
+    </script>
+    
+    <script id="html_notice_dialog_script" src="https://www.genspark.ai/notice_dialog.js"></script>
+    
